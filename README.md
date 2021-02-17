@@ -1,5 +1,5 @@
 # DataMining2-project
-# Module 1 - Introduction, Imbalanced Learning and Anomaly Detection
+Module 1 - Introduction, Imbalanced Learning and Anomaly Detection
 
 1-Explore and prepare the dataset. You are allowed to take inspiration from the associated GitHub repository and figure out your personal research perspective (from choosing a subset of variables to the class to predict…). You are welcome in creating new variables and performing all the pre-processing steps the dataset needs.
 
