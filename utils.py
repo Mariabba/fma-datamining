@@ -10,7 +10,7 @@ def load(filepath):
         return pd.read_csv(filepath, index_col=0, header=[0, 1, 2])
 
     if "echonest" in filename:
-        return pd.read_csv(filepath, index_col=0, header=[0, 1, 2])
+        return pd.read_csv(filepath, index_col=0, header=[0, 1])
 
     if "genres" or "albums" or "artists" in filename:
         return pd.read_csv(filepath, index_col=0)
