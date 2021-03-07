@@ -69,9 +69,9 @@ def load(filepath, clean=False, dummies=False):
 
 
 def discretizer(df):
-    pass
-    # df["Gender"] = df["Gender"].replace("Male", 0).replace("Female", 1)
-    pd.cut(df["track", "listens"], 4)
+    df["track", "listens"] = pd.qcut(
+        df["track", "listens"], 4, labels=["low", "medium", "high", "superhigh"]
+    )
     return df
 
 

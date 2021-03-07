@@ -11,9 +11,12 @@ tracks = utils.load(Path("data/tracks.csv"))
 # print(tracks.info())
 
 # tracks = utils.dummy_maker(tracks)
-print(tracks.info())
 
 tracks = utils.discretizer(tracks)
+print(tracks.info())
+print(tracks["track", "listens"].describe())
+print(tracks["track", "listens"].head())
+
 # print(tracks[("track", "dummy_lyricist")].value_counts())
 
 del tracks[("set", "subset")]
