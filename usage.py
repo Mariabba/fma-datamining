@@ -19,7 +19,5 @@ print(tracks["track", "listens"].head())
 
 # print(tracks[("track", "dummy_lyricist")].value_counts())
 
-del tracks[("set", "subset")]
-
 # df_decisiontree = tracks[[blablabla]]
 # df_knn = tracks[[blablaslsadasdldsaldsa]]

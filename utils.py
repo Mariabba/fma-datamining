@@ -59,6 +59,7 @@ def load(filepath, clean=False, dummies=False):
         print(f"Something bad just happened with {filename}.")
 
     df = df.convert_dtypes()
+    del df[("set", "subset")]
 
     if clean:
         df = discretizer(df)
