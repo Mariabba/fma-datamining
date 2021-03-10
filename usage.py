@@ -12,10 +12,14 @@ tracks = utils.load(Path("data/tracks.csv"))
 
 # tracks = utils.dummy_maker(tracks)
 
+tracks = utils.dummy_maker(tracks)
+# print(tracks.info())
+
 tracks = utils.discretizer(tracks)
+print("Here are informations on tracks")
 print(tracks.info())
-print(tracks["track", "comments"].describe())
-print(tracks["track", "comments"].head(30))
+# print(tracks["track", "comments"].describe())
+# print(tracks["track", "comments"].head(30))
 
 # print(tracks[("track", "dummy_lyricist")].value_counts())
 
