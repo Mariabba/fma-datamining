@@ -1,7 +1,7 @@
 import ast
-
+import numpy as np
 import pandas as pd
-from rich.progress import Progress, track
+#from rich.progress import Progress, track
 
 
 def load(filepath, clean=False, dummies=False):
@@ -73,9 +73,11 @@ def load(filepath, clean=False, dummies=False):
 
 
 def discretizer(df):
-    bins = pd.IntervalIndex.from_tuples([(-1, 0.5), (0.8, 37)])
+    #bins = pd.IntervalIndex.from_tuples([(-1, 0.5), (0.8, 37)])
+    bins = [-np.inf,0,np.inf]
+    labels = ["nocomm", "comm"]
     df["track", "comments"] = pd.cut(
-        df["track", "comments"], bins, labels=["nocomm", "comm"]
+        df["track", "comments"], bins=bins, labels=labels
     )
     return df
 
