@@ -180,4 +180,5 @@ def clean(df):
     # 4. check di consistenza: come?
 
     # 5. missing values colonne coverage > 80% : come riempire?
-     #prova marianna sono scemaaaaa
+
+     #commit per bambini deficenti
