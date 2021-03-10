@@ -74,7 +74,7 @@ def load(filepath, clean=False, dummies=False):
 
 def discretizer(df):
     #album comments
-    bins = [-np.inf, -1, 0,np.inf]
+    bins = [-np.inf, -1, 0, np.inf]
     labels = ["no_info","no_comments", "commented"]
     df["album", "comments"] = pd.cut(
         df["album", "comments"], bins=bins, labels=labels
@@ -89,13 +89,11 @@ def discretizer(df):
 
     print(df["artist", "comments"].value_counts())
 
-    #album engineer
-    df["album", "engineer"] = ~df["album", "engineer"].isnull() # ~ is used to state true as presence of engineer and false the absence
-    print(df["album", "engineer"].value_counts())
+    print(df["album", "favorites"].value_counts())
 
-    #album favorites
-    bins = [-np.inf, -1, 0, 1, 2, 3,  np.inf]
-    labels = ["no_album","no_favorites", "lowest_favorites", "low_favorites", "medium_favorites", "high_favorites"]
+    # artist favorites
+    bins = [-np.inf, -1, 0, 1, 2, 3, np.inf]
+    labels = ["no_album", "no_favorites", "lowest_favorites", "low_favorites", "medium_favorites", "high_favorites"]
     df["album", "favorites"] = pd.cut(
         df["album", "favorites"], bins=bins, labels=labels
     )
