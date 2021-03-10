@@ -75,12 +75,19 @@ def load(filepath, clean=False, dummies=False):
 def discretizer(df):
     #album comments
     bins = [-np.inf, -1, 0,np.inf]
-    labels = ["no_album","no_comments", "commented"]
+    labels = ["no_info","no_comments", "commented"]
     df["album", "comments"] = pd.cut(
         df["album", "comments"], bins=bins, labels=labels
     )
 
-    print(df["album", "comments"].value_counts())
+    #artist comments
+    bins = [-np.inf, -1, 0,np.inf]
+    labels = ["no_info","no_comments", "commented"]
+    df["artist", "comments"] = pd.cut(
+        df["artist", "comments"], bins=bins, labels=labels
+    )
+
+    print(df["artist", "comments"].value_counts())
 
     #album engineer
     df["album", "engineer"] = ~df["album", "engineer"].isnull() # ~ is used to state true as presence of engineer and false the absence
@@ -99,6 +106,14 @@ def discretizer(df):
     #album information
     df["album", "information"] = ~df["album", "information"].isnull() # ~ is used to state true as presence of information and false the absence
     print(df["album", "information"].value_counts())
+
+    #artist bio
+    df["artist", "bio"] = ~df["artist", "bio"].isnull() # ~ is used to state true as presence of bio and false the absence
+    print(df["artist", "bio"].value_counts())
+
+    #album producer
+    df["album", "producer"] = ~df["album", "producer"].isnull() # ~ is used to state true as presence of producer and false the absence
+    print(df["album", "producer"].value_counts())
 
     #track comments
     bins = [-np.inf,0,np.inf]
