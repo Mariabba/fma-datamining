@@ -60,6 +60,9 @@ def load(filepath, clean=False, dummies=False):
 
     df = df.convert_dtypes()
     del df[("set", "subset")]
+    del df[("track", "bit_rate")]
+    del df[("artist", "latitude")]
+    del df[("artist", "longitude")]
 
     if clean:
         df = discretizer(df)
@@ -70,8 +73,9 @@ def load(filepath, clean=False, dummies=False):
 
 
 def discretizer(df):
-    df["track", "listens"] = pd.qcut(
-        df["track", "listens"], 4, labels=["low", "medium", "high", "superhigh"]
+    bins = pd.IntervalIndex.from_tuples([(-1, 0.5), (0.8, 37)])
+    df["track", "comments"] = pd.cut(
+        df["track", "comments"], bins, labels=["nocomm", "comm"]
     )
     return df
 
@@ -92,9 +96,7 @@ def dummy_maker(df, threshold=0.9):
 
     my_df = (~my_df.isna()).astype(int)
 
-    my_df.columns = pd.MultiIndex.from_tuples(
-        [(a, f"dummy_{b}") for a, b in my_df.columns]
-    )
+    my_df.columns = pd.MultiIndex.from_tuples([(a, f"d_{b}") for a, b in my_df.columns])
 
     return df.append(my_df, ignore_index=True)
 

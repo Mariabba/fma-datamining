@@ -14,8 +14,8 @@ tracks = utils.load(Path("data/tracks.csv"))
 
 tracks = utils.discretizer(tracks)
 print(tracks.info())
-print(tracks["track", "listens"].describe())
-print(tracks["track", "listens"].head())
+print(tracks["track", "comments"].describe())
+print(tracks["track", "comments"].head(30))
 
 # print(tracks[("track", "dummy_lyricist")].value_counts())
 
