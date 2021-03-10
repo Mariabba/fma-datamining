@@ -73,12 +73,43 @@ def load(filepath, clean=False, dummies=False):
 
 
 def discretizer(df):
-    #bins = pd.IntervalIndex.from_tuples([(-1, 0.5), (0.8, 37)])
+    #album comments
+    bins = [-np.inf, -1, 0,np.inf]
+    labels = ["no_album","no_comments", "commented"]
+    df["album", "comments"] = pd.cut(
+        df["album", "comments"], bins=bins, labels=labels
+    )
+
+    print(df["album", "comments"].value_counts())
+
+    #album engineer
+    df["album", "engineer"] = ~df["album", "engineer"].isnull() # ~ is used to state true as presence of engineer and false the absence
+    print(df["album", "engineer"].value_counts())
+
+    #album favorites
+    bins = [-np.inf, -1, 0, 1, 2, 3,  np.inf]
+    labels = ["no_album","no_favorites", "lowest_favorites", "low_favorites", "medium_favorites", "high_favorites"]
+    df["album", "favorites"] = pd.cut(
+        df["album", "favorites"], bins=bins, labels=labels
+    )
+
+    print(df["album", "favorites"].value_counts())
+
+    #text analysis
+    #album information
+    df["album", "information"] = ~df["album", "information"].isnull() # ~ is used to state true as presence of information and false the absence
+    print(df["album", "information"].value_counts())
+
+    #track comments
     bins = [-np.inf,0,np.inf]
-    labels = ["nocomm", "comm"]
+    labels = ["no_comments", "commented"]
     df["track", "comments"] = pd.cut(
         df["track", "comments"], bins=bins, labels=labels
     )
+
+    print(df["track", "comments"].value_counts())
+
+
     return df
 
 
