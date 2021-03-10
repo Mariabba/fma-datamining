@@ -8,14 +8,11 @@ import utils
 # echonest = utils.load(Path("data/echonest.csv"))
 tracks = utils.load(Path("data/tracks.csv"))
 # artists = utils.load(Path("data/raw_artists.csv"))
-# print(tracks.info())
-
-# tracks = utils.dummy_maker(tracks)
 
 tracks = utils.dummy_maker(tracks)
-# print(tracks.info())
 
 tracks = utils.discretizer(tracks)
+
 print("Here are informations on tracks")
 print(tracks.info())
 # print(tracks["track", "comments"].describe())
