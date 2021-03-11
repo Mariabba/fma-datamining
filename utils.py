@@ -99,14 +99,11 @@ def discretizer(df):
 
     print(df["artist", "comments"].value_counts())
 
-    print(df["album", "favorites"].value_counts())
-
-    # artist favorites
-    bins = [-np.inf, -1, 0, 1, 2, 3, np.inf]
+    # album favorites
+    bins = [-np.inf, -1, 0, 2, 5, np.inf]
     labels = [
-        "no_album",
+        "no_info",
         "no_favorites",
-        "lowest_favorites",
         "low_favorites",
         "medium_favorites",
         "high_favorites",
@@ -116,6 +113,23 @@ def discretizer(df):
     )
 
     print(df["album", "favorites"].value_counts())
+
+    # artist favorites
+    bins = [-np.inf, 0, 10, 50, 150, 500, np.inf]
+    labels = [
+        "no_favorites",
+        "low_favorites",
+        "medium_favorites",
+        "high_favorites",
+        "higher_favorites",
+        "super_favourites"
+    ]
+    df["artist", "favorites"] = pd.cut(
+        df["artist", "favorites"], bins=bins, labels=labels
+    )
+
+    print(df["artist", "favorites"].value_counts())
+
 
     # text analysis
     # album information
@@ -142,6 +156,33 @@ def discretizer(df):
     df["track", "comments"] = pd.cut(df["track", "comments"], bins=bins, labels=labels)
 
     print(df["track", "comments"].value_counts())
+
+    # track duration
+    bins = [-np.inf, 60, 120, np.inf]
+    labels = ["1min", "2min", "morethan3min"]
+    df["track", "duration"] = pd.cut(df["track", "duration"], bins=bins, labels=labels)
+
+    print(df["track", "duration"].value_counts())
+
+    # track favorites
+    bins = [-np.inf, 0, 2, 5, np.inf]
+    labels = [
+        "no_favorites",
+        "low_favorites",
+        "medium_favorites",
+        "high_favorites",
+    ]
+    df["track", "favorites"] = pd.cut(
+        df["track", "favorites"], bins=bins, labels=labels
+    )
+
+    print(df["track", "favorites"].value_counts())
+
+    # artist website
+    df["artist", "website"] = ~df[
+        "artist", "website"
+    ].isnull()  # ~ is used to state true as presence of website stated and false the absence
+    print(df["artist", "website"].value_counts())
 
     return df
 
