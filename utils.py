@@ -184,6 +184,34 @@ def discretizer(df):
     ].isnull()  # ~ is used to state true as presence of website stated and false the absence
     print(df["artist", "website"].value_counts())
 
+    # album listens
+    bins = [-np.inf, -1, 10000, 50000, 150000, np.inf]
+    labels = [
+        "no_info",
+        "low_listened",
+        "medium_listened",
+        "high_listened",
+        "higher_listened"
+    ]
+    df["album", "listens"] = pd.cut(
+        df["album", "listens"], bins=bins, labels=labels
+    )
+
+    print(df["album", "listens"].value_counts())
+
+    # track listens
+    bins = [-np.inf, 1000, 5000, np.inf]
+    labels = [
+        "low_listened",
+        "medium_listened",
+        "high_listened",
+    ]
+    df["track", "listens"] = pd.cut(
+        df["track", "listens"], bins=bins, labels=labels
+    )
+
+    print(df["track", "listens"].value_counts())
+
     return df
 
 
