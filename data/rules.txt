@@ -1,0 +1,11 @@
+track, comments >= 0
+album, comments >= 0
+artist, comments >= 0
+
+album, listens >= 0
+track, listens >= 0
+
+album, favorites >= 0
+artist, favorites >= 0
+track, favorites >= 0
+album, listens < 0
