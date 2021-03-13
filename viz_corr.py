@@ -36,4 +36,6 @@ sns.heatmap(
     cbar_kws={"shrink": 0.5},
 )
 # plt.show()
+plt.title("Correlation Matrix")
+plt.xticks(fontsize=10)
 plt.savefig(Path("viz/correlation.png"), bbox_inches="tight")
