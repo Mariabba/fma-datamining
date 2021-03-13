@@ -8,7 +8,7 @@ except ModuleNotFoundError:
     pass
 
 
-def load(filepath, clean=False, dummies=False):
+def load(filepath, clean=False, dummies=False, fill=False):
 
     filename = filepath.name
 
@@ -44,6 +44,8 @@ def load(filepath, clean=False, dummies=False):
         df = discretizer(df)
     if dummies:
         df = dummy_maker(df)
+    if fill:
+        df = fill_missing(df)
 
     return df
 
@@ -122,7 +124,7 @@ def discretizer(df):
         "medium_favorites",
         "high_favorites",
         "higher_favorites",
-        "super_favourites"
+        "super_favourites",
     ]
     df["artist", "favorites"] = pd.cut(
         df["artist", "favorites"], bins=bins, labels=labels
@@ -130,24 +132,17 @@ def discretizer(df):
 
     print(df["artist", "favorites"].value_counts())
 
-
     # text analysis
-    # album information
-    df["album", "information"] = ~df[
-        "album", "information"
-    ].isnull()  # ~ is used to state true as presence of information and false the absence
+    # album information ~ is used to state true as presence of information and false the absence
+    df["album", "information"] = ~df["album", "information"].isnull()
     print(df["album", "information"].value_counts())
 
-    # artist bio
-    df["artist", "bio"] = ~df[
-        "artist", "bio"
-    ].isnull()  # ~ is used to state true as presence of bio and false the absence
+    # artist bio ~ is used to state true as presence of bio and false the absence
+    df["artist", "bio"] = ~df["artist", "bio"].isnull()
     print(df["artist", "bio"].value_counts())
 
-    # album producer
-    df["album", "producer"] = ~df[
-        "album", "producer"
-    ].isnull()  # ~ is used to state true as presence of producer and false the absence
+    # album producer ~ is used to state true as presence of producer and false the absence
+    df["album", "producer"] = ~df["album", "producer"].isnull()
     print(df["album", "producer"].value_counts())
 
     # track comments
@@ -178,11 +173,8 @@ def discretizer(df):
 
     print(df["track", "favorites"].value_counts())
 
-    # artist website
-    df["artist", "website"] = ~df[
-        "artist", "website"
-    ].isnull()  # ~ is used to state true as presence of website stated and false the absence
-    print(df["artist", "website"].value_counts())
+    # artist website - ~ is used to state true as presence of website stated and false the absence
+    df["artist", "website"] = ~df["artist", "website"].isnull()
 
     # album listens
     bins = [-np.inf, -1, 10000, 50000, 150000, np.inf]
@@ -191,13 +183,9 @@ def discretizer(df):
         "low_listened",
         "medium_listened",
         "high_listened",
-        "higher_listened"
+        "higher_listened",
     ]
-    df["album", "listens"] = pd.cut(
-        df["album", "listens"], bins=bins, labels=labels
-    )
-
-    print(df["album", "listens"].value_counts())
+    df["album", "listens"] = pd.cut(df["album", "listens"], bins=bins, labels=labels)
 
     # track listens
     bins = [-np.inf, 1000, 5000, np.inf]
@@ -206,11 +194,7 @@ def discretizer(df):
         "medium_listened",
         "high_listened",
     ]
-    df["track", "listens"] = pd.cut(
-        df["track", "listens"], bins=bins, labels=labels
-    )
-
-    print(df["track", "listens"].value_counts())
+    df["track", "listens"] = pd.cut(df["track", "listens"], bins=bins, labels=labels)
 
     return df
 
@@ -238,6 +222,10 @@ def dummy_maker(df, threshold=0.9):
     return pd.concat([df, my_df], axis=1)
 
 
+def fill_missing(df):
+    pass
+
+
 def clean(df):
     pass
     # 1. discretizzare ciò che ha senso sia discretizzato
@@ -249,5 +237,3 @@ def clean(df):
     # 4. check di consistenza: come?
 
     # 5. missing values colonne coverage > 80% : come riempire?
-
-     #commit per bambini deficenti
