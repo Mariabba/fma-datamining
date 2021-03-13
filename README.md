@@ -1,5 +1,6 @@
 # DataMining2-project
-Module 1 - Introduction, Imbalanced Learning and Anomaly Detection
+
+#Module 1 - Introduction, Imbalanced Learning and Anomaly Detection
 
 1-Explore and prepare the dataset. You are allowed to take inspiration from the associated GitHub repository and figure out your personal research perspective (from choosing a subset of variables to the class to predict…). You are welcome in creating new variables and performing all the pre-processing steps the dataset needs.
 
@@ -13,7 +14,7 @@ Module 1 - Introduction, Imbalanced Learning and Anomaly Detection
 
 N.B. When “solving the classification task”, remember, (i) to test, when needed, different criteria for the parameter estimation of the algorithms, and (ii) to evaluate the classifiers (e.g., Accuracy, F1, Lift Chart) in order to compare the results obtained with an imbalanced technique against those obtained from using the “original” dataset.
 
-Module 2 - Advanced Classification Methods
+#Module 2 - Advanced Classification Methods
 
 1-Solve the classification task defined in Module 1 (or define new ones) with the other classification methods analyzed during the course: Naive Bayes Classifier, Logistic Regression, Rule-based Classifiers, Support Vector Machines, Neural Networks, Ensemble Methods and evaluate each classifier with the techniques presented in Module 1 (accuracy, precision, recall, F1-score, ROC curve). Perform hyper-parameter tuning phases and justify your choices.
 
