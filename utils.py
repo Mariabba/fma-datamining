@@ -1,4 +1,6 @@
 import ast
+from pathlib import Path
+
 import numpy as np
 import pandas as pd
 
@@ -39,6 +41,8 @@ def load(filepath, clean=False, dummies=False, fill=False):
     del df[("track", "bit_rate")]
     del df[("artist", "latitude")]
     del df[("artist", "longitude")]
+
+    check_rules(df, Path("data/rules.txt"))
 
     if clean:
         df = discretizer(df)
@@ -99,8 +103,6 @@ def discretizer(df):
         df["artist", "comments"], bins=bins, labels=labels
     )
 
-    print(df["artist", "comments"].value_counts())
-
     # album favorites
     bins = [-np.inf, -1, 0, 2, 5, np.inf]
     labels = [
@@ -113,8 +115,6 @@ def discretizer(df):
     df["album", "favorites"] = pd.cut(
         df["album", "favorites"], bins=bins, labels=labels
     )
-
-    print(df["album", "favorites"].value_counts())
 
     # artist favorites
     bins = [-np.inf, 0, 10, 50, 150, 500, np.inf]
@@ -130,34 +130,25 @@ def discretizer(df):
         df["artist", "favorites"], bins=bins, labels=labels
     )
 
-    print(df["artist", "favorites"].value_counts())
-
     # text analysis
     # album information ~ is used to state true as presence of information and false the absence
     df["album", "information"] = ~df["album", "information"].isnull()
-    print(df["album", "information"].value_counts())
 
     # artist bio ~ is used to state true as presence of bio and false the absence
     df["artist", "bio"] = ~df["artist", "bio"].isnull()
-    print(df["artist", "bio"].value_counts())
 
     # album producer ~ is used to state true as presence of producer and false the absence
     df["album", "producer"] = ~df["album", "producer"].isnull()
-    print(df["album", "producer"].value_counts())
 
     # track comments
     bins = [-np.inf, 0, np.inf]
     labels = ["no_comments", "commented"]
     df["track", "comments"] = pd.cut(df["track", "comments"], bins=bins, labels=labels)
 
-    print(df["track", "comments"].value_counts())
-
     # track duration
     bins = [-np.inf, 60, 120, np.inf]
     labels = ["1min", "2min", "morethan3min"]
     df["track", "duration"] = pd.cut(df["track", "duration"], bins=bins, labels=labels)
-
-    print(df["track", "duration"].value_counts())
 
     # track favorites
     bins = [-np.inf, 0, 2, 5, np.inf]
@@ -170,8 +161,6 @@ def discretizer(df):
     df["track", "favorites"] = pd.cut(
         df["track", "favorites"], bins=bins, labels=labels
     )
-
-    print(df["track", "favorites"].value_counts())
 
     # artist website - ~ is used to state true as presence of website stated and false the absence
     df["artist", "website"] = ~df["artist", "website"].isnull()
@@ -224,6 +213,63 @@ def dummy_maker(df, threshold=0.9):
 
 def fill_missing(df):
     pass
+
+    return df
+
+
+def check_rules(df: pd.DataFrame, rules_path: Path) -> pd.DataFrame:
+    with open(rules_path, "r") as reader:
+        file_contents = reader.readlines()
+    rules = [x.split() for x in file_contents]
+
+    errors = pd.DataFrame(
+        columns=[
+            "Rule",
+            "Errors",
+            "Errors %",
+            "Errors without nan",
+            "without nan %",
+            "Records",
+        ]
+    )
+    for rule in rules:
+        print(rule)
+        if rule == []:  # Useful for excessive line breaks at the end of file
+            continue
+        rest_of_rule = ""
+        if len(rule) > 4:  # This checks if it's a complex rule
+            rest_of_rule = f" {rule[4]} {rule[5]}"
+
+        try:
+            my_df = df.query(f"not (({rule[0]} {rule[1]}) {rule[2]} {rule[3]})").filter(
+                [rule[0], rule[1]]
+            )
+            df_no_nan = my_df.dropna()
+
+            errors = errors.append(
+                {
+                    "Rule": f"{rule[0]} {rule[1]} {rule[2]} {rule[3]}({rest_of_rule})",
+                    "Errors": len(my_df),
+                    "Errors %": len(my_df) / len(df) * 100,
+                    "Errors without nan": len(df_no_nan),
+                    "without nan %": len(df_no_nan) / len(df) * 100,
+                    "Records": [x for x in my_df.index],
+                },
+                ignore_index=True,
+            )
+        except pd.core.computation.ops.UndefinedVariableError:
+            errors = errors.append(
+                {
+                    "Rule": f"{rule[0]} {rule[1]} {rule[2]} {rule[3]}({rest_of_rule})",
+                    "Errors": None,
+                    "Errors %": None,
+                    "Errors without nan": None,
+                    "without nan %": None,
+                    "Records": None,
+                },
+                ignore_index=True,
+            )
+    return errors
 
 
 def clean(df):
