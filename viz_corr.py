@@ -8,7 +8,7 @@ import utils
 
 sns.set_theme(style="white")
 
-tracks = utils.load(Path("data/tracks.csv"))
+tracks = utils.load(Path("data/tracks.csv"), clean=True, dummies=True)
 
 # Compute the correlation matrix
 corr = tracks.corr()
