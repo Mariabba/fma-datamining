@@ -15,8 +15,8 @@ tracks = utils.load(Path("data/tracks.csv"))
 print("Here are informations on tracks")
 print(tracks.info())
 
-my_df = tracks.query(f"not ('album', 'listens') < 0")
-print(my_df)
+#my_df = tracks.query(f"not ('album', 'listens') < 0")
+#print(my_df)
 
 # errors = utils.check_rules(tracks, Path("data/rules.txt"))
 # print(errors)

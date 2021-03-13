@@ -42,7 +42,7 @@ def load(filepath, clean=False, dummies=False, fill=False):
     del df[("artist", "latitude")]
     del df[("artist", "longitude")]
 
-    check_rules(df, Path("data/rules.txt"))
+    #check_rules(df, Path("data/rules.txt"))
 
     if clean:
         df = discretizer(df)
@@ -184,6 +184,9 @@ def discretizer(df):
         "high_listened",
     ]
     df["track", "listens"] = pd.cut(df["track", "listens"], bins=bins, labels=labels)
+
+    # album engineer ~ is used to state true as presence of engineer and false the absence
+    df["album", "engineer"] = ~df["album", "engineer"].isnull()
 
     return df
 
