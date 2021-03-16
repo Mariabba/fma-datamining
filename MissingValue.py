@@ -9,8 +9,12 @@ from langdetect import detect
 
 sns.set_theme(style="white")
 
+
 tracks = utils.load(Path("data/tracks.csv"), clean=True, dummies=True)
-tracks["track", "language_code"] = tracks["track", "language_code"].fillna(detect(str(tracks["track", "title"])))
+
+# fill dataCreated_ data released
+
+# sistemare questione generi
 
 y = mso.matrix(tracks)
 print(y)
@@ -19,5 +23,3 @@ y = plt.savefig(Path("viz/missing_matrix.png"), bbox_inches="tight")
 x = mso.bar(tracks)
 print(x)
 x = plt.savefig(Path("viz/missing_bar.png"), bbox_inches="tight")
-
-

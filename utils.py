@@ -3,6 +3,7 @@ from pathlib import Path
 
 import numpy as np
 import pandas as pd
+from langdetect import detect
 
 try:
     from rich.progress import Progress, track
@@ -41,8 +42,24 @@ def load(filepath, clean=False, dummies=False, fill=False):
     del df[("track", "bit_rate")]
     del df[("artist", "latitude")]
     del df[("artist", "longitude")]
+    del df[("artist", "active_year_begin")]
+    del df[("artist", "associated_labels")]
+    del df[("artist", "related_projects")]
 
-    #check_rules(df, Path("data/rules.txt"))
+    # eliminate per andare avanti che potrebbero servire in seguito
+    del df[("album", "date_released")]
+    del df[("artist", "location")]
+    del df[("artist", "members")]
+    del df[("track", "genre_top")]
+
+    # elimino le row che non hanno album type
+    df = df[df[("album", "type")].notna()]
+
+    # elimino le row che hanno valori mancanti in artist_date_created , track:license e track title
+    df = df[df[("artist", "date_created")].notna()]
+    df = df[df[("track", "license")].notna()]
+    df = df[df[("track", "title")].notna()]
+    # check_rules(df, Path("data/rules.txt"))
 
     if clean:
         df = discretizer(df)
@@ -132,13 +149,13 @@ def discretizer(df):
 
     # text analysis
     # album information ~ is used to state true as presence of information and false the absence
-    df["album", "information"] = ~df["album", "information"].isnull()
+    df["album", "information"] = (~df["album", "information"].isnull()).astype(int)
 
     # artist bio ~ is used to state true as presence of bio and false the absence
-    df["artist", "bio"] = ~df["artist", "bio"].isnull()
+    df["artist", "bio"] = (~df["artist", "bio"].isnull()).astype(int)
 
     # album producer ~ is used to state true as presence of producer and false the absence
-    df["album", "producer"] = ~df["album", "producer"].isnull()
+    df["album", "producer"] = (~df["album", "producer"].isnull()).astype(int)
 
     # track comments
     bins = [-np.inf, 0, np.inf]
@@ -147,7 +164,7 @@ def discretizer(df):
 
     # track duration
     bins = [-np.inf, 60, 120, np.inf]
-    labels = ["1min", "2min", "morethan3min"]
+    labels = ["1min", "2min", "+3min"]
     df["track", "duration"] = pd.cut(df["track", "duration"], bins=bins, labels=labels)
 
     # track favorites
@@ -163,7 +180,7 @@ def discretizer(df):
     )
 
     # artist website - ~ is used to state true as presence of website stated and false the absence
-    df["artist", "website"] = ~df["artist", "website"].isnull()
+    df["artist", "website"] = (~df["artist", "website"].isnull()).astype(int)
 
     # album listens
     bins = [-np.inf, -1, 10000, 50000, 150000, np.inf]
@@ -186,7 +203,12 @@ def discretizer(df):
     df["track", "listens"] = pd.cut(df["track", "listens"], bins=bins, labels=labels)
 
     # album engineer ~ is used to state true as presence of engineer and false the absence
-    df["album", "engineer"] = ~df["album", "engineer"].isnull()
+    df["album", "engineer"] = (~df["album", "engineer"].isnull()).astype(int)
+
+    # fill language_code
+    df["track", "language_code"] = df["track", "language_code"].fillna(
+        detect(str(df["track", "title"]))
+    )
 
     return df
 
@@ -277,11 +299,6 @@ def check_rules(df: pd.DataFrame, rules_path: Path) -> pd.DataFrame:
 
 def clean(df):
     pass
-    # 1. discretizzare ciò che ha senso sia discretizzato
-
-    # 2. provare a vedere se dà informazioni la dummizzazione delle colonne con coverage <10%
-
-    # 3. matrice di correlazione
 
     # 4. check di consistenza: come?
 
