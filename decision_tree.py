@@ -7,6 +7,34 @@ import utils
 
 tracks = utils.load(Path("data/tracks.csv"), clean=True, dummies=True)
 
+# cancellazione temporanea di un bordello di roba giusto per vedere se funziona
+"""del tracks[("artist", "comments")]
+del tracks[("album", "date_created")]
+del tracks[("album", "favorites")]
+del tracks[("album", "listens")]
+del tracks[("artist", "favorites")]
+del tracks[("track", "comments")]
+del tracks[("track", "tags")]
+del tracks[("track", "genres")]
+del tracks[("artist", "tags")]
+del tracks[("track", "genres_all")]
+# del tracks[("track", "genres")]
+# del tracks[("track", "genres")]
+# del tracks[("track", "genres")]
+"""
+
+
+tracks = tracks[
+    [
+        ("album", "id"),
+        ("album", "information"),
+        ("album", "producer"),
+        ("album", "type"),
+    ]
+]
+
+print(tracks.info())
+
 
 target_class = ("album", "type")
 
