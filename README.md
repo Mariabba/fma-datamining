@@ -20,4 +20,4 @@ N.B. When “solving the classification task”, remember, (i) to test, when nee
 
 **2-Besides the numerical evaluation draw your conclusions** about the various classifiers, e.g. for Neural Networks: what are the parameter sets or the convergence criteria which avoid overfitting? For Ensemble classifiers how the number of base models impacts the classification performance? For any classifier which is the minimum amount of data required to guarantee an acceptable level of performance? Is this level the same for any classifier? What is revealing the feature importance of Random Forests?
 
-**3-Select two continuous attributes, define a regression problem **and try to solve it using different techniques reporting various evaluation measures. Plot the two-dimensional dataset. Then generalize to multiple linear regression and observe how the performance varies.
+**3-Select two continuous attributes, define a regression problem** and try to solve it using different techniques reporting various evaluation measures. Plot the two-dimensional dataset. Then generalize to multiple linear regression and observe how the performance varies.
