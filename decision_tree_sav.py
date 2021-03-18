@@ -1,4 +1,6 @@
 # %matplotlib inline
+from pydotplus import graphviz
+
 import utils
 from pathlib import Path
 
@@ -22,6 +24,7 @@ from sklearn.model_selection import train_test_split
 import pydotplus
 from sklearn import tree
 from IPython.display import Image
+from sklearn.model_selection import StratifiedShuffleSplit
 
 import os
 
@@ -65,8 +68,7 @@ def load_data(path):
         ("artist", "tags"),
         ("track", "tags"),
         ("track", "genres"),
-        ("track", "genres_all")
-
+        ("track", "genres_all"),
     ]
     df.drop(column2drop, axis=1, inplace=True)
 
@@ -84,7 +86,7 @@ def load_data(path):
         ("track", "favorites"),
         ("track", "language_code"),
         ("track", "license"),
-        ("track", "listens")
+        ("track", "listens"),
     ]
 
     for col in column2encode:
@@ -103,7 +105,7 @@ def tuning_param(df, target1, target2):
     y = df[target1, target2]
 
     X_train, X_test, y_train, y_test = train_test_split(
-        X, y, test_size=0.2, random_state=100
+        X, y, stratify=y, test_size=0.25
     )
     print(X_train.shape, X_test.shape)
 
@@ -135,7 +137,9 @@ def tuning_param(df, target1, target2):
     report(random_search.cv_results_, n_top=3)
 
 
-def build_model(df,target1, target2, min_samples_split, min_samples_leaf, max_depth, criterion):
+def build_model(
+    df, target1, target2, min_samples_split, min_samples_leaf, max_depth, criterion
+):
 
     # split dataset train and set
     attributes = [col for col in df.columns if col != (target1, target2)]
@@ -143,13 +147,17 @@ def build_model(df,target1, target2, min_samples_split, min_samples_leaf, max_de
     y = df[target1, target2]
 
     X_train, X_test, y_train, y_test = train_test_split(
-        X, y, test_size=0.2, random_state=100
+        X, y, stratify=y, test_size=0.25
     )
+
     print(X_train.shape, X_test.shape)
     # build a model
 
     clf = DecisionTreeClassifier(
-        criterion=criterion, max_depth=max_depth, min_samples_split=min_samples_split, min_samples_leaf=min_samples_leaf
+        criterion=criterion,
+        max_depth=max_depth,
+        min_samples_split=min_samples_split,
+        min_samples_leaf=min_samples_leaf,
     )
     clf.fit(X_train, y_train)
 
@@ -176,21 +184,32 @@ def build_model(df,target1, target2, min_samples_split, min_samples_leaf, max_de
     print(classification_report(y_test, y_pred))
     confusion_matrix(y_test, y_pred)
 
-    # ROC CURVE
-    le = LabelEncoder()
+    # ROC Curve
+    from sklearn.preprocessing import LabelBinarizer
 
-    y_test = le.fit_transform(y_test)
+    lb = LabelBinarizer()
+    lb.fit(y_test)
+    lb.classes_.tolist()
 
-    y_pred = le.fit_transform(y_pred)
+    fpr = dict()
+    tpr = dict()
+    roc_auc = dict()
+    by_test = lb.transform(y_test)
+    by_pred = lb.transform(y_pred)
+    for i in range(5):
+        fpr[i], tpr[i], _ = roc_curve(by_test[:, i], by_pred[:, i])
+        roc_auc[i] = auc(fpr[i], tpr[i])
 
-    print("ROC CURVE")
-    fpr, tpr, _ = roc_curve(y_test, y_pred)
-    roc_auc = auc(fpr, tpr)
-    print("Roc Curve precision")
+    roc_auc = roc_auc_score(by_test, by_pred, average=None)
     print(roc_auc)
 
     plt.figure(figsize=(8, 5))
-    plt.plot(fpr, tpr, label="ROC curve (area = %0.2f)" % (roc_auc))
+    for i in range(5):
+        plt.plot(
+            fpr[i],
+            tpr[i],
+            label="%s ROC curve (area = %0.2f)" % (lb.classes_.tolist()[i], roc_auc[i]),
+        )
 
     plt.plot([0, 1], [0, 1], "k--")
     plt.xlim([0.0, 1.0])
@@ -200,23 +219,22 @@ def build_model(df,target1, target2, min_samples_split, min_samples_leaf, max_de
     plt.tick_params(axis="both", which="major", labelsize=22)
     plt.legend(loc="lower right", fontsize=14, frameon=False)
     plt.show()
-"""
-#visualize the tree
-dot_data = tree.export_graphviz(clf, out_file=None,
-                                feature_names=attributes,
-                                class_names=clf.classes_,
-                                filled=True, rounded=True,
-                                special_characters=True)
-graph = pydotplus.graph_from_dot_data(dot_data)
-Image(graph.create_png())
+    """
+    #visualize the tree
+    dot_data = tree.export_graphviz(clf, out_file=None,
+                                    feature_names=attributes,
+                                    class_names=clf.classes_,
+                                    filled=True, rounded=True,
+                                    special_characters=True)
+    graph = pydotplus.graph_from_dot_data(dot_data)
+    Image(graph.create_png())
 
-graph2 = graphviz.Source(dot_data)
-graph2.format = "png"
-graph2.render("tree")
+    graph2 = graphviz.Source(dot_data)
+    graph2.format = "png"
+    graph2.render("tree")
+    """
 
-
-"""
 
 tracks = load_data("data/tracks.csv")
 #tuning_param(tracks, "album", "type")
-build_model(tracks, "album", "type", 100, 10, 2, 'gini')
+build_model(tracks, "album", "type", 100, 100, 8, "entropy")
