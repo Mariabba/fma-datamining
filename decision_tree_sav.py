@@ -57,8 +57,8 @@ def load_data(path):
 
     # feature to drop
     column2drop = [
-        ("album", "title"), #add later
-        ("artist", "name"), #add later
+        ("album", "title"),  # add later
+        ("artist", "name"),  # add later
         ("set", "split"),
         ("track", "title"),
         ("album", "date_created"),
@@ -218,6 +218,7 @@ def build_model(
     plt.ylabel("True Positive Rate", fontsize=20)
     plt.tick_params(axis="both", which="major", labelsize=22)
     plt.legend(loc="lower right", fontsize=14, frameon=False)
+    plt.savefig(Path("viz/1.0-DT_ROC.png"), bbox_inches="tight")
     plt.show()
     """
     #visualize the tree
@@ -236,5 +237,5 @@ def build_model(
 
 
 tracks = load_data("data/tracks.csv")
-#tuning_param(tracks, "album", "type")
+# tuning_param(tracks, "album", "type")
 build_model(tracks, "album", "type", 100, 100, 8, "entropy")
