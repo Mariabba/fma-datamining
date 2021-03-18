@@ -57,8 +57,8 @@ def load_data(path):
 
     # feature to drop
     column2drop = [
-        ("album", "title"),
-        ("artist", "name"),
+        ("album", "title"), #add later
+        ("artist", "name"), #add later
         ("set", "split"),
         ("track", "title"),
         ("album", "date_created"),
