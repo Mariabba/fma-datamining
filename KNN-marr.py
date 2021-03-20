@@ -4,9 +4,6 @@ from sklearn.model_selection import train_test_split
 # sklearn
 from sklearn import metrics
 from sklearn.preprocessing import (
-    MinMaxScaler,
-    MaxAbsScaler,
-    RobustScaler,
     StandardScaler,
     LabelEncoder,
     LabelBinarizer,
@@ -144,14 +141,6 @@ def tuning_param(df, target1, target2):
     )
     print(X_train.shape, X_test.shape)
 
-    # tuning hyperparam with randomize search
-
-    # This has two main benefits over an exhaustive search:
-
-    # A budget can be chosen independent of the number of parameters and possible values.
-
-    # Adding parameters that do not influence the performance does not decrease efficiency.
-    # RANDOM
     print("Parameter Tuning: \n")
 
 
