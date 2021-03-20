@@ -42,8 +42,6 @@ from sklearn.inspection import permutation_importance
 from sklearn.neighbors import KNeighborsClassifier
 
 from pandas import DataFrame
-from statsmodels.compat import numpy as np
-
 import utils
 from pathlib import Path
 
@@ -72,29 +70,6 @@ def conf_mat_disp(confusion_matrix, disp_labels):
     disp.plot(cmap="OrRd")
 
 
-def draw_roc_curve(Y_test, Y_pred, diz, k):
-    fig, ax = plt.subplots()  # figsize = (13,30)
-
-    fpr, tpr, _ = roc_curve(Y_test, Y_pred)
-    roc_auc = auc(fpr, tpr)
-    roc_auc = roc_auc_score(Y_test, Y_pred, average=None)
-
-    diz[k] = {"fpr": fpr.tolist(), "tpr": tpr.tolist(), "roc": roc_auc}
-
-    ax.plot(fpr, tpr, color="#994D00", label="ROC curve (area = %0.2f)" % (roc_auc))
-    ax.plot([0, 1], [0, 1], "r--")
-    ax.set_xlim([0.0, 1.0])
-    ax.set_ylim([0.0, 1.05])
-    ax.set_xlabel("False Positive Rate")
-    ax.set_ylabel("True Positive Rate")
-    ax.set_title("Roc curve of the model")
-    ax.tick_params(axis="both")
-    ax.legend(loc="lower right", title="AUC", fontsize=14, frameon=True)
-
-    fig.tight_layout()
-    plt.show()
-
-
 def draw_precision_recall_curve(Y_test, Y_pred):
     fig, ax = plt.subplots()
 
@@ -115,46 +90,11 @@ def draw_precision_recall_curve(Y_test, Y_pred):
     plt.show()
 
 
-def results_permutation_importance(res, attr):
-    # get importance
-    importance = res.importances_mean
-
-    # summarize feature importance
-    feature_importances = []
-    for col, imp in zip(attr, importance):
-        feature_importances.append((col, imp))
-
-    sorted_feature_importances = sorted(
-        feature_importances, key=lambda tup: (-tup[1], tup[0])
-    )
-
-    return sorted_feature_importances
-
-
-def plot_permutation_importance(res, attr, tit):
-    fig, ax = plt.subplots(figsize=(12, 8))
-
-    feature_names = np.r_[attr]
-
-    importance = res.importances_mean
-    sorted_idx = res.importances_mean.argsort()
-
-    y_ticks = np.arange(0, len(feature_names))
-    ax.barh(y_ticks, importance[sorted_idx], height=0.7, color="#CC6600")
-    ax.set_yticklabels(feature_names[sorted_idx])
-    ax.set_yticks(y_ticks)
-    ax.set_title(tit)
-
-    fig.tight_layout()
-    plt.show()
-
-
 # =====================DATASET ADJUSTING AND VISUALIZING===============================
 df = utils.load(Path("data/tracks.csv"), clean=True, dummies=True)
 column2drop = [
     ("album", "title"),  # add later
     ("artist", "name"),  # add later
-    ("album", "id"),  # add later
     ("set", "split"),
     ("track", "title"),
     ("album", "date_created"),
@@ -221,26 +161,7 @@ features_sel = [col for col in df.columns if col != ("album", "type")]
 
 X_features_sel = df[features_sel].values
 y_features_sel = df[("album", "type")]
-scaler_prova = MaxAbsScaler()
-X_features_sel_normalized = scaler_prova.fit_transform(X_features_sel)
 
-model = KNeighborsClassifier()
-
-model.fit(X_features_sel_normalized, y_features_sel)
-
-results_features_sel = permutation_importance(
-    model, X_features_sel_normalized, y_features_sel, scoring="roc_auc", n_repeats=10
-)
-
-sorted_feat_imp = results_permutation_importance(results_features_sel, features_sel)
-
-# print results
-for t in sorted_feat_imp:
-    print("{0:50} {1:.6f}".format(t[0], t[1]))
-
-# plot results
-t = "Permutation Feature Importance for Classification"
-plot_permutation_importance(results_features_sel, features_sel, t)
 scaler = StandardScaler()
 scaler.fit(X_train)
 
@@ -271,8 +192,7 @@ draw_confusion_matrix(knn, X_test, y_test)
 
 print()
 
-print("\033[1m" "Classification report train" "\033[0m")
-print(classification_report(X_train, y_test))
+
 print("\033[1m" "Classification report test" "\033[0m")
 print(classification_report(y_test, y_pred))
 
