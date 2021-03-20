@@ -12,7 +12,7 @@ except ModuleNotFoundError:
     pass
 
 
-def load(filepath, clean=False, dummies=False, fill=False):
+def load(filepath, clean=False, dummies=False, fill=True):
     filename = filepath.name
 
     if "features" in filename:
@@ -36,30 +36,6 @@ def load(filepath, clean=False, dummies=False, fill=False):
         print(f"Something bad just happened with {filename}.")
 
     df = df.convert_dtypes()
-
-    # Deletion of columns
-    del df[("set", "subset")]
-    del df[("track", "bit_rate")]
-    del df[("artist", "latitude")]
-    del df[("artist", "longitude")]
-    del df[("artist", "active_year_begin")]
-    del df[("artist", "associated_labels")]
-    del df[("artist", "related_projects")]
-
-    # eliminate per andare avanti che potrebbero servire in seguito
-    del df[("album", "date_released")]
-    del df[("artist", "location")]
-    del df[("artist", "members")]
-    del df[("track", "genre_top")]
-
-    # elimino le row che non hanno album type
-    df = df[df[("album", "type")].notna()]
-
-    # elimino le row che hanno valori mancanti in artist_date_created , track:license e track title
-    df = df[df[("artist", "date_created")].notna()]
-    df = df[df[("track", "license")].notna()]
-    df = df[df[("track", "title")].notna()]
-    # check_rules(df, Path("data/rules.txt"))
 
     if clean:
         df = discretizer(df)
@@ -247,7 +223,28 @@ def dummy_maker(df, threshold=0.9):
 
 
 def fill_missing(df):
-    pass
+    # Deletion of columns
+    del df[("set", "subset")]
+    del df[("track", "bit_rate")]
+    del df[("artist", "latitude")]
+    del df[("artist", "longitude")]
+    del df[("artist", "active_year_begin")]
+    del df[("artist", "associated_labels")]
+    del df[("artist", "related_projects")]
+
+    # eliminate per andare avanti che potrebbero servire in seguito
+    del df[("album", "date_released")]
+    del df[("artist", "location")]
+    del df[("artist", "members")]
+    del df[("track", "genre_top")]
+
+    # elimino le row che non hanno album type
+    df = df[df[("album", "type")].notna()]
+
+    # elimino le row che hanno valori mancanti in artist_date_created , track:license e track title
+    df = df[df[("artist", "date_created")].notna()]
+    df = df[df[("track", "license")].notna()]
+    df = df[df[("track", "title")].notna()]
 
     return df
 
@@ -268,22 +265,17 @@ def check_rules(df: pd.DataFrame, rules_path: Path) -> pd.DataFrame:
         ]
     )
     for rule in rules:
-        print(rule)
-        if rule == []:  # Useful for excessive line breaks at the end of file
+        if rule == []:  # Useful for excessive line breaks
             continue
-        rest_of_rule = ""
-        if len(rule) > 4:  # This checks if it's a complex rule
-            rest_of_rule = f" {rule[4]} {rule[5]}"
 
         try:
-            my_df = df.query(f"not (({rule[0]} {rule[1]}) {rule[2]} {rule[3]})").filter(
-                [rule[0], rule[1]]
-            )
+            my_df = df[df.loc[:, (rule[0], rule[1])] < 0]
+
             df_no_nan = my_df.dropna()
 
             errors = errors.append(
                 {
-                    "Rule": f"{rule[0]} {rule[1]} {rule[2]} {rule[3]}({rest_of_rule})",
+                    "Rule": f"{rule[0]} {rule[1]} {rule[2]} {rule[3]}",
                     "Errors": len(my_df),
                     "Errors %": len(my_df) / len(df) * 100,
                     "Errors without nan": len(df_no_nan),
@@ -295,7 +287,7 @@ def check_rules(df: pd.DataFrame, rules_path: Path) -> pd.DataFrame:
         except pd.core.computation.ops.UndefinedVariableError:
             errors = errors.append(
                 {
-                    "Rule": f"{rule[0]} {rule[1]} {rule[2]} {rule[3]}({rest_of_rule})",
+                    "Rule": f"{rule[0]} {rule[1]} {rule[2]} {rule[3]}",
                     "Errors": None,
                     "Errors %": None,
                     "Errors without nan": None,

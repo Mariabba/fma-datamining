@@ -8,12 +8,15 @@ import utils
 pretty.install()
 # genres = utils.load(Path("data/genres.csv"))
 # echonest = utils.load(Path("data/echonest.csv"))
-tracks = utils.load(Path("data/tracks.csv"), clean=True, dummies=True)
+tracks = utils.load(Path("data/tracks.csv"), fill=False)
 # artists = utils.load(Path("data/raw_artists.csv"))
 
 
-print("Here are informations on tracks")
-print(tracks.info())
+errors = utils.check_rules(tracks, Path("data/rules.txt"))
+print(errors)
+
+# print("Here are informations on tracks")
+# print(tracks.info())
 
 
 # my_df = tracks.query(f"not ('album', 'listens') < 0")
