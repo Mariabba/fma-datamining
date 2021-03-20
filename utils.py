@@ -1,4 +1,5 @@
 import ast
+from datetime import datetime
 from pathlib import Path
 
 import numpy as np
@@ -12,7 +13,6 @@ except ModuleNotFoundError:
 
 
 def load(filepath, clean=False, dummies=False, fill=False):
-
     filename = filepath.name
 
     if "features" in filename:
@@ -67,6 +67,16 @@ def load(filepath, clean=False, dummies=False, fill=False):
         df = dummy_maker(df)
     if fill:
         df = fill_missing(df)
+
+    # datetime manipulation
+    df[("album", "date_created")] = pd.to_datetime(df[("album", "date_created")])
+    df[("album", "date_created")] = df[("album", "date_created")].dt.year
+
+    df[("artist", "date_created")] = pd.to_datetime(df[("artist", "date_created")])
+    df[("artist", "date_created")] = df[("artist", "date_created")].dt.year
+
+    df[("track", "date_created")] = pd.to_datetime(df[("track", "date_created")])
+    df[("track", "date_created")] = df[("track", "date_created")].dt.year
 
     return df
 

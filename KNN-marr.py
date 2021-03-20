@@ -203,20 +203,11 @@ print()
 
 print("Accuracy %s" % accuracy_score(y_test, y_pred))
 
-print(
-    "F1-score %s"
-    % f1_score(y_test, y_pred, labels=[0, 1], average=None, zero_division=1)
-)
+print("F1-score %s" % f1_score(y_test, y_pred, labels=[0, 1], average=None))
 
-print(
-    "Precision %s"
-    % precision_score(y_test, y_pred, labels=[0, 1], average=None, zero_division=1)
-)
+print("Precision %s" % precision_score(y_test, y_pred, labels=[0, 1], average=None))
 
-print(
-    "Recall %s"
-    % recall_score(y_test, y_pred, labels=[0, 1], average=None, zero_division=1)
-)
+print("Recall %s" % recall_score(y_test, y_pred, labels=[0, 1], average=None))
 
 # plot the Roc Curve of the model
 lb = LabelBinarizer()

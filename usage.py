@@ -14,7 +14,7 @@ tracks = utils.load(Path("data/tracks.csv"), clean=True, dummies=True)
 
 print("Here are informations on tracks")
 print(tracks.info())
-print("ciao")
+
 
 # my_df = tracks.query(f"not ('album', 'listens') < 0")
 # print(my_df)
