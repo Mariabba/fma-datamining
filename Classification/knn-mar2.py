@@ -150,7 +150,9 @@ print(df.info())
 
 
 # Create KNN Object.
-knn = KNeighborsClassifier()
+knn = KNeighborsClassifier(
+    n_neighbors=2, p=1
+)  # dopo la grid search il mio setting è n = 2 e p =1
 # Create x and y variables.
 x = df.drop(columns=[("album", "type")])
 y = df[("album", "type")]
@@ -194,18 +196,18 @@ print(
 
 print("Recall %s" % recall_score(y_test, Y_pred, average="weighted", zero_division=0))
 
-
 """
 # TODO TESTARE I PARAMENTRI MIGLIORI
 # List Hyperparameters that we want to tune.
-# n_neighbors = list(range(1, 10))
-# p = [1, 2]
+print("STA FACENDO LA GRIDSEARCH")
+n_neighbors = list(range(1, 10))
+p = [1, 2]
 # Convert to dictionary
-# hyperparameters = dict(n_neighbors=n_neighbors, p=p)
+hyperparameters = dict(n_neighbors=n_neighbors, p=p)
 # Create new KNN object
 knn_2 = KNeighborsClassifier()
 # Use GridSearch
-clf = GridSearchCV(knn_2, hyperparameters, cv=10)
+clf = GridSearchCV(knn_2, hyperparameters)
 # Fit the model
 best_model = clf.fit(x, y)
 # Print The value of best Hyperparameters

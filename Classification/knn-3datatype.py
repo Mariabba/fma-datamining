@@ -61,7 +61,7 @@ def draw_confusion_matrix(Clf, X, y):
     ]
 
     for title, normalize in titles_options:
-        disp = plot_confusion_matrix(Clf, X, y, cmap="OrRd", normalize=normalize)
+        disp = plot_confusion_matrix(Clf, X, y, cmap="RdPu", normalize=normalize)
         disp.ax_.set_title(title)
 
     plt.show()
@@ -151,7 +151,9 @@ print(df.info())
 
 
 # Create KNN Object.
-knn = KNeighborsClassifier()
+knn = KNeighborsClassifier(
+    n_neighbors=2, p=1
+)  # valori migliori dalla gridsearch n = 2, p=1, levarli per avere la standard
 # Create x and y variables.
 x = df.drop(columns=[("album", "type")])
 y = df[("album", "type")]
@@ -192,21 +194,22 @@ print("Precision %s" % precision_score(y_test, Y_pred, labels=[0, 1], average=No
 
 print("Recall %s" % recall_score(y_test, Y_pred, labels=[0, 1], average=None))
 
-
 """
 # TODO TESTARE I PARAMENTRI MIGLIORI
 # List Hyperparameters that we want to tune.
-# n_neighbors = list(range(1, 10))
-# p = [1, 2]
+print("STA FACENDO LA GRIDSEARCH")
+n_neighbors = list(range(1, 10))
+p = [1, 2]
 # Convert to dictionary
-# hyperparameters = dict(n_neighbors=n_neighbors, p=p)
+hyperparameters = dict(n_neighbors=n_neighbors, p=p)
 # Create new KNN object
 knn_2 = KNeighborsClassifier()
 # Use GridSearch
-clf = GridSearchCV(knn_2, hyperparameters, cv=10)
+clf = GridSearchCV(knn_2, hyperparameters)
 # Fit the model
 best_model = clf.fit(x, y)
 # Print The value of best Hyperparameters
 print("Best p:", best_model.best_estimator_.get_params()["p"])
 print("Best n_neighbors:", best_model.best_estimator_.get_params()["n_neighbors"])
+
 """
