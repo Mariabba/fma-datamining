@@ -260,6 +260,6 @@ def build_model(
     """
 
 
-tracks = load_data("data/tracks.csv")
+tracks = load_data("../data/tracks.csv")
 # tuning_param(tracks, "album", "type")
 build_model(tracks, "album", "type", 100, 100, 8, "entropy")

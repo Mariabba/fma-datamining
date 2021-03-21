@@ -6,6 +6,7 @@ import matplotlib.pyplot as plt
 from matplotlib.colors import ListedColormap
 
 # sklearn
+from sklearn import metrics
 from sklearn.preprocessing import (
     MinMaxScaler,
     MaxAbsScaler,
@@ -51,75 +52,6 @@ from pathlib import Path
 
 
 # FUNCTION
-def plot_grid_search_results(grid_results, grid_best_params, grid_best_score):
-    fig, (ax1, ax2, ax3) = plt.subplots(
-        nrows=3, ncols=1, figsize=(12, 18)
-    )  # figsize = (13,30)
-
-    ax1.errorbar(
-        x=grid_results["param_n_neighbors"].data,
-        y=grid_results["mean_test_f1"],
-        color="#B8002E",
-        yerr=grid_results["std_test_f1"],
-        ecolor="orange",
-    )
-    ax1.set_xlabel("n_neigbors")
-    ax1.set_ylabel("f1")
-    ax1.set_title("Classification F1")
-
-    ax2.errorbar(
-        x=grid_results["param_n_neighbors"].data,
-        y=grid_results["mean_test_recall"],
-        color="#B8002E",
-        yerr=grid_results["std_test_recall"],
-        ecolor="orange",
-    )
-    ax2.set_xlabel("n_neigbors")
-    ax2.set_ylabel("recall")
-    ax2.set_title("Classification Recall")
-
-    ax3.errorbar(
-        x=grid_results["param_n_neighbors"].data,
-        y=grid_results["mean_test_roc_auc"],
-        color="#B8002E",
-        yerr=grid_results["std_test_roc_auc"],
-        ecolor="orange",
-    )
-    ax3.plot(
-        [grid_best_params["n_neighbors"]],
-        [grid_best_score],
-        marker=".",
-        markeredgewidth=3,
-        c="r",
-    )
-    ax3.annotate(
-        "best k",
-        xy=(grid_best_params["n_neighbors"], grid_best_score),
-        xytext=(grid_best_params["n_neighbors"] + 1, grid_best_score + 0.02),
-        arrowprops=dict(facecolor="black", shrink=0.01),
-    )
-    ax3.set_xlabel("n_neigbors")
-    ax3.set_ylabel("roc auc")
-    ax3.set_title("Classification Roc Auc")
-
-    fig.tight_layout()
-    plt.show()
-
-
-def results_permutation_importance(res, attr):
-    # get importance
-    importance = res.importances_mean
-
-    # summarize feature importance
-    feature_importances = []
-    for col, imp in zip(attr, importance):
-        feature_importances.append((col, imp))
-
-    sorted_feature_importances = sorted(
-        feature_importances, key=lambda tup: (-tup[1], tup[0])
-    )
-
-    return sorted_feature_importances
 
 
 def draw_confusion_matrix(Clf, X, y):
@@ -186,77 +118,88 @@ def draw_precision_recall_curve(Y_test, Y_pred):
     plt.show()
 
 
-def adjusted_classes(y_scores, t):
-    """
-    This function adjusts class predictions based on the prediction threshold (t).
-    Will only work for binary classification problems.
-    """
-    return [1 if y >= t else 0 for y in y_scores]
-
-
 # DATASET
-df = utils.load(Path("data/tracks.csv"), clean=True, dummies=True)
+df = utils.load(Path("../data/tracks.csv"), clean=False, dummies=True, clean_knn=True)
 column2drop = [
-    ("album", "title"),  # add later
-    ("artist", "name"),  # add later
+    ("album", "title"),
+    ("artist", "name"),
     ("set", "split"),
     ("track", "title"),
-    ("album", "date_created"),
-    ("artist", "date_created"),
-    ("track", "date_created"),
     ("album", "tags"),
     ("artist", "tags"),
+    ("track", "language_code"),
     ("track", "tags"),
-    ("track", "genres"),
+    ("track", "genres"),  # todo da trattare se si vuole inserire solo lei
     ("track", "genres_all"),
 ]
 df.drop(column2drop, axis=1, inplace=True)
+df = df[df["album", "type"] != "Contest"]
 
 # feature to reshape
 label_encoders = dict()
 column2encode = [
-    ("album", "comments"),
-    ("album", "favorites"),
     ("album", "listens"),
     ("album", "type"),
-    ("artist", "comments"),
-    ("artist", "favorites"),
-    ("track", "duration"),
-    ("track", "comments"),
-    ("track", "favorites"),
-    ("track", "language_code"),
     ("track", "license"),
-    ("track", "listens"),
 ]
 for col in column2encode:
     le = LabelEncoder()
     df[col] = le.fit_transform(df[col])
     label_encoders[col] = le
+
 print(df.info())
 
 
-# Create KNN Object. #DA FINIRE MARI
+# Create KNN Object.
 knn = KNeighborsClassifier()
 # Create x and y variables.
 x = df.drop(columns=[("album", "type")])
 y = df[("album", "type")]
 # Split data into training and testing.
-x_train, x_test, y_train, y_test = train_test_split(x, y, test_size=0.2, random_state=4)
+X_train, X_test, y_train, y_test = train_test_split(x, y, stratify=y, test_size=0.25)
+print(X_train.shape, X_test.shape)
 # Training the model.
-knn.fit(x_train, y_train)
+knn.fit(X_train, y_train)
 # Predict test data set.
-# y_pred = knn.predict(x_test)
-# Checking performance our model with classification report.
-# print(classification_report(y_test, y_pred))
-# Checking performance our model with ROC Score.
-# roc_auc_score(y_test, y_pred)
+Y_pred = knn.predict(X_test)
 
-# tuning
+
+# Checking performance our model with classification report.
+draw_confusion_matrix
+print("Accuracy:", metrics.accuracy_score(y_test, Y_pred))
+# confusion matrix
+print("\033[1m" "Confusion matrix" "\033[0m")
+
+plot_confusion_matrix(knn, X_test, y_test, cmap="OrRd")
+draw_confusion_matrix(knn, X_test, y_test)
+
+print()
+
+
+print("\033[1m" "Classification report test" "\033[0m")
+print(classification_report(y_test, Y_pred))
+
+print()
+
+print("\033[1m" "Metrics" "\033[0m")
+print()
+
+print("Accuracy %s" % accuracy_score(y_test, Y_pred))
+
+print("F1-score %s" % f1_score(y_test, Y_pred, labels=[0, 1], average=None))
+
+print("Precision %s" % precision_score(y_test, Y_pred, labels=[0, 1], average=None))
+
+print("Recall %s" % recall_score(y_test, Y_pred, labels=[0, 1], average=None))
+
+
+"""
+# TODO TESTARE I PARAMENTRI MIGLIORI
 # List Hyperparameters that we want to tune.
-n_neighbors = list(range(1, 10))
-p = [1, 2]
+# n_neighbors = list(range(1, 10))
+# p = [1, 2]
 # Convert to dictionary
-hyperparameters = dict(n_neighbors=n_neighbors, p=p)
+# hyperparameters = dict(n_neighbors=n_neighbors, p=p)
 # Create new KNN object
 knn_2 = KNeighborsClassifier()
 # Use GridSearch
@@ -266,3 +209,4 @@ best_model = clf.fit(x, y)
 # Print The value of best Hyperparameters
 print("Best p:", best_model.best_estimator_.get_params()["p"])
 print("Best n_neighbors:", best_model.best_estimator_.get_params()["n_neighbors"])
+"""

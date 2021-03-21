@@ -1,12 +1,18 @@
+import os
+import numpy as np
+import pandas as pd
+import matplotlib as mpl
 import matplotlib.pyplot as plt
-from sklearn.model_selection import train_test_split
+from matplotlib.colors import ListedColormap
 
 # sklearn
 from sklearn import metrics
 from sklearn.preprocessing import (
+    MinMaxScaler,
+    MaxAbsScaler,
+    RobustScaler,
     StandardScaler,
     LabelEncoder,
-    LabelBinarizer,
 )
 from sklearn.preprocessing import KBinsDiscretizer
 
@@ -39,11 +45,13 @@ from sklearn.inspection import permutation_importance
 from sklearn.neighbors import KNeighborsClassifier
 
 from pandas import DataFrame
+
+from pandas import DataFrame
 import utils
 from pathlib import Path
 
-# ==========FUNCTION==========================
-from decision_tree import X_train, y_train, X_test, y_test, attributes
+
+# FUNCTION
 
 
 def draw_confusion_matrix(Clf, X, y):
@@ -67,6 +75,29 @@ def conf_mat_disp(confusion_matrix, disp_labels):
     disp.plot(cmap="OrRd")
 
 
+def draw_roc_curve(Y_test, Y_pred, diz, k):
+    fig, ax = plt.subplots()  # figsize = (13,30)
+
+    fpr, tpr, _ = roc_curve(Y_test, Y_pred)
+    roc_auc = auc(fpr, tpr)
+    roc_auc = roc_auc_score(Y_test, Y_pred, average=None)
+
+    diz[k] = {"fpr": fpr.tolist(), "tpr": tpr.tolist(), "roc": roc_auc}
+
+    ax.plot(fpr, tpr, color="#994D00", label="ROC curve (area = %0.2f)" % (roc_auc))
+    ax.plot([0, 1], [0, 1], "r--")
+    ax.set_xlim([0.0, 1.0])
+    ax.set_ylim([0.0, 1.05])
+    ax.set_xlabel("False Positive Rate")
+    ax.set_ylabel("True Positive Rate")
+    ax.set_title("Roc curve of the model")
+    ax.tick_params(axis="both")
+    ax.legend(loc="lower right", title="AUC", fontsize=14, frameon=True)
+
+    fig.tight_layout()
+    plt.show()
+
+
 def draw_precision_recall_curve(Y_test, Y_pred):
     fig, ax = plt.subplots()
 
@@ -87,40 +118,30 @@ def draw_precision_recall_curve(Y_test, Y_pred):
     plt.show()
 
 
-# =====================DATASET ADJUSTING AND VISUALIZING===============================
-df = utils.load(Path("data/tracks.csv"), clean=True, dummies=True)
+# DATASET
+df = utils.load(Path("../data/tracks.csv"), clean=False, dummies=True, clean_knn=True)
 column2drop = [
     ("album", "title"),
-    ("album", "tags"),  # might be usefull to include them, but how?
-    ("album", "id"),
+    ("artist", "name"),
     ("set", "split"),
     ("track", "title"),
-    ("artist", "id"),
-    ("artist", "name"),
-    ("artist", "tags"),  # might be usefull to include them, but how?
+    ("album", "tags"),
+    ("artist", "tags"),
+    ("track", "language_code"),
     ("track", "tags"),
-    ("track", "genres"),
+    ("track", "genres"),  # todo da trattare se si vuole inserire solo lei
     ("track", "genres_all"),
 ]
 df.drop(column2drop, axis=1, inplace=True)
 
+
 # feature to reshape
 label_encoders = dict()
 column2encode = [
-    ("album", "comments"),
-    ("album", "favorites"),
     ("album", "listens"),
     ("album", "type"),
-    ("artist", "comments"),
-    ("artist", "favorites"),
-    ("track", "duration"),
-    ("track", "comments"),
-    ("track", "favorites"),
-    ("track", "language_code"),
     ("track", "license"),
-    ("track", "listens"),
 ]
-
 for col in column2encode:
     le = LabelEncoder()
     df[col] = le.fit_transform(df[col])
@@ -128,71 +149,66 @@ for col in column2encode:
 print(df.info())
 
 
-# ==== SUDDIVISIONE DATASET======
-def tuning_param(df, target1, target2):
-    # split dataset train and set
-    attributes = [col for col in df.columns if col != (target1, target2)]
-    X = df[attributes].values
-    y = df[target1, target2]
-
-    X_train, X_test, y_train, y_test = train_test_split(
-        X, y, stratify=y, test_size=0.25
-    )
-    print(X_train.shape, X_test.shape)
-
-    print("Parameter Tuning: \n")
-
-
-# ===================FEATURE SELECTION============================
-
-features_sel = [col for col in df.columns if col != ("album", "type")]
-
-X_features_sel = df[features_sel].values
-y_features_sel = df[("album", "type")]
-
-scaler = StandardScaler()
-scaler.fit(X_train)
-
-X_train = scaler.transform(X_train)
-X_test = scaler.transform(X_test)
-
-# ===========MODEL KNN========================
-
-
-# Create KNN Classifier
-knn = KNeighborsClassifier(n_neighbors=5)
-
-# Train the model using the training sets
+# Create KNN Object.
+knn = KNeighborsClassifier()
+# Create x and y variables.
+x = df.drop(columns=[("album", "type")])
+y = df[("album", "type")]
+# Split data into training and testing.
+X_train, X_test, y_train, y_test = train_test_split(x, y, stratify=y, test_size=0.25)
+print(X_train.shape, X_test.shape)
+# Training the model.
 knn.fit(X_train, y_train)
+# Predict test data set.
+Y_pred = knn.predict(X_test)
 
-# Predict the response for test dataset
-y_pred = knn.predict(X_test)
 
+# Checking performance our model with classification report.
 
-# Model Accuracy, how often is the classifier correct?
-draw_confusion_matrix
-print("Accuracy:", metrics.accuracy_score(y_test, y_pred))
+print("Accuracy:", metrics.accuracy_score(y_test, Y_pred))
 # confusion matrix
 print("\033[1m" "Confusion matrix" "\033[0m")
 
-# plot_confusion_matrix(clf, X_test_normalized, y_test, cmap = 'OrRd')
+
 draw_confusion_matrix(knn, X_test, y_test)
 
 print()
 
 
 print("\033[1m" "Classification report test" "\033[0m")
-print(classification_report(y_test, y_pred))
+print(classification_report(y_test, Y_pred))
 
 print()
 
 print("\033[1m" "Metrics" "\033[0m")
-print()
 
-print("Accuracy %s" % accuracy_score(y_test, y_pred))
 
-print("F1-score %s" % f1_score(y_test, y_pred, labels=[0, 1], average=None))
+print("Accuracy %s" % accuracy_score(y_test, Y_pred))
 
-print("Precision %s" % precision_score(y_test, y_pred, labels=[0, 1], average=None))
+print("F1-score %s" % f1_score(y_test, Y_pred, average="weighted", zero_division=0))
 
-print("Recall %s" % recall_score(y_test, y_pred, labels=[0, 1], average=None))
+print(
+    "Precision %s"
+    % precision_score(y_test, Y_pred, average="weighted", zero_division=0)
+)
+
+print("Recall %s" % recall_score(y_test, Y_pred, average="weighted", zero_division=0))
+
+
+"""
+# TODO TESTARE I PARAMENTRI MIGLIORI
+# List Hyperparameters that we want to tune.
+# n_neighbors = list(range(1, 10))
+# p = [1, 2]
+# Convert to dictionary
+# hyperparameters = dict(n_neighbors=n_neighbors, p=p)
+# Create new KNN object
+knn_2 = KNeighborsClassifier()
+# Use GridSearch
+clf = GridSearchCV(knn_2, hyperparameters, cv=10)
+# Fit the model
+best_model = clf.fit(x, y)
+# Print The value of best Hyperparameters
+print("Best p:", best_model.best_estimator_.get_params()["p"])
+print("Best n_neighbors:", best_model.best_estimator_.get_params()["n_neighbors"])
+"""

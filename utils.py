@@ -12,7 +12,7 @@ except ModuleNotFoundError:
     pass
 
 
-def load(filepath, clean=False, dummies=False, fill=True):
+def load(filepath, clean=False, dummies=False, fill=True, clean_knn=False):
     filename = filepath.name
 
     if "features" in filename:
@@ -43,6 +43,8 @@ def load(filepath, clean=False, dummies=False, fill=True):
         df = dummy_maker(df)
     if fill:
         df = fill_missing(df)
+    if clean_knn:
+        df = discretizer_knn(df)
 
     # datetime manipulation
     df[("album", "date_created")] = pd.to_datetime(df[("album", "date_created")])
@@ -308,3 +310,40 @@ def clean(df):
     # 4. check di consistenza: come?
 
     # 5. missing values colonne coverage > 80% : come riempire?
+
+
+def discretizer_knn(df):
+
+    # text analysis
+    # album information ~ is used to state true as presence of information and false the absence
+    df["album", "information"] = (~df["album", "information"].isnull()).astype(int)
+
+    # artist bio ~ is used to state true as presence of bio and false the absence
+    df["artist", "bio"] = (~df["artist", "bio"].isnull()).astype(int)
+
+    # album producer ~ is used to state true as presence of producer and false the absence
+    df["album", "producer"] = (~df["album", "producer"].isnull()).astype(int)
+
+    # artist website - ~ is used to state true as presence of website stated and false the absence
+    df["artist", "website"] = (~df["artist", "website"].isnull()).astype(int)
+
+    # album listens #TODO rivedere se tenerla così o eliminare discretizzazione
+    bins = [-np.inf, -1, 10000, 50000, 150000, np.inf]
+    labels = [
+        "no_info",
+        "low_listened",
+        "medium_listened",
+        "high_listened",
+        "higher_listened",
+    ]
+    df["album", "listens"] = pd.cut(df["album", "listens"], bins=bins, labels=labels)
+
+    # album engineer ~ is used to state true as presence of engineer and false the absence
+    df["album", "engineer"] = (~df["album", "engineer"].isnull()).astype(int)
+
+    # fill language_code
+    df["track", "language_code"] = df["track", "language_code"].fillna(
+        detect(str(df["track", "title"]))
+    )
+
+    return df
