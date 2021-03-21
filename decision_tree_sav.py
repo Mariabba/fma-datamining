@@ -39,10 +39,11 @@ from sklearn.model_selection import GridSearchCV
 from sklearn.metrics import average_precision_score
 from sklearn.metrics import plot_confusion_matrix, ConfusionMatrixDisplay
 
+
 def draw_confusion_matrix(Clf, X, y):
     titles_options = [
         ("Confusion matrix, without normalization", None),
-        ("Normalized confusion matrix", "true"),
+        ("Decision Tree Confusion matrix", "true"),
     ]
 
     for title, normalize in titles_options:
@@ -50,6 +51,7 @@ def draw_confusion_matrix(Clf, X, y):
         disp.ax_.set_title(title)
 
     plt.show()
+
 
 def report(results, n_top=3):
     for i in range(1, n_top + 1):
@@ -72,14 +74,14 @@ def load_data(path):
     # feature to drop
     column2drop = [
         ("album", "title"),
-        ("album", "tags"), #might be usefull to include them, but how?
+        ("album", "tags"),  # might be usefull to include them, but how?
         ("album", "id"),
         ("set", "split"),
         ("track", "title"),
         ("artist", "id"),
         ("artist", "name"),
-        ("artist", "tags"), #might be usefull to include them, but how?
-        ("track", "tags"), #might be usefull to include them, but how?
+        ("artist", "tags"),  # might be usefull to include them, but how?
+        ("track", "tags"),  # might be usefull to include them, but how?
         ("track", "genres"),
         ("track", "genres_all"),
     ]
@@ -258,10 +260,6 @@ def build_model(
     """
 
 
-
-
 tracks = load_data("data/tracks.csv")
-print(tracks.info())
-print(tracks["album", "date_created"].head())
-#tuning_param(tracks, "album", "type")
+# tuning_param(tracks, "album", "type")
 build_model(tracks, "album", "type", 100, 100, 8, "entropy")
