@@ -90,15 +90,14 @@ def draw_precision_recall_curve(Y_test, Y_pred):
 # =====================DATASET ADJUSTING AND VISUALIZING===============================
 df = utils.load(Path("data/tracks.csv"), clean=True, dummies=True)
 column2drop = [
-    ("album", "title"),  # add later
-    ("artist", "name"),  # add later
+    ("album", "title"),
+    ("album", "tags"),  # might be usefull to include them, but how?
+    ("album", "id"),
     ("set", "split"),
     ("track", "title"),
-    ("album", "date_created"),
-    ("artist", "date_created"),
-    ("track", "date_created"),
-    ("album", "tags"),
-    ("artist", "tags"),
+    ("artist", "id"),
+    ("artist", "name"),
+    ("artist", "tags"),  # might be usefull to include them, but how?
     ("track", "tags"),
     ("track", "genres"),
     ("track", "genres_all"),
@@ -197,38 +196,3 @@ print("F1-score %s" % f1_score(y_test, y_pred, labels=[0, 1], average=None))
 print("Precision %s" % precision_score(y_test, y_pred, labels=[0, 1], average=None))
 
 print("Recall %s" % recall_score(y_test, y_pred, labels=[0, 1], average=None))
-
-# plot the Roc Curve of the model
-lb = LabelBinarizer()
-lb.fit(y_test)
-lb.classes_.tolist()
-
-fpr = dict()
-tpr = dict()
-roc_auc = dict()
-by_test = lb.transform(y_test)
-by_pred = lb.transform(y_pred)
-for i in range(5):
-    fpr[i], tpr[i], _ = roc_curve(by_test[:, i], by_pred[:, i])
-    roc_auc[i] = auc(fpr[i], tpr[i])
-
-    roc_auc = roc_auc_score(by_test, by_pred, average=None)
-    print(roc_auc)
-
-    plt.figure(figsize=(8, 5))
-    for i in range(5):
-        plt.plot(
-            fpr[i],
-            tpr[i],
-            label="%s ROC curve (area = %0.2f)" % (lb.classes_.tolist()[i], roc_auc[i]),
-        )
-
-    plt.plot([0, 1], [0, 1], "k--")
-    plt.xlim([0.0, 1.0])
-    plt.ylim([0.0, 1.05])
-    plt.xlabel("False Positive Rate", fontsize=20)
-    plt.ylabel("True Positive Rate", fontsize=20)
-    plt.tick_params(axis="both", which="major", labelsize=22)
-    plt.legend(loc="lower right", fontsize=14, frameon=False)
-    plt.savefig(Path("viz/1.0-KNN_ROC.png"), bbox_inches="tight")
-    plt.show()

@@ -148,10 +148,13 @@ def discretizer(df):
     labels = ["no_comments", "commented"]
     df["track", "comments"] = pd.cut(df["track", "comments"], bins=bins, labels=labels)
 
+    #removed track duration discretization better performance decision tree
+    """
     # track duration
     bins = [-np.inf, 60, 120, np.inf]
     labels = ["1min", "2min", "+3min"]
     df["track", "duration"] = pd.cut(df["track", "duration"], bins=bins, labels=labels)
+    """
 
     # track favorites
     bins = [-np.inf, 0, 2, 5, np.inf]
