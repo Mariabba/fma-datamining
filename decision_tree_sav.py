@@ -79,7 +79,7 @@ def load_data(path):
         ("artist", "id"),
         ("artist", "name"),
         ("artist", "tags"), #might be usefull to include them, but how?
-        ("track", "tags"),
+        ("track", "tags"), #might be usefull to include them, but how?
         ("track", "genres"),
         ("track", "genres_all"),
     ]
