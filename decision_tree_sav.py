@@ -22,7 +22,7 @@ from sklearn.tree import DecisionTreeClassifier
 from sklearn.model_selection import train_test_split
 
 import pydotplus
-from sklearn import tree
+from sklearn import tree, metrics
 from IPython.display import Image
 from sklearn.model_selection import StratifiedShuffleSplit
 
@@ -36,6 +36,20 @@ os.environ["PATH"] += (
 from sklearn.model_selection import RandomizedSearchCV
 from sklearn.model_selection import GridSearchCV
 
+from sklearn.metrics import average_precision_score
+from sklearn.metrics import plot_confusion_matrix, ConfusionMatrixDisplay
+
+def draw_confusion_matrix(Clf, X, y):
+    titles_options = [
+        ("Confusion matrix, without normalization", None),
+        ("Normalized confusion matrix", "true"),
+    ]
+
+    for title, normalize in titles_options:
+        disp = plot_confusion_matrix(Clf, X, y, cmap="OrRd", normalize=normalize)
+        disp.ax_.set_title(title)
+
+    plt.show()
 
 def report(results, n_top=3):
     for i in range(1, n_top + 1):
@@ -57,15 +71,14 @@ def load_data(path):
 
     # feature to drop
     column2drop = [
-        ("album", "title"),  # add later
-        ("artist", "name"),  # add later
+        ("album", "title"),
+        ("album", "tags"), #might be usefull to include them, but how?
+        ("album", "id"),
         ("set", "split"),
         ("track", "title"),
-        ("album", "date_created"),
-        ("artist", "date_created"),
-        ("track", "date_created"),
-        ("album", "tags"),
-        ("artist", "tags"),
+        ("artist", "id"),
+        ("artist", "name"),
+        ("artist", "tags"), #might be usefull to include them, but how?
         ("track", "tags"),
         ("track", "genres"),
         ("track", "genres_all"),
@@ -218,8 +231,17 @@ def build_model(
     plt.ylabel("True Positive Rate", fontsize=20)
     plt.tick_params(axis="both", which="major", labelsize=22)
     plt.legend(loc="lower right", fontsize=14, frameon=False)
-    plt.savefig(Path("viz/1.0-DT_ROC.png"), bbox_inches="tight")
     plt.show()
+
+    # Model Accuracy, how often is the classifier correct?
+    draw_confusion_matrix
+    print("Accuracy:", metrics.accuracy_score(y_test, y_pred))
+    # confusion matrix
+    print("\033[1m" "Confusion matrix" "\033[0m")
+
+    draw_confusion_matrix(clf, X_test, y_test)
+
+    print()
     """
     #visualize the tree
     dot_data = tree.export_graphviz(clf, out_file=None,
@@ -236,6 +258,10 @@ def build_model(
     """
 
 
+
+
 tracks = load_data("data/tracks.csv")
-# tuning_param(tracks, "album", "type")
+print(tracks.info())
+print(tracks["album", "date_created"].head())
+#tuning_param(tracks, "album", "type")
 build_model(tracks, "album", "type", 100, 100, 8, "entropy")
