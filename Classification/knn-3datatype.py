@@ -13,6 +13,7 @@ from sklearn.preprocessing import (
     RobustScaler,
     StandardScaler,
     LabelEncoder,
+    label_binarize,
 )
 from sklearn.preprocessing import KBinsDiscretizer
 
@@ -165,7 +166,6 @@ knn.fit(X_train, y_train)
 # Predict test data set.
 Y_pred = knn.predict(X_test)
 
-
 # Checking performance our model with classification report.
 draw_confusion_matrix
 print("Accuracy:", metrics.accuracy_score(y_test, Y_pred))
@@ -176,7 +176,6 @@ plot_confusion_matrix(knn, X_test, y_test, cmap="OrRd")
 draw_confusion_matrix(knn, X_test, y_test)
 
 print()
-
 
 print("\033[1m" "Classification report test" "\033[0m")
 print(classification_report(y_test, Y_pred))
@@ -193,6 +192,7 @@ print("F1-score %s" % f1_score(y_test, Y_pred, labels=[0, 1], average=None))
 print("Precision %s" % precision_score(y_test, Y_pred, labels=[0, 1], average=None))
 
 print("Recall %s" % recall_score(y_test, Y_pred, labels=[0, 1], average=None))
+
 
 """
 # TODO TESTARE I PARAMENTRI MIGLIORI
