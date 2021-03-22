@@ -137,9 +137,9 @@ def tuning_param(df, target1, target2):
     # tuning parameters with random search
     print("Search best parameters: \n")
     param_list = {
-        "max_depth": [None] + list(np.arange(2, 50)),
+        'max_depth': [None] + list(np.arange(2, 50)),
         "min_samples_split": [2, 5, 10, 15, 20, 30, 50, 100, 150],
-        "min_samples_leaf": [1, 5, 10, 15, 20, 30, 50, 100, 150],
+        "min_samples_leaf": [1, 2, 5, 10, 15, 20, 30, 50, 100, 150],
         "criterion": ["gini", "entropy"],
     }
 
@@ -175,9 +175,9 @@ def tuning_param_gridsearch(df, target1, target2):
                 print("Parameters: {0}".format(results['params'][candidate]))
                 print("")
 
-    param_list = {  'max_depth': [None] + list(np.arange(2, 20)),
+    param_list = {  'max_depth': [None] + list(np.arange(2, 50)),
                     "min_samples_split": [2, 5, 10, 15, 20, 30, 50, 100, 150],
-                    "min_samples_leaf": [1, 5, 10, 15, 20, 30, 50, 100, 150],
+                    "min_samples_leaf": [1, 2, 5, 10, 15, 20, 30, 50, 100, 150],
                     "criterion": ["gini", "entropy"],
                   }
 
@@ -299,4 +299,3 @@ tracks = load_data("../data/tracks.csv")
 #tuning_param_gridsearch(tracks, "album", "type")
 #build_model(tracks, "album", "type", 100, 100, 8, "entropy")
 build_model(tracks, "album", "type", 2, 1, 20, "entropy")
-#build_model(tracks, "album", "type", 2, 1, 2, "gini")
