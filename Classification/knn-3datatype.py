@@ -129,6 +129,7 @@ column2drop = [
     ("album", "tags"),
     ("artist", "tags"),
     ("track", "language_code"),
+    ("track", "number"),
     ("track", "tags"),
     ("track", "genres"),  # todo da trattare se si vuole inserire solo lei
     ("track", "genres_all"),
