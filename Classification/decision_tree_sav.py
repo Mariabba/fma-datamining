@@ -84,6 +84,7 @@ def load_data(path):
         ("track", "tags"),  # might be usefull to include them, but how?
         ("track", "genres"),
         ("track", "genres_all"),
+        ("track", "number"),
     ]
     df.drop(column2drop, axis=1, inplace=True)
 
@@ -176,8 +177,8 @@ def tuning_param_gridsearch(df, target1, target2):
                 print("")
 
     param_list = {  'max_depth': [None] + list(np.arange(2, 50)),
-                    "min_samples_split": [2, 5, 10, 15, 20, 30, 50, 100, 150],
-                    "min_samples_leaf": [1, 2, 5, 10, 15, 20, 30, 50, 100, 150],
+                    "min_samples_split": list(np.arange(2, 50)),
+                    "min_samples_leaf": list(np.arange(2, 50)),
                     "criterion": ["gini", "entropy"],
                   }
 
@@ -296,6 +297,6 @@ def build_model(
 
 tracks = load_data("../data/tracks.csv")
 #tuning_param(tracks, "album", "type")
-#tuning_param_gridsearch(tracks, "album", "type")
+tuning_param_gridsearch(tracks, "album", "type")
 #build_model(tracks, "album", "type", 100, 100, 8, "entropy")
-build_model(tracks, "album", "type", 2, 1, 20, "entropy")
+#build_model(tracks, "album", "type", 2, 1, 20, "entropy")
