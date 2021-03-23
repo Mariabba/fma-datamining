@@ -84,6 +84,7 @@ def load_data(path):
         ("track", "tags"),  # might be usefull to include them, but how?
         ("track", "genres"),
         ("track", "genres_all"),
+        ("track", "number"),
     ]
     df.drop(column2drop, axis=1, inplace=True)
 
@@ -137,9 +138,9 @@ def tuning_param(df, target1, target2):
     # tuning parameters with random search
     print("Search best parameters: \n")
     param_list = {
-        "max_depth": [None] + list(np.arange(2, 50)),
+        'max_depth': [None] + list(np.arange(2, 50)),
         "min_samples_split": [2, 5, 10, 15, 20, 30, 50, 100, 150],
-        "min_samples_leaf": [1, 5, 10, 15, 20, 30, 50, 100, 150],
+        "min_samples_leaf": [1, 2, 5, 10, 15, 20, 30, 50, 100, 150],
         "criterion": ["gini", "entropy"],
     }
 
@@ -151,6 +152,40 @@ def tuning_param(df, target1, target2):
     random_search.fit(X, y)
     report(random_search.cv_results_, n_top=3)
 
+def tuning_param_gridsearch(df, target1, target2):
+
+    # split dataset train and set
+    attributes = [col for col in df.columns if col != (target1, target2)]
+    X = df[attributes].values
+    y = df[target1, target2]
+
+    X_train, X_test, y_train, y_test = train_test_split(
+        X, y, stratify=y, test_size=0.25
+    )
+    print(X_train.shape, X_test.shape)
+    clf = DecisionTreeClassifier(criterion='gini', max_depth=None, min_samples_split=2, min_samples_leaf=1)
+
+    def report(results, n_top=3):
+        for i in range(1, n_top + 1):
+            candidates = np.flatnonzero(results['rank_test_score'] == i)
+            for candidate in candidates:
+                print("Model with rank: {0}".format(i))
+                print("Mean validation score: {0:.3f} (std: {1:.3f})".format(
+                    results['mean_test_score'][candidate],
+                    results['std_test_score'][candidate]))
+                print("Parameters: {0}".format(results['params'][candidate]))
+                print("")
+
+    param_list = {  'max_depth': [None] + list(np.arange(2, 50)),
+                    "min_samples_split": list(np.arange(2, 50)),
+                    "min_samples_leaf": list(np.arange(2, 50)),
+                    "criterion": ["gini", "entropy"],
+                  }
+
+    grid_search = GridSearchCV(clf, param_grid=param_list)
+    grid_search.fit(X, y)
+    clf = grid_search.best_estimator_
+    print(report(grid_search.cv_results_, n_top=3))
 
 def build_model(
     df, target1, target2, min_samples_split, min_samples_leaf, max_depth, criterion
@@ -162,7 +197,7 @@ def build_model(
     y = df[target1, target2]
 
     X_train, X_test, y_train, y_test = train_test_split(
-        X, y, stratify=y, test_size=0.25
+        X, y, test_size=0.25
     )
 
     print(X_train.shape, X_test.shape)
@@ -261,5 +296,7 @@ def build_model(
 
 
 tracks = load_data("../data/tracks.csv")
-# tuning_param(tracks, "album", "type")
-build_model(tracks, "album", "type", 100, 100, 8, "entropy")
+#tuning_param(tracks, "album", "type")
+tuning_param_gridsearch(tracks, "album", "type")
+#build_model(tracks, "album", "type", 100, 100, 8, "entropy")
+#build_model(tracks, "album", "type", 2, 1, 20, "entropy")
