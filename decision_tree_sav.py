@@ -1,44 +1,41 @@
-# from pydotplus import graphviz
-
-import utils
 from pathlib import Path
+import os
 
-# import graphviz
+import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
-import matplotlib.pyplot as plt
-
-# from scipy.constants import lb
-
-from sklearn.preprocessing import LabelEncoder
-
-from sklearn.metrics import confusion_matrix
-from sklearn.metrics import accuracy_score, f1_score, classification_report
-from sklearn.metrics import roc_curve, auc, roc_auc_score
-
-# from sklearn.preprocessing import LabelEncoder
-
-from sklearn.tree import DecisionTreeClassifier
-from sklearn.model_selection import train_test_split
 
 # import pydotplus
+# from pydotplus import graphviz
+from scipy.constants import lb
 from sklearn import tree, metrics
+from sklearn.metrics import (
+    plot_confusion_matrix,
+    ConfusionMatrixDisplay,
+    roc_curve,
+    auc,
+    roc_auc_score,
+    confusion_matrix,
+    accuracy_score,
+    f1_score,
+    classification_report,
+    average_precision_score,
+)
+from sklearn.model_selection import (
+    GridSearchCV,
+    RandomizedSearchCV,
+    StratifiedShuffleSplit,
+    train_test_split,
+)
+from sklearn.preprocessing import LabelEncoder
+from sklearn.tree import DecisionTreeClassifier
 
-# from IPython.display import Image
-# from sklearn.model_selection import StratifiedShuffleSplit
-
-import os
+import utils
 
 os.environ["PATH"] += (
     os.pathsep
     + "C:/Users/saverio/Desktop/Data Mining/DataMiningProject/venvv/Lib/site-packages/graphviz/bin"
 )
-
-from sklearn.model_selection import RandomizedSearchCV
-from sklearn.model_selection import GridSearchCV
-
-from sklearn.metrics import average_precision_score
-from sklearn.metrics import plot_confusion_matrix, ConfusionMatrixDisplay
 
 
 def draw_confusion_matrix(Clf, X, y):
@@ -115,7 +112,6 @@ def load_data(path):
 
 
 def tuning_param(df, target1, target2):
-
     # split dataset train and set
     attributes = [col for col in df.columns if col != (target1, target2)]
     X = df[attributes].values
@@ -155,7 +151,6 @@ def tuning_param(df, target1, target2):
 
 
 def tuning_param_gridsearch(df, target1, target2):
-
     # split dataset train and set
     attributes = [col for col in df.columns if col != (target1, target2)]
     X = df[attributes].values
@@ -190,7 +185,7 @@ def tuning_param_gridsearch(df, target1, target2):
         "criterion": ["gini", "entropy"],
     }
 
-    grid_search = GridSearchCV(clf, param_grid=param_list, n_jobs=-1, verbose=1)
+    grid_search = GridSearchCV(clf, param_grid=param_list)
     grid_search.fit(X, y)
     clf = grid_search.best_estimator_
     print(report(grid_search.cv_results_, n_top=3))
