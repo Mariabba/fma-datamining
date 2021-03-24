@@ -12,7 +12,7 @@ except ModuleNotFoundError:
     pass
 
 
-def load(filepath, clean=False, dummies=False, fill=True, clean_knn=False):
+def load(filepath, buckets=False, dummies=False, fill=True, buckets_knn=False):
     filename = filepath.name
 
     if "features" in filename:
@@ -37,29 +37,22 @@ def load(filepath, clean=False, dummies=False, fill=True, clean_knn=False):
 
     df = df.convert_dtypes()
 
-    if clean:
+    if buckets:
         df = discretizer(df)
     if dummies:
         df = dummy_maker(df)
     if fill:
         df = fill_missing(df)
-    if clean_knn:
+    if buckets_knn:
         df = discretizer_knn(df)
-
-    # datetime manipulation
-    df[("album", "date_created")] = pd.to_datetime(df[("album", "date_created")])
-    df[("album", "date_created")] = df[("album", "date_created")].dt.year
-
-    df[("artist", "date_created")] = pd.to_datetime(df[("artist", "date_created")])
-    df[("artist", "date_created")] = df[("artist", "date_created")].dt.year
-
-    df[("track", "date_created")] = pd.to_datetime(df[("track", "date_created")])
-    df[("track", "date_created")] = df[("track", "date_created")].dt.year
 
     return df
 
 
 def correct_dtypes(df):
+    """
+    Used for tracks.csv to convert into category, datetime types
+    """
     columns = [
         ("track", "tags"),
         ("album", "tags"),
@@ -96,6 +89,19 @@ def correct_dtypes(df):
 
 
 def discretizer(df):
+    # datetime manipulation
+    df[("album", "date_created")] = pd.to_datetime(
+        df[("album", "date_created")]
+    ).dt.year
+    df[("artist", "date_created")] = pd.to_datetime(
+        df[("artist", "date_created")]
+    ).dt.year
+    df[("track", "date_created")] = pd.to_datetime(
+        df[("track", "date_created")]
+    ).dt.year
+
+    # miao
+
     # album comments
     bins = [-np.inf, -1, 0, np.inf]
     labels = ["no_info", "no_comments", "commented"]
@@ -135,16 +141,6 @@ def discretizer(df):
         df["artist", "favorites"], bins=bins, labels=labels
     )
 
-    # text analysis
-    # album information ~ is used to state true as presence of information and false the absence
-    df["album", "information"] = (~df["album", "information"].isnull()).astype(int)
-
-    # artist bio ~ is used to state true as presence of bio and false the absence
-    df["artist", "bio"] = (~df["artist", "bio"].isnull()).astype(int)
-
-    # album producer ~ is used to state true as presence of producer and false the absence
-    df["album", "producer"] = (~df["album", "producer"].isnull()).astype(int)
-
     # track comments
     bins = [-np.inf, 0, np.inf]
     labels = ["no_comments", "commented"]
@@ -170,9 +166,6 @@ def discretizer(df):
         df["track", "favorites"], bins=bins, labels=labels
     )
 
-    # artist website - ~ is used to state true as presence of website stated and false the absence
-    df["artist", "website"] = (~df["artist", "website"].isnull()).astype(int)
-
     # album listens
     bins = [-np.inf, -1, 10000, 50000, 150000, np.inf]
     labels = [
@@ -192,9 +185,6 @@ def discretizer(df):
         "high_listened",
     ]
     df["track", "listens"] = pd.cut(df["track", "listens"], bins=bins, labels=labels)
-
-    # album engineer ~ is used to state true as presence of engineer and false the absence
-    df["album", "engineer"] = (~df["album", "engineer"].isnull()).astype(int)
 
     # fill language_code
     df["track", "language_code"] = df["track", "language_code"].fillna(
@@ -221,8 +211,14 @@ def dummy_maker(df, threshold=0.9):
     df = df.drop(columns=low_coverage)
 
     my_df = (~my_df.isna()).astype(int)
-
     my_df.columns = pd.MultiIndex.from_tuples([(a, f"d_{b}") for a, b in my_df.columns])
+
+    # Special cases
+    df["album", "engineer"] = (~df["album", "ds_engineer"].isnull()).astype(int)
+    df["album", "information"] = (~df["album", "ds_information"].isnull()).astype(int)
+    df["artist", "bio"] = (~df["artist", "ds_bio"].isnull()).astype(int)
+    df["album", "producer"] = (~df["album", "ds_producer"].isnull()).astype(int)
+    df["artist", "website"] = (~df["artist", "ds_website"].isnull()).astype(int)
 
     return pd.concat([df, my_df], axis=1)
 
