@@ -6,10 +6,10 @@ from rich import pretty, print
 import utils
 
 pretty.install()
-# genres = utils.load(Path("data/genres.csv"))
-# echonest = utils.load(Path("data/echonest.csv"))
-tracks = utils.load(Path("data/tracks.csv"), fill=False)
-# artists = utils.load(Path("data/raw_artists.csv"))
+# genres = utils.load("data/genres.csv")
+# echonest = utils.load("data/echonest.csv")
+tracks = utils.load("data/tracks.csv", fill=False)
+# artists = utils.load("data/raw_artists.csv")
 
 
 errors = utils.check_rules(tracks, Path("data/rules.txt"))

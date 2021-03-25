@@ -1,11 +1,8 @@
 import csv
-from pathlib import Path
 
 import matplotlib.pyplot as plt
 import networkx as nx
 
-
-# df = utils.load("data/genres.csv")
 
 # df = df.drop(columns=["#tracks", "title", "top_level"])
 

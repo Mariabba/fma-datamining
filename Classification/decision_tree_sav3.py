@@ -69,7 +69,7 @@ def report(results, n_top=3):
 
 
 def load_data(path):
-    df = utils.load(Path(path), clean=True, dummies=True)
+    df = utils.load(path, dummies=True)
 
     # feature to drop
     column2drop = [

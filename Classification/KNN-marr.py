@@ -73,7 +73,7 @@ def draw_precision_recall_curve(Y_test, Y_pred):
 
 
 # =====================DATASET ADJUSTING AND VISUALIZING===============================
-df = utils.load(Path("../data/tracks.csv"), clean=True, dummies=True)
+df = utils.load("../data/tracks.csv", dummies=True)
 column2drop = [
     ("album", "title"),
     ("album", "tags"),  # might be usefull to include them, but how?

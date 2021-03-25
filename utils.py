@@ -12,8 +12,14 @@ except ModuleNotFoundError:
     pass
 
 
-def load(filepath, buckets=False, dummies=False, fill=True, buckets_knn=False):
-    filename = filepath.name
+def load(filepath, buckets="basic", dummies=False, fill=False, buckets_knn=False):
+    """
+    usage: load(Path object filepath,
+    buckets='basic|continuous|discrete' default basic,
+    dummies=True|False default False,
+    fill=True|False default False
+    """
+    filename = Path(filepath).name
 
     if "features" in filename:
         # print("using features")
@@ -37,8 +43,20 @@ def load(filepath, buckets=False, dummies=False, fill=True, buckets_knn=False):
 
     df = df.convert_dtypes()
 
-    if buckets:
+    # start of parameter choices
+    if buckets == "basic":
         df = discretizer(df)
+    elif buckets == "continuous":
+        df = discretizer(df)
+        df = discretizer_continuousmethods(df)
+    elif buckets == "discrete":
+        df = discretizer(df)
+        df = discretizer_discretemethods(df)
+    else:
+        raise ValueError(
+            "usage: load(Path object filepath, buckets='basic|continuous|discrete' default basic, dummies=True|False default False, fill=True|False default False"
+        )
+
     if dummies:
         df = dummy_maker(df)
     if fill:
@@ -89,6 +107,9 @@ def correct_dtypes(df):
 
 
 def discretizer(df):
+    """
+    General discretizations that we use for EVERYTHING.
+    """
     # datetime manipulation
     df[("album", "date_created")] = pd.to_datetime(
         df[("album", "date_created")]
@@ -99,8 +120,6 @@ def discretizer(df):
     df[("track", "date_created")] = pd.to_datetime(
         df[("track", "date_created")]
     ).dt.year
-
-    # miao
 
     # album comments
     bins = [-np.inf, -1, 0, np.inf]
@@ -192,6 +211,20 @@ def discretizer(df):
     )
 
     return df
+
+
+def discretizer_continuousmethods():
+    """
+    Discretizations that we use for methods that accept or require continuous variables (like knn)
+    """
+    pass
+
+
+def discretizer_discretemethods():
+    """
+    Discretizations that we use for methods that accept or require discrete variables (like xxx)
+    """
+    pass
 
 
 def dummy_maker(df, threshold=0.9):
@@ -309,8 +342,6 @@ def clean(df):
 
 
 def discretizer_knn(df):
-
-    # text analysis
     # album information ~ is used to state true as presence of information and false the absence
     df["album", "information"] = (~df["album", "information"].isnull()).astype(int)
 

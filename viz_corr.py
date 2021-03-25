@@ -1,5 +1,3 @@
-from pathlib import Path
-
 import matplotlib.pyplot as plt
 import numpy as np
 import seaborn as sns
@@ -8,7 +6,7 @@ import utils
 
 sns.set_theme(style="white")
 
-tracks = utils.load(Path("data/tracks.csv"), clean=True, dummies=True)
+tracks = utils.load("data/tracks.csv", dummies=True)
 
 # Compute the correlation matrix
 corr = tracks.corr()

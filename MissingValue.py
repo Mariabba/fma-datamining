@@ -10,7 +10,7 @@ from langdetect import detect
 sns.set_theme(style="white")
 
 
-tracks = utils.load(Path("data/tracks.csv"), clean=True, dummies=True)
+tracks = utils.load("data/tracks.csv", dummies=True)
 
 # fill dataCreated_ data released
 

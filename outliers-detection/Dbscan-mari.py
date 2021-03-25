@@ -16,9 +16,8 @@ from sklearn.preprocessing import MinMaxScaler
 from statsmodels.compat import pandas
 
 import utils
-from pathlib import Path
 
-df = utils.load(Path("../data/tracks.csv"), clean=False, dummies=True, clean_knn=False)
+df = utils.load("../data/tracks.csv", dummies=True)
 
 df.info()
 
