@@ -8,11 +8,11 @@ import utils
 pretty.install()
 # genres = utils.load("data/genres.csv")
 # echonest = utils.load("data/echonest.csv")
-tracks = utils.load("data/tracks.csv", fill=False)
+tracks = utils.load("data/tracks.csv")
 # artists = utils.load("data/raw_artists.csv")
 
 
-errors = utils.check_rules(tracks, Path("data/rules.txt"))
+errors = utils.check_rules(tracks, "data/rules.txt")
 print(errors)
 
 # print("Here are informations on tracks")

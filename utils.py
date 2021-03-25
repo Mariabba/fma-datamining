@@ -12,36 +12,41 @@ except ModuleNotFoundError:
     pass
 
 
-def load(filepath, buckets="basic", dummies=False, fill=False, buckets_knn=False):
-    """
-    usage: load(Path object filepath,
+def load(filepath, buckets="basic", dummies=False, fill=False) -> pd.DataFrame:
+    docstring = """
+    usage: load(string filepath,
     buckets='basic|continuous|discrete' default basic,
     dummies=True|False default False,
     fill=True|False default False
     """
-    filename = Path(filepath).name
+    filepath = Path(filepath)
+    filename = filepath.name
 
     if "features" in filename:
-        # print("using features")
         df = pd.read_csv(filepath, index_col=0, header=[0, 1, 2])
+        df.name = filename
 
     elif "echonest" in filename:
-        # print("using echonest")
         df = pd.read_csv(filepath, index_col=0, header=[0, 1])
 
     elif any(x in filename for x in ("genres", "albums", "artists")):
-        # print("using anyof")
         df = pd.read_csv(filepath, index_col=0)
 
     elif "tracks" in filename:
-        # print("using tracks")
         df = pd.read_csv(filepath, index_col=0, header=[0, 1], low_memory=False)
         df = correct_dtypes(df)
 
     else:
-        print(f"Something bad just happened with {filename}.")
+        raise ValueError(f"{filename} is not supported by load().")
 
+    print(filename)
     df = df.convert_dtypes()
+
+    # Columns that we're not interested in for ANY method
+    del df[("set", "subset")]
+    del df[("artist", "latitude")]
+    del df[("artist", "longitude")]
+    del df[("track", "bit_rate")]
 
     # start of parameter choices
     if buckets == "basic":
@@ -53,21 +58,18 @@ def load(filepath, buckets="basic", dummies=False, fill=False, buckets_knn=False
         df = discretizer(df)
         df = discretizer_discretemethods(df)
     else:
-        raise ValueError(
-            "usage: load(Path object filepath, buckets='basic|continuous|discrete' default basic, dummies=True|False default False, fill=True|False default False"
-        )
+        raise ValueError(docstring)
 
     if dummies:
         df = dummy_maker(df)
     if fill:
         df = fill_missing(df)
-    if buckets_knn:
-        df = discretizer_knn(df)
 
+    df.attrs["df_name"] = filename
     return df
 
 
-def correct_dtypes(df):
+def correct_dtypes(df: pd.DataFrame) -> pd.DataFrame:
     """
     Used for tracks.csv to convert into category, datetime types
     """
@@ -106,7 +108,7 @@ def correct_dtypes(df):
     return df
 
 
-def discretizer(df):
+def discretizer(df: pd.DataFrame) -> pd.DataFrame:
     """
     General discretizations that we use for EVERYTHING.
     """
@@ -121,19 +123,32 @@ def discretizer(df):
         df[("track", "date_created")]
     ).dt.year
 
-    # album comments
+    return df
+
+
+def discretizer_continuousmethods(df: pd.DataFrame) -> pd.DataFrame:
+    """
+    Discretizations that we use for methods that prefer or require continuous variables (like KNN)
+    """
+    pass
+
+    return df
+
+
+def discretizer_discretemethods(df: pd.DataFrame) -> pd.DataFrame:
+    """
+    Discretizations that we use for methods that prefer or require discrete variables (like xxx)
+    """
     bins = [-np.inf, -1, 0, np.inf]
     labels = ["no_info", "no_comments", "commented"]
     df["album", "comments"] = pd.cut(df["album", "comments"], bins=bins, labels=labels)
 
-    # artist comments
     bins = [-np.inf, -1, 0, np.inf]
     labels = ["no_info", "no_comments", "commented"]
     df["artist", "comments"] = pd.cut(
         df["artist", "comments"], bins=bins, labels=labels
     )
 
-    # album favorites
     bins = [-np.inf, -1, 0, 2, 5, np.inf]
     labels = [
         "no_info",
@@ -146,7 +161,6 @@ def discretizer(df):
         df["album", "favorites"], bins=bins, labels=labels
     )
 
-    # artist favorites
     bins = [-np.inf, 0, 10, 50, 150, 500, np.inf]
     labels = [
         "no_favorites",
@@ -160,7 +174,6 @@ def discretizer(df):
         df["artist", "favorites"], bins=bins, labels=labels
     )
 
-    # track comments
     bins = [-np.inf, 0, np.inf]
     labels = ["no_comments", "commented"]
     df["track", "comments"] = pd.cut(df["track", "comments"], bins=bins, labels=labels)
@@ -173,7 +186,6 @@ def discretizer(df):
     df["track", "duration"] = pd.cut(df["track", "duration"], bins=bins, labels=labels)
     """
 
-    # track favorites
     bins = [-np.inf, 0, 2, 5, np.inf]
     labels = [
         "no_favorites",
@@ -185,7 +197,6 @@ def discretizer(df):
         df["track", "favorites"], bins=bins, labels=labels
     )
 
-    # album listens
     bins = [-np.inf, -1, 10000, 50000, 150000, np.inf]
     labels = [
         "no_info",
@@ -196,7 +207,6 @@ def discretizer(df):
     ]
     df["album", "listens"] = pd.cut(df["album", "listens"], bins=bins, labels=labels)
 
-    # track listens
     bins = [-np.inf, 1000, 5000, np.inf]
     labels = [
         "low_listened",
@@ -205,29 +215,10 @@ def discretizer(df):
     ]
     df["track", "listens"] = pd.cut(df["track", "listens"], bins=bins, labels=labels)
 
-    # fill language_code
-    df["track", "language_code"] = df["track", "language_code"].fillna(
-        detect(str(df["track", "title"]))
-    )
-
     return df
 
 
-def discretizer_continuousmethods():
-    """
-    Discretizations that we use for methods that accept or require continuous variables (like knn)
-    """
-    pass
-
-
-def discretizer_discretemethods():
-    """
-    Discretizations that we use for methods that accept or require discrete variables (like xxx)
-    """
-    pass
-
-
-def dummy_maker(df, threshold=0.9):
+def dummy_maker(df, threshold=0.9) -> pd.DataFrame:
     """
     returns a new dataframe with dummy variables for columns with <10% coverage
 
@@ -256,12 +247,13 @@ def dummy_maker(df, threshold=0.9):
     return pd.concat([df, my_df], axis=1)
 
 
-def fill_missing(df):
+def fill_missing(df: pd.DataFrame) -> pd.DataFrame:
+    # fill language_code
+    df["track", "language_code"] = df["track", "language_code"].fillna(
+        detect(str(df["track", "title"]))
+    )
+
     # Deletion of columns
-    del df[("set", "subset")]
-    del df[("track", "bit_rate")]
-    del df[("artist", "latitude")]
-    del df[("artist", "longitude")]
     del df[("artist", "active_year_begin")]
     del df[("artist", "associated_labels")]
     del df[("artist", "related_projects")]
@@ -283,8 +275,11 @@ def fill_missing(df):
     return df
 
 
-def check_rules(df: pd.DataFrame, rules_path: Path) -> pd.DataFrame:
-    with open(rules_path, "r") as reader:
+def check_rules(df: pd.DataFrame, rules_path: str) -> pd.DataFrame:
+    """
+    Checks rules_path (possibly 'data/rules.txt') and returns a dataframe with the error count for each rule
+    """
+    with open(Path(rules_path), "r") as reader:
         file_contents = reader.readlines()
     rules = [x.split() for x in file_contents]
 
@@ -331,46 +326,3 @@ def check_rules(df: pd.DataFrame, rules_path: Path) -> pd.DataFrame:
                 ignore_index=True,
             )
     return errors
-
-
-def clean(df):
-    pass
-
-    # 4. check di consistenza: come?
-
-    # 5. missing values colonne coverage > 80% : come riempire?
-
-
-def discretizer_knn(df):
-    # album information ~ is used to state true as presence of information and false the absence
-    df["album", "information"] = (~df["album", "information"].isnull()).astype(int)
-
-    # artist bio ~ is used to state true as presence of bio and false the absence
-    df["artist", "bio"] = (~df["artist", "bio"].isnull()).astype(int)
-
-    # album producer ~ is used to state true as presence of producer and false the absence
-    df["album", "producer"] = (~df["album", "producer"].isnull()).astype(int)
-
-    # artist website - ~ is used to state true as presence of website stated and false the absence
-    df["artist", "website"] = (~df["artist", "website"].isnull()).astype(int)
-
-    # album listens #TODO rivedere se tenerla così o eliminare discretizzazione
-    bins = [-np.inf, -1, 10000, 50000, 150000, np.inf]
-    labels = [
-        "no_info",
-        "low_listened",
-        "medium_listened",
-        "high_listened",
-        "higher_listened",
-    ]
-    df["album", "listens"] = pd.cut(df["album", "listens"], bins=bins, labels=labels)
-
-    # album engineer ~ is used to state true as presence of engineer and false the absence
-    df["album", "engineer"] = (~df["album", "engineer"].isnull()).astype(int)
-
-    # fill language_code
-    df["track", "language_code"] = df["track", "language_code"].fillna(
-        detect(str(df["track", "title"]))
-    )
-
-    return df

@@ -120,7 +120,7 @@ def draw_precision_recall_curve(Y_test, Y_pred):
 
 
 # DATASET
-df = utils.load("../data/tracks.csv", dummies=True, buckets_knn=True)
+df = utils.load("../data/tracks.csv", dummies=True, buckets="continuous")
 column2drop = [
     ("album", "title"),
     ("artist", "name"),

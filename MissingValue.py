@@ -4,12 +4,11 @@ import matplotlib.pyplot as plt
 import numpy as np
 import seaborn as sns
 import missingno as mso
-import utils
 from langdetect import detect
 
+import utils
+
 sns.set_theme(style="white")
-
-
 tracks = utils.load("data/tracks.csv", dummies=True)
 
 # fill dataCreated_ data released

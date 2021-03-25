@@ -1,10 +1,8 @@
 import csv
+from pathlib import Path
 
 import matplotlib.pyplot as plt
 import networkx as nx
-
-
-# df = df.drop(columns=["#tracks", "title", "top_level"])
 
 with open("data/genres.csv", "r") as nodecsv:  # Open the file
     nodereader = csv.reader(nodecsv)  # Read the csv
