@@ -12,7 +12,7 @@ except ModuleNotFoundError:
     pass
 
 
-def load(filepath, buckets="basic", dummies=False, fill=False) -> pd.DataFrame:
+def load(filepath: str, buckets="basic", dummies=False, fill=False) -> pd.DataFrame:
     docstring = """
     usage: load(string filepath,
     buckets='basic|continuous|discrete' default basic,
