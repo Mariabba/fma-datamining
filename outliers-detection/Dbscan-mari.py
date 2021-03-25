@@ -16,10 +16,12 @@ from sklearn.preprocessing import MinMaxScaler
 from statsmodels.compat import pandas
 
 import utils
+from pathlib import Path
 
 df = utils.load("../data/tracks.csv", dummies=True, buckets="basic", fill=True)
 
 df.info()
+print(Path.cwd())
 
 """
 mi son apena resa conto che posso fare questa cosa solo con le variabili intere
@@ -35,62 +37,18 @@ df[("album", "comments")].plot.box(ax=ax)
 plt.xlabel(("album", "comments"))
 plt.show()
 """
-"""
-#==============trasformo in interi gli object==========
-Queste son le variabili ora ci ragiono un attimo su ognuna
- (album, tags)                99404 non-null  object  
- (artist, tags)               99404 non-null  object  
- (track, genres)              99404 non-null  object  
- (track, genres_all)          99404 non-null  object  
- (track, tags)                99404 non-null  object 
- 
-Sicuramente devo eliminare i tags ma prima provo a trasformarne uno e farci il boxplot
-per vedere cosa ne esce,nulla di buono, non posso trasformarli in int quindi elimino tutto.
-Per quanto riguarda genres è un problema quindi le elimino
-"""
+
 column2drop = [
     ("album", "tags"),
     ("artist", "tags"),
     ("track", "tags"),
     ("track", "genres"),
     ("track", "genres_all"),
+    ("track", "license"),
+    ("track", "language_code"),
 ]
 df.drop(column2drop, axis=1, inplace=True)
 
-"""
-#==============trasformo in interi le category========================
-(album, information)         81260 non-null  category
-(album, type)                99404 non-null  category
-(artist, bio)                66610 non-null  category 
-(track, license)             99404 non-null  category
-"""
-df["album", "information"] = (~df["album", "information"].isnull()).astype(int)
-df["album", "type"] = (~df["album", "type"].isnull()).astype(int)
-df["artist", "bio"] = (~df["artist", "bio"].isnull()).astype(int)
-df["track", "license"] = (~df["track", "license"].isnull()).astype(int)
-
-"""
-============trasformo in interi le stringhe=======================
-(album, engineer)
-(album, producer)            17707 non-null  string  
-(album, title)               99404 non-null  string  
-(artist, name)               99404 non-null  string  
-(artist, website)            74276 non-null  string  
-(set, split)                 99404 non-null  string  
-(track, language_code)       14446 non-null  string 
-(track, title)               99404 non-null  string  
-
-"""
-df["album", "engineer"] = (~df["album", "engineer"].isnull()).astype(int)
-df["album", "producer"] = (~df["album", "producer"].isnull()).astype(int)
-df["artist", "website"] = (~df["artist", "website"].isnull()).astype(int)
-
-
-# sistemo track, language code come fece saverio, ha senso come cosa e serve farlo prima
-df["track", "language_code"] = df["track", "language_code"].fillna(
-    detect(str(df["track", "title"]))
-)
-df["track", "language_code"] = (~df["track", "language_code"].isnull()).astype(int)
 
 # decido di eliminare  album title, artist name,set split e track title, ovviamente sono valori unici e outliers
 # DEVO ELIMINARE GLI ID SENNO' COMBINANO MACELLO
@@ -101,14 +59,18 @@ column2drop = {
     ("track", "title"),
     ("album", "id"),
     ("artist", "id"),
+    ("album", "date_created"),
 }
 df.drop(column2drop, axis=1, inplace=True)
 
 # Riformatto le date
-df["album", "date_created"] = (~df["album", "date_created"].isnull()).astype(int)
-df["artist", "date_created"] = (~df["artist", "date_created"].isnull()).astype(int)
+
+df["artist", "date_created"] = df["artist", "date_created"].astype("Int64")
 
 df.info()
+print(df["artist", "date_created"].unique())
+print(df["album", "listens"].unique())
+print(df["album", "information"].unique())
 
 class_name = ("album", "type")
 attributes = [col for col in df.columns if col != class_name]
@@ -129,10 +91,9 @@ b = sns.boxplot(data=df, orient="v")
 b.set(ylabel="Class", xlabel="Normalization Value")
 plt.show()
 
-"""
 # PLOT per trovare best esp
 
-
+"""
 sns.set()
 neigh = NearestNeighbors(n_neighbors=3)
 nbrs = neigh.fit(X)
@@ -142,8 +103,8 @@ distances = distances[:, 1]
 plt.plot(distances)
 plt.show()
 """
-"""APPLICO IL DBSCAN
-
+"""APPLICO IL DBSCAN """
+"""
 from sklearn.cluster import DBSCAN
 
 print("DBSCAN")
