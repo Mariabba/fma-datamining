@@ -114,13 +114,13 @@ def discretizer(df: pd.DataFrame) -> pd.DataFrame:
     # datetime manipulation
     df[("album", "date_created")] = pd.to_datetime(
         df[("album", "date_created")]
-    ).dt.year
+    ).dt.year.astype("Int64")
     df[("artist", "date_created")] = pd.to_datetime(
         df[("artist", "date_created")]
-    ).dt.year
+    ).dt.year.astype("Int64")
     df[("track", "date_created")] = pd.to_datetime(
         df[("track", "date_created")]
-    ).dt.year
+    ).dt.year.astype("Int64")
 
     return df
 

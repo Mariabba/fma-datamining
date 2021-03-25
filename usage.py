@@ -8,7 +8,7 @@ import utils
 pretty.install()
 # genres = utils.load("data/genres.csv")
 # echonest = utils.load("data/echonest.csv")
-tracks = utils.load("data/tracks.csv")
+tracks = utils.load("data/tracks.csv", buckets="continuous", dummies=True, fill=True)
 # artists = utils.load("data/raw_artists.csv")
 
 
