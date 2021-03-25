@@ -39,7 +39,6 @@ def load(filepath: str, buckets="basic", dummies=False, fill=False) -> pd.DataFr
     else:
         raise ValueError(f"{filename} is not supported by load().")
 
-    print(filename)
     df = df.convert_dtypes()
 
     # Columns that we're not interested in for ANY method
@@ -226,23 +225,31 @@ def dummy_maker(df, threshold=0.9) -> pd.DataFrame:
     Original columns are removed
     """
 
+    # Columns coverage < threshold
     low_coverage = []
     for col in df:
         miao = df[col].isnull().mean()
         if miao > threshold:
             low_coverage.append(col)
+
+    # Special cases
+    special_cases = [
+        ("album", "engineer"),
+        ("album", "information"),
+        ("artist", "bio"),
+        ("album", "producer"),
+        ("artist", "website"),
+        ("album", "type"),
+    ]
+
+    low_coverage.extend(special_cases)
     my_df = df[low_coverage]
     df = df.drop(columns=low_coverage)
 
     my_df = (~my_df.isna()).astype(int)
-    my_df.columns = pd.MultiIndex.from_tuples([(a, f"d_{b}") for a, b in my_df.columns])
-
-    # Special cases
-    df["album", "engineer"] = (~df["album", "ds_engineer"].isnull()).astype(int)
-    df["album", "information"] = (~df["album", "ds_information"].isnull()).astype(int)
-    df["artist", "bio"] = (~df["artist", "ds_bio"].isnull()).astype(int)
-    df["album", "producer"] = (~df["album", "ds_producer"].isnull()).astype(int)
-    df["artist", "website"] = (~df["artist", "ds_website"].isnull()).astype(int)
+    my_df.columns = pd.MultiIndex.from_tuples(
+        [(a, f"{b}") for a, b in my_df.columns]
+    )  # was (a, f"d_{b}")
 
     return pd.concat([df, my_df], axis=1)
 
