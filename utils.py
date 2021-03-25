@@ -12,6 +12,12 @@ except ModuleNotFoundError:
     pass
 
 
+def load_tracks(
+    filepath="data/tracks.csv", buckets="basic", dummies=False, fill=False
+) -> pd.DataFrame:
+    return load(filepath, buckets, dummies, fill)
+
+
 def load(filepath: str, buckets="basic", dummies=False, fill=False) -> pd.DataFrame:
     docstring = """
     usage: load(string filepath,
