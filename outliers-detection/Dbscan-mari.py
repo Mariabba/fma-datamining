@@ -17,7 +17,7 @@ from statsmodels.compat import pandas
 
 import utils
 
-df = utils.load("../data/tracks.csv", dummies=True)
+df = utils.load("../data/tracks.csv", dummies=True, buckets="basic", fill=True)
 
 df.info()
 
@@ -84,7 +84,7 @@ df["track", "license"] = (~df["track", "license"].isnull()).astype(int)
 df["album", "engineer"] = (~df["album", "engineer"].isnull()).astype(int)
 df["album", "producer"] = (~df["album", "producer"].isnull()).astype(int)
 df["artist", "website"] = (~df["artist", "website"].isnull()).astype(int)
-df.info()
+
 
 # sistemo track, language code come fece saverio, ha senso come cosa e serve farlo prima
 df["track", "language_code"] = df["track", "language_code"].fillna(
@@ -104,6 +104,10 @@ column2drop = {
 }
 df.drop(column2drop, axis=1, inplace=True)
 
+# Riformatto le date
+df["album", "date_created"] = (~df["album", "date_created"].isnull()).astype(int)
+df["artist", "date_created"] = (~df["artist", "date_created"].isnull()).astype(int)
+
 df.info()
 
 class_name = ("album", "type")
@@ -119,13 +123,15 @@ min_max_scaler = preprocessing.MinMaxScaler()
 x_scaled = min_max_scaler.fit_transform(x)
 df = pd.DataFrame(x_scaled)
 
-# FACCIO  IL PLOTTING
-plt.figure(figsize=(15, 17))
-sns.boxplot(data=df, orient="h")
+# FACCIO  IL PLOTTING BOXPLOT
+plt.figure(figsize=(20, 25))
+b = sns.boxplot(data=df, orient="v")
+b.set(ylabel="Class", xlabel="Normalization Value")
 plt.show()
 
-# PLOT per trovare best est
-import seaborn as sns
+"""
+# PLOT per trovare best esp
+
 
 sns.set()
 neigh = NearestNeighbors(n_neighbors=3)
@@ -135,8 +141,8 @@ distances = np.sort(distances, axis=0)
 distances = distances[:, 1]
 plt.plot(distances)
 plt.show()
-
-"""APPLICO IL DBSCAN"""
+"""
+"""APPLICO IL DBSCAN
 
 from sklearn.cluster import DBSCAN
 
@@ -152,7 +158,7 @@ print("Estimated number of clusters: %d" % n_clusters_)
 print("Estimated number of noise points: %d" % n_noise_)
 
 print(df.loc[(labels == -1)])
-"""
+
 #Calcolo eps e min samples migliori
 eps_to_test = [3, 4, 5, 6, 7, 8]  # i migliori sono esp 4 min 3
 min_samples_to_test = [2, 3, 4, 5]

@@ -67,7 +67,7 @@ def report(results, n_top=3):
 
 
 def load_data(path):
-    df = utils.load(path, dummies=True, buckets='discrete', fill=True)
+    df = utils.load(path, dummies=True, buckets="discrete", fill=True)
 
     # feature to drop
     column2drop = [
@@ -298,6 +298,6 @@ def build_model(
 
 tracks = load_data("data/tracks.csv")
 # tuning_param(tracks, "album", "type")
-#tuning_param_gridsearch(tracks, "album", "type")
+# tuning_param_gridsearch(tracks, "album", "type")
 build_model(tracks, "album", "type", 100, 100, 8, "entropy")
 # build_model(tracks, "album", "type", 2, 1, 20, "entropy")
