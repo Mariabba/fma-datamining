@@ -21,22 +21,6 @@ from pathlib import Path
 df = utils.load("../data/tracks.csv", dummies=True, buckets="basic", fill=True)
 
 df.info()
-print(Path.cwd())
-
-"""
-mi son apena resa conto che posso fare questa cosa solo con le variabili intere
-quindi credo che farò cosi, di quelle selezionate le trasformo in intere e 
-guardo i boxplot un attimo
-
-# stampo qualche boxplot per avere più o meno un'idea del da farsi
-fig = plt.subplots(figsize=(10, 10))
-fig_dims = (1, 1)
-
-ax = plt.subplot2grid(fig_dims, (0, 0))
-df[("album", "comments")].plot.box(ax=ax)
-plt.xlabel(("album", "comments"))
-plt.show()
-"""
 
 column2drop = [
     ("album", "tags"),
@@ -46,13 +30,6 @@ column2drop = [
     ("track", "genres_all"),
     ("track", "license"),
     ("track", "language_code"),
-]
-df.drop(column2drop, axis=1, inplace=True)
-
-
-# decido di eliminare  album title, artist name,set split e track title, ovviamente sono valori unici e outliers
-# DEVO ELIMINARE GLI ID SENNO' COMBINANO MACELLO
-column2drop = {
     ("album", "title"),
     ("artist", "name"),
     ("set", "split"),
@@ -60,13 +37,13 @@ column2drop = {
     ("album", "id"),
     ("artist", "id"),
     ("album", "date_created"),
-}
+]
 df.drop(column2drop, axis=1, inplace=True)
 
 # Riformatto le date
 
 df["artist", "date_created"] = df["artist", "date_created"].astype("Int64")
-
+# stampo qualche valore
 df.info()
 print(df["artist", "date_created"].unique())
 print(df["album", "listens"].unique())
@@ -77,23 +54,122 @@ attributes = [col for col in df.columns if col != class_name]
 X = df[attributes].values
 y = df[class_name]
 
-# NORMALIZZO I VALORI
-from sklearn import preprocessing
 
-x = df.values  # returns a numpy array
-min_max_scaler = preprocessing.MinMaxScaler()
-x_scaled = min_max_scaler.fit_transform(x)
-df = pd.DataFrame(x_scaled)
-
-# FACCIO  IL PLOTTING BOXPLOT
-plt.figure(figsize=(20, 25))
-b = sns.boxplot(data=df, orient="v")
-b.set(ylabel="Class", xlabel="Normalization Value")
+"""BOXPLOT PER OGNUNA DELLE 26 VARIABILI CHE VOGLIO TENERE 
+df[("album", "comments")].plot.box()
+plt.xlabel(("album", "comments"))
+plt.show()
+df[("album", "favorites")].plot.box()
+plt.xlabel(("album", "favorites"))
+plt.show()
+df[("album", "listens")].plot.box()
+plt.xlabel(("album", "listens"))
+plt.show()
+df[("album", "tracks")].plot.box()
+plt.xlabel(("album", "tracks"))
+plt.show()
+df[("album", "engineer")].plot.box() #da levare
+plt.xlabel(("album", "engineer"))
+plt.show()
+df[("album", "information")].plot.box() #da levare
+plt.xlabel(("album", "information"))
+plt.show()
+df[("album", "producer")].plot.box() #da levare
+plt.xlabel(("album", "producer"))
+plt.show()
+df[("album", "type")].plot.box()
+plt.xlabel(("album", "type"))
 plt.show()
 
-# PLOT per trovare best esp
+df[("artist", "comments")].plot.box()
+plt.xlabel(("artist", "comments"))
+plt.show()
+df[("artist", "date_created")].plot.box()
+plt.xlabel(("artist", "date_created"))
+plt.show()
+df[("artist", "favorites")].plot.box()
+plt.xlabel(("artist", "favorites"))
+plt.show()
+df[("artist", "active_year_end")].plot.box() #da levare
+plt.xlabel(("artist", "active_year_end"))
+plt.show()
+df[("artist", "wikipedia_page")].plot.box() #da levare
+plt.xlabel(("artist", "wikipedia_page"))
+plt.show()
+df[("artist", "bio")].plot.box() #da levare
+plt.xlabel(("artist", "bio"))
+plt.show()
+df[("artist", "website")].plot.box() #dalevare
+plt.xlabel(("artist", "website"))
+plt.show()
 
+df[("track", "comments")].plot.box()
+plt.xlabel(("track", "comments"))
+plt.show()
+df[("track", "date_created")].plot.box()
+plt.xlabel(("track", "date_created"))
+plt.show()
+df[("track", "duration")].plot.box()
+plt.xlabel(("track", "duration"))
+plt.show()
+df[("track", "favorites")].plot.box()
+plt.xlabel(("track", "favorites"))
+plt.show()
+df[("track", "interest")].plot.box()
+plt.xlabel(("track", "interest"))
+plt.show()
+df[("track", "listens")].plot.box()
+plt.xlabel(("track", "listens"))
+plt.show()
+df[("track", "number")].plot.box()
+plt.xlabel(("track", "number"))
+plt.show()
+df[("track", "composer")].plot.box() #dalevare
+plt.xlabel(("track", "composer"))
+plt.show()
+df[("track", "date_recorded")].plot.box()#dalevare
+plt.xlabel(("track", "date_recorded"))
+plt.show()
+df[("track", "information")].plot.box()#da levare
+plt.xlabel(("track", "information"))
+plt.show()
+df[("track", "lyricist")].plot.box() #da levare
+plt.xlabel(("track", "lyricist"))
+plt.show()
+df[("track", "publisher")].plot.box() #da levare
+plt.xlabel(("track", "publisher"))
+plt.show()
 """
+
+# elimino le colonne che ho selezionato
+column2drop = [
+    ("album", "engineer"),
+    ("album", "information"),
+    ("album", "producer"),
+    ("artist", "active_year_end"),
+    ("artist", "wikipedia_page"),
+    ("artist", "website"),
+    ("artist", "bio"),
+    ("track", "composer"),
+    ("track", "date_recorded"),
+    ("track", "information"),
+    ("track", "lyricist"),
+    ("track", "publisher"),
+    ("artist", "date_created"),
+    ("track", "date_recorded"),
+    ("track", "date_created"),
+]
+df.drop(column2drop, axis=1, inplace=True)
+# normalizzo in basic
+normalized_df = (df - df.min()) / (df.max() - df.min())
+df = normalized_df
+# FACCIO  IL PLOTTING BOXPLOT del Df completo
+plt.figure(figsize=(20, 25))
+b = sns.boxplot(data=df, orient="h")
+b.set(ylabel="Class", xlabel="Normalization Value")
+plt.show()
+"""
+# PLOT per trovare best esp
 sns.set()
 neigh = NearestNeighbors(n_neighbors=3)
 nbrs = neigh.fit(X)
@@ -104,11 +180,11 @@ plt.plot(distances)
 plt.show()
 """
 """APPLICO IL DBSCAN """
-"""
+
 from sklearn.cluster import DBSCAN
 
 print("DBSCAN")
-dbscan = DBSCAN(eps=4, min_samples=3)
+dbscan = DBSCAN(eps=0.00000001, min_samples=2)
 dbscan = dbscan.fit(X)
 labels = dbscan.labels_
 # Number of clusters in labels, ignoring noise if present.
@@ -119,8 +195,8 @@ print("Estimated number of clusters: %d" % n_clusters_)
 print("Estimated number of noise points: %d" % n_noise_)
 
 print(df.loc[(labels == -1)])
-
-#Calcolo eps e min samples migliori
+"""
+# Calcolo eps e min samples migliori
 eps_to_test = [3, 4, 5, 6, 7, 8]  # i migliori sono esp 4 min 3
 min_samples_to_test = [2, 3, 4, 5]
 
