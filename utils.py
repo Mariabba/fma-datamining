@@ -12,6 +12,28 @@ except ModuleNotFoundError:
     pass
 
 
+def load_tracks_xyz(
+    filepath="data/tracks.csv", buckets="basic", dummies=False, fill=False
+):
+    """
+    Same usage as load()
+    Returns tuple of pd.Dataframe from tracks.csv: (train_df, validation_df, test_df)
+    """
+    df = load(filepath, buckets, dummies, fill)
+    mask_train = df[("set", "split")] == "training"
+    mask_vali = df[("set", "split")] == "validation"
+    mask_test = df[("set", "split")] == "test"
+
+    df_train = df[mask_train]
+    df_vali = df[mask_vali]
+    df_test = df[mask_test]
+
+    del df_train[("set", "split")]
+    del df_vali[("set", "split")]
+    del df_test[("set", "split")]
+    return df_train, df_vali, df_test
+
+
 def load_tracks(
     filepath="data/tracks.csv", buckets="basic", dummies=False, fill=False
 ) -> pd.DataFrame:

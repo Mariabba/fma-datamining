@@ -1,8 +1,8 @@
+import numpy as np
 import pandas as pd
 from rich import pretty, print
 from sklearn.ensemble import IsolationForest
 from sklearn.model_selection import train_test_split
-import numpy as np
 
 import utils
 
