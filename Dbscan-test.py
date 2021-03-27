@@ -6,7 +6,6 @@ import matplotlib.pyplot as plt
 from collections import Counter
 from collections import defaultdict
 
-from attr import attributes
 from langdetect import detect
 from scipy.spatial.distance import pdist, squareform
 from sklearn.cluster import DBSCAN
@@ -21,7 +20,7 @@ from pathlib import Path
 from sklearn.preprocessing import LabelEncoder, StandardScaler
 from sklearn.decomposition import PCA
 
-df = utils.load("../data/tracks.csv", dummies=True, buckets="basic", fill=True)
+df = utils.load("data/tracks.csv", dummies=True, buckets="basic", fill=True)
 
 df.info()
 
@@ -159,7 +158,7 @@ column2drop = [
     ("artist", "date_created"),
     ("track", "date_recorded"),
     ("track", "date_created"),
-    ("album", "type")
+    ("album", "type"),
 ]
 df.drop(column2drop, axis=1, inplace=True)
 # normalizzo in basic
@@ -167,9 +166,13 @@ df.drop(column2drop, axis=1, inplace=True)
 normalized_df = (df - df.min()) / (df.max() - df.min())
 df = normalized_df
 """
+
+
 def normalize(feature):
     scaler = StandardScaler()
     df[feature] = scaler.fit_transform(df[[feature]])
+
+
 for col in df.columns:
     normalize(col)
 
@@ -196,7 +199,7 @@ plt.show()
 
 
 print("DBSCAN")
-dbscan = DBSCAN(eps=3000, min_samples=24)
+dbscan = DBSCAN(eps=5000, min_samples=24)
 dbscan = dbscan.fit(X)
 labels = dbscan.labels_
 # Number of clusters in labels, ignoring noise if present.
@@ -207,6 +210,10 @@ print("Estimated number of clusters: %d" % n_clusters_)
 print("Estimated number of noise points: %d" % n_noise_)
 
 print(df.loc[(labels == -1)])
+miao = df.loc[(labels == -1)]
+miao = miao["album", "comments"]
+miao.to_csv("4000dbscan.csv")
+
 """
 # Calcolo eps e min samples migliori
 eps_to_test = [100, 200, 300, 400, 500, 600]  # i migliori sono esp 4 min 3
