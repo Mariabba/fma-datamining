@@ -49,6 +49,9 @@ from pandas import DataFrame
 from pandas import DataFrame
 import utils
 from pathlib import Path
+from sklearn.preprocessing import LabelEncoder, StandardScaler
+import seaborn as sns
+from pyod.models.knn import KNN
 
 
 # FUNCTION
@@ -121,42 +124,62 @@ def draw_precision_recall_curve(Y_test, Y_pred):
 # DATASET
 df = utils.load("../data/tracks.csv", dummies=True, buckets="continuous", fill=True)
 column2drop = [
-    ("album", "title"),
-    ("album", "type"),
-    ("album", "producer"),
-    ("set", "split"),
-    ("track", "title"),
     ("album", "tags"),
-    ("album", "id"),
-    ("artist", "website"),
-    ("artist", "name"),
     ("artist", "tags"),
-    ("artist", "wikipedia_page"),
-    ("artist", "bio"),
-    ("artist", "id"),
-    ("track", "language_code"),
-    ("track", "composer"),
-    ("track", "information"),
-    ("track", "license"),
     ("track", "tags"),
     ("track", "genres"),
     ("track", "genres_all"),
+    ("track", "license"),
+    ("track", "language_code"),
+    ("album", "title"),
+    ("artist", "name"),
+    ("set", "split"),
+    ("track", "title"),
+    ("album", "id"),
+    ("artist", "id"),
+    ("album", "engineer"),
+    ("album", "information"),
+    ("album", "producer"),
+    ("artist", "active_year_end"),
+    ("artist", "wikipedia_page"),
+    ("artist", "website"),
+    ("artist", "bio"),
+    ("track", "composer"),
+    ("track", "date_recorded"),
+    ("track", "information"),
+    ("track", "lyricist"),
+    ("track", "publisher"),
+    ("album", "date_created"),
+    ("artist", "date_created"),
+    ("track", "date_recorded"),
+    ("track", "date_created"),
 ]
 df.drop(column2drop, axis=1, inplace=True)
 print(df.info())
 
+def normalize(feature):
+    scaler = StandardScaler()
+    df[feature] = scaler.fit_transform(df[[feature]])
 
-# feature to reshape
-label_encoders = dict()
-column2encode = [
-    ("album", "listens"),
-    ("album", "type"),
-    ("track", "license"),
-]
-for col in column2encode:
-    le = LabelEncoder()
-    df[col] = le.fit_transform(df[col])
-    label_encoders[col] = le
+
+for col in df.columns:
+    normalize(col)
+
+# FACCIO  IL PLOTTING BOXPLOT del Df completo
+plt.figure(figsize=(20, 25))
+b = sns.boxplot(data=df, orient="h")
+b.set(ylabel="Class", xlabel="Normalization Value")
+plt.show()
+
+class_name = ("album", "type")
+attributes = [col for col in df.columns if col != class_name]
+X = df[attributes].values
+y = df[class_name]
+
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.3, random_state=100, stratify=y)
+
+clf = KNN()
+clf.fit(X)
 
 """
 # Create KNN Object.
@@ -203,25 +226,5 @@ print(
     "Precision %s"
     % precision_score(y_test, Y_pred, average="weighted", zero_division=0)
 )
-
-print("Recall %s" % recall_score(y_test, Y_pred, average="weighted", zero_division=0))
-
 """
-"""
-# TODO TESTARE I PARAMENTRI MIGLIORI
-# List Hyperparameters that we want to tune.
-print("STA FACENDO LA GRIDSEARCH")
-n_neighbors = list(range(1, 10))
-p = [1, 2]
-# Convert to dictionary
-hyperparameters = dict(n_neighbors=n_neighbors, p=p)
-# Create new KNN object
-knn_2 = KNeighborsClassifier()
-# Use GridSearch
-clf = GridSearchCV(knn_2, hyperparameters)
-# Fit the model
-best_model = clf.fit(x, y)
-# Print The value of best Hyperparameters
-print("Best p:", best_model.best_estimator_.get_params()["p"])
-print("Best n_neighbors:", best_model.best_estimator_.get_params()["n_neighbors"])
-"""
+#print("Recall %s" % recall_score(y_test, Y_pred, average="weighted", zero_division=0))
