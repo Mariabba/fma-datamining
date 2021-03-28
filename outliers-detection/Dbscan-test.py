@@ -159,7 +159,7 @@ column2drop = [
     ("artist", "date_created"),
     ("track", "date_recorded"),
     ("track", "date_created"),
-    ("album", "type")
+    ("album", "type"),
 ]
 df.drop(column2drop, axis=1, inplace=True)
 # normalizzo in basic
@@ -167,9 +167,13 @@ df.drop(column2drop, axis=1, inplace=True)
 normalized_df = (df - df.min()) / (df.max() - df.min())
 df = normalized_df
 """
+
+
 def normalize(feature):
     scaler = StandardScaler()
     df[feature] = scaler.fit_transform(df[[feature]])
+
+
 for col in df.columns:
     normalize(col)
 
@@ -196,7 +200,7 @@ plt.show()
 
 
 print("DBSCAN")
-dbscan = DBSCAN(eps=3000, min_samples=24)
+dbscan = DBSCAN(eps=2000, min_samples=24)
 dbscan = dbscan.fit(X)
 labels = dbscan.labels_
 # Number of clusters in labels, ignoring noise if present.
@@ -233,7 +237,7 @@ def get_metrics(eps, min_samples, dataset, iter_):
     else:
         noise_mean_distance = None
 
-    # Number of found Clusters metric ==============================================
+    # Number of found Clusters metric =nnnn=============================================
 
     number_of_clusters = len(set(dbscan.labels_[dbscan.labels_ >= 0]))
 
