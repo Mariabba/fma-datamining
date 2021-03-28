@@ -93,6 +93,7 @@ column2drop = [
 df.drop(column2drop, axis=1, inplace=True)
 print(df.info())
 
+
 def normalize(feature):
     scaler = StandardScaler()
     df[feature] = scaler.fit_transform(df[[feature]])
@@ -111,21 +112,21 @@ plt.show()
 
 X = df.values
 
-#X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.3, random_state=100, stratify=y)
+# X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.3, random_state=100, stratify=y)
 
 # instantiate model
-nbrs = NearestNeighbors(n_neighbors = 3)
+nbrs = NearestNeighbors(n_neighbors=3)
 # fit model
 nbrs.fit(X)
 
 # distances and indexes of k-neaighbors from model outputs
 distances, indexes = nbrs.kneighbors(X)
 # plot mean of k-distances of each observation
-plt.plot(distances.mean(axis =1))
+plt.plot(distances.mean(axis=1))
 plt.show()
 
 # visually determine cutoff values > 10
-outlier_index = np.where(distances.mean(axis = 1) > 0.8)
+outlier_index = np.where(distances.mean(axis=1) > 0.8)
 print(outlier_index)
 
 # filter outlier values
