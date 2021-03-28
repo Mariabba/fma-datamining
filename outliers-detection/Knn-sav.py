@@ -122,17 +122,28 @@ def draw_precision_recall_curve(Y_test, Y_pred):
 df = utils.load("../data/tracks.csv", dummies=True, buckets="continuous", fill=True)
 column2drop = [
     ("album", "title"),
-    ("artist", "name"),
+    ("album", "type"),
+    ("album", "producer"),
     ("set", "split"),
     ("track", "title"),
     ("album", "tags"),
+    ("album", "id"),
+    ("artist", "website"),
+    ("artist", "name"),
     ("artist", "tags"),
+    ("artist", "wikipedia_page"),
+    ("artist", "bio"),
+    ("artist", "id"),
     ("track", "language_code"),
+    ("track", "composer"),
+    ("track", "information"),
+    ("track", "license"),
     ("track", "tags"),
-    ("track", "genres"),  # todo da trattare se si vuole inserire solo lei
+    ("track", "genres"),
     ("track", "genres_all"),
 ]
 df.drop(column2drop, axis=1, inplace=True)
+print(df.info())
 
 
 # feature to reshape
@@ -146,9 +157,8 @@ for col in column2encode:
     le = LabelEncoder()
     df[col] = le.fit_transform(df[col])
     label_encoders[col] = le
-print(df.info())
 
-
+"""
 # Create KNN Object.
 knn = KNeighborsClassifier(
     n_neighbors=2, p=1
@@ -196,6 +206,7 @@ print(
 
 print("Recall %s" % recall_score(y_test, Y_pred, average="weighted", zero_division=0))
 
+"""
 """
 # TODO TESTARE I PARAMENTRI MIGLIORI
 # List Hyperparameters that we want to tune.
