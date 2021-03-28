@@ -267,7 +267,7 @@ def dummy_maker(df, threshold=0.9) -> pd.DataFrame:
         ("artist", "bio"),
         ("album", "producer"),
         ("artist", "website"),
-        ("album", "type"),
+        # ("album", "type"),
     ]
 
     low_coverage.extend(special_cases)
@@ -306,6 +306,7 @@ def fill_missing(df: pd.DataFrame) -> pd.DataFrame:
     df = df[df[("artist", "date_created")].notna()]
     df = df[df[("track", "license")].notna()]
     df = df[df[("track", "title")].notna()]
+    df = df[df[("album", "date_created")].notna()]
 
     return df
 

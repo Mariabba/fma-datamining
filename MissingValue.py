@@ -9,7 +9,7 @@ from langdetect import detect
 import utils
 
 sns.set_theme(style="white")
-tracks = utils.load("data/tracks.csv", dummies=True)
+tracks = utils.load("data/tracks.csv", dummies=True, fill=True)
 
 # fill dataCreated_ data released
 
