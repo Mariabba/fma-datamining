@@ -1,9 +1,11 @@
+import itertools
 import os
 import numpy as np
 import pandas as pd
 import matplotlib as mpl
 import matplotlib.pyplot as plt
 from matplotlib.colors import ListedColormap
+import missingno as mso
 
 # sklearn
 from sklearn import metrics
@@ -33,7 +35,7 @@ from sklearn.metrics import (
 )
 from sklearn.metrics import average_precision_score
 from sklearn.metrics import plot_confusion_matrix, ConfusionMatrixDisplay
-
+import seaborn as sns
 from sklearn.model_selection import train_test_split
 from sklearn.model_selection import (
     cross_val_score,
@@ -62,7 +64,7 @@ def draw_confusion_matrix(Clf, X, y):
     ]
 
     for title, normalize in titles_options:
-        disp = plot_confusion_matrix(Clf, X, y, cmap="RdPu", normalize=normalize)
+        disp = plot_confusion_matrix(Clf, X, y, cmap="OrRd", normalize=normalize)
         disp.ax_.set_title(title)
 
     plt.show()
@@ -120,7 +122,7 @@ def draw_precision_recall_curve(Y_test, Y_pred):
 
 
 # DATASET
-df = utils.load("../data/tracks.csv", dummies=True, buckets="continuous")
+df = utils.load("../data/tracks.csv", dummies=True, buckets="continuous", fill=True)
 column2drop = [
     ("album", "title"),
     ("artist", "name"),
@@ -135,6 +137,7 @@ column2drop = [
     ("track", "genres_all"),
 ]
 df.drop(column2drop, axis=1, inplace=True)
+
 df = df[df["album", "type"] != "Contest"]
 
 # feature to reshape
@@ -150,7 +153,10 @@ for col in column2encode:
     label_encoders[col] = le
 
 print(df.info())
+y = mso.matrix(df)
+y = plt.show()
 
+print("cosa?", df["album", "type"].unique())
 
 # Create KNN Object.
 knn = KNeighborsClassifier(
@@ -181,6 +187,7 @@ print()
 print("\033[1m" "Classification report test" "\033[0m")
 print(classification_report(y_test, Y_pred))
 
+
 print()
 
 print("\033[1m" "Metrics" "\033[0m")
@@ -193,7 +200,6 @@ print("F1-score %s" % f1_score(y_test, Y_pred, labels=[0, 1], average=None))
 print("Precision %s" % precision_score(y_test, Y_pred, labels=[0, 1], average=None))
 
 print("Recall %s" % recall_score(y_test, Y_pred, labels=[0, 1], average=None))
-
 
 """
 # TODO TESTARE I PARAMENTRI MIGLIORI
