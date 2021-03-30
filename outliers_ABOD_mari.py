@@ -64,7 +64,7 @@ X_train, X_test, y_train, y_test = train_test_split(
 
 # TRYING ABOD
 print("Making Abod")
-clf = ABOD(method="default")
+clf = ABOD(n_neighbors=5000)
 clf.fit(X)
 clf.decision_scores_
 outliers = clf.predict(X)

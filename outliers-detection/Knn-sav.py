@@ -93,6 +93,7 @@ column2drop = [
 df.drop(column2drop, axis=1, inplace=True)
 print(df.info())
 
+
 def normalize(feature):
     scaler = StandardScaler()
     df[feature] = scaler.fit_transform(df[[feature]])
@@ -108,9 +109,9 @@ b = sns.boxplot(data=df, orient="h")
 b.set(ylabel="Class", xlabel="Normalization Value")
 plt.show()
 """
-#X = df.drop(columns=[("album", "type")])
-#y = df[("album", "type")]
-#X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.3, random_state=100, stratify=y)
+# X = df.drop(columns=[("album", "type")])
+# y = df[("album", "type")]
+# X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.3, random_state=100, stratify=y)
 
 X = df.values
 
@@ -138,7 +139,7 @@ print(outlier_values.info())
 """
 
 # train kNN detector
-clf_name = 'KNN'
+clf_name = "KNN"
 clf = KNN()
 clf.fit(X)
 # If you want to see the predictions of the training data, you can use this way:
@@ -147,7 +148,7 @@ print("Prediction on the training data: ")
 print(y_train_scores)
 
 # Now we have the trained K-NN model, let's apply to the test data to get the predictions
-y_test_pred = clf.predict(X) # outlier labels (0 or 1)
+y_test_pred = clf.predict(X)  # outlier labels (0 or 1)
 # Because it is '0' and '1', we can run a count statistic.
 unique, counts = np.unique(y_test_pred, return_counts=True)
 print("Prediction on the test data: ")
@@ -156,15 +157,15 @@ print(dict(zip(unique, counts)))
 # And you can generate the anomaly score using clf.decision_function:
 y_test_scores = clf.decision_function(X)
 print("Anomaly score: ")
-plt.hist(y_test_scores, bins='auto')  # arguments are passed to np.histogram
+plt.hist(y_test_scores, bins="auto")  # arguments are passed to np.histogram
 plt.title("Histogram with 'auto' bins")
 plt.show()
 
-print(np.mean(y_test_scores[np.where(y_test_pred==1)]))
-print(np.mean(y_test_scores[np.where(y_test_pred==0)]))
-print(np.mean(clf.decision_scores_[np.where(y_test_pred==1)]))
-print(np.mean(clf.decision_scores_[np.where(y_test_pred==0)]))
+print(np.mean(y_test_scores[np.where(y_test_pred == 1)]))
+print(np.mean(y_test_scores[np.where(y_test_pred == 0)]))
+print(np.mean(clf.decision_scores_[np.where(y_test_pred == 1)]))
+print(np.mean(clf.decision_scores_[np.where(y_test_pred == 0)]))
 
 plt.hist(clf.decision_scores_, bins=20)
-plt.axvline(np.min(clf.decision_scores_[np.where(y_test_pred==1)]), c='k')
+plt.axvline(np.min(clf.decision_scores_[np.where(y_test_pred == 1)]), c="k")
 plt.show()
