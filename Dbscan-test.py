@@ -51,9 +51,6 @@ print(df["artist", "date_created"].unique())
 print(df["album", "listens"].unique())
 print(df["album", "information"].unique())
 
-attributes = [col for col in df.columns]
-X = df[attributes].values
-
 
 """BOXPLOT PER OGNUNA DELLE 26 VARIABILI CHE VOGLIO TENERE 
 df[("album", "comments")].plot.box()
@@ -176,6 +173,8 @@ def normalize(feature):
 for col in df.columns:
     normalize(col)
 
+attributes = [col for col in df.columns]
+X = df[attributes].values
 print(df.info())
 """
 # FACCIO  IL PLOTTING BOXPLOT del Df completo
