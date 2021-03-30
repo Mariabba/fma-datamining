@@ -13,13 +13,17 @@ except ModuleNotFoundError:
 
 
 def load_tracks_xyz(
-    filepath="data/tracks.csv", buckets="basic", dummies=False, fill=False
+    filepath="data/tracks.csv",
+    buckets="basic",
+    dummies=False,
+    fill=False,
+    outliers=False,
 ):
     """
     Same usage as load()
     Returns tuple of pd.Dataframe from tracks.csv: (train_df, validation_df, test_df)
     """
-    df = load(filepath, buckets, dummies, fill)
+    df = load(filepath, buckets, dummies, fill, outliers)
     mask_train = df[("set", "split")] == "training"
     mask_vali = df[("set", "split")] == "validation"
     mask_test = df[("set", "split")] == "test"
@@ -35,12 +39,18 @@ def load_tracks_xyz(
 
 
 def load_tracks(
-    filepath="data/tracks.csv", buckets="basic", dummies=False, fill=False
+    filepath="data/tracks.csv",
+    buckets="basic",
+    dummies=False,
+    fill=False,
+    outliers=False,
 ) -> pd.DataFrame:
-    return load(filepath, buckets, dummies, fill)
+    return load(filepath, buckets, dummies, fill, outliers)
 
 
-def load(filepath: str, buckets="basic", dummies=False, fill=False) -> pd.DataFrame:
+def load(
+    filepath: str, buckets="basic", dummies=False, fill=False, outliers=False
+) -> pd.DataFrame:
     docstring = """
     usage: load(string filepath,
     buckets='basic|continuous|discrete' default basic,
@@ -76,6 +86,8 @@ def load(filepath: str, buckets="basic", dummies=False, fill=False) -> pd.DataFr
     del df[("track", "bit_rate")]
 
     # start of parameter choices
+    if outliers:
+        df = treat_outliers(df)
     if buckets == "basic":
         df = discretizer(df)
     elif buckets == "continuous":
@@ -362,3 +374,13 @@ def check_rules(df: pd.DataFrame, rules_path: str) -> pd.DataFrame:
                 ignore_index=True,
             )
     return errors
+
+
+def treat_outliers(df: pd.DataFrame) -> pd.DataFrame:
+    """
+    Inserire qui trattamento outlier. Accetta dataframe e deve restituire dataframe.
+    """
+
+    pass
+
+    return df

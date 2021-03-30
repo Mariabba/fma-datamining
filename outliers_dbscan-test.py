@@ -1,24 +1,22 @@
+from collections import Counter, defaultdict
+from pathlib import Path
+
+import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 import seaborn as sns
-import matplotlib.pyplot as plt
-
-from collections import Counter
-from collections import defaultdict
-
 from langdetect import detect
 from scipy.spatial.distance import pdist, squareform
+from sklearn import preprocessing
 from sklearn.cluster import DBSCAN
+from sklearn.decomposition import PCA
 from sklearn.metrics import silhouette_score
 from sklearn.model_selection import train_test_split
 from sklearn.neighbors import NearestNeighbors
-from sklearn.preprocessing import MinMaxScaler
+from sklearn.preprocessing import LabelEncoder, MinMaxScaler, StandardScaler
 from statsmodels.compat import pandas
-from sklearn import preprocessing
+
 import utils
-from pathlib import Path
-from sklearn.preprocessing import LabelEncoder, StandardScaler
-from sklearn.decomposition import PCA
 
 df = utils.load("data/tracks.csv", dummies=True, buckets="basic", fill=True)
 
