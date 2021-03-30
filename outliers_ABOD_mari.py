@@ -5,7 +5,7 @@ from pathlib import Path
 from pyod.models.abod import ABOD
 import matplotlib.pyplot as plt
 
-df = utils.load("../data/tracks.csv", dummies=True, buckets="basic", fill=True)
+df = utils.load("data/tracks.csv", dummies=True, buckets="basic", fill=True)
 
 
 column2drop = [
