@@ -1,5 +1,3 @@
-from pathlib import Path
-
 import pandas as pd
 from rich import pretty, print
 
@@ -8,12 +6,22 @@ import utils
 pretty.install()
 # genres = utils.load("data/genres.csv")
 # echonest = utils.load("data/echonest.csv")
-tracks = utils.load("data/tracks.csv", buckets="continuous", dummies=True, fill=True)
+tracks = utils.load("data/tracks.csv", buckets="basic", dummies=False, fill=False)
 # artists = utils.load("data/raw_artists.csv")
 
+threshold = 0.9
 
-errors = utils.check_rules(tracks, "data/rules.txt")
-print(errors)
+low_coverage = []
+for col in tracks:
+    miao = tracks[col].isnull().mean()
+    if miao > threshold:
+        low_coverage.append(col)
+
+print(low_coverage)
+
+# error checking
+# errors = utils.check_rules(tracks, "data/rules.txt")
+# print(errors)
 
 # print("Here are informations on tracks")
 # print(tracks.info())
@@ -32,3 +40,5 @@ print(errors)
 
 # df_decisiontree = tracks[[blablabla]]
 # df_knn = tracks[[blablaslsadasdldsaldsa]]
+
+print(tracks[("album", "type")].unique())

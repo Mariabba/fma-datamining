@@ -1,9 +1,10 @@
-from sklearn.model_selection import train_test_split, GridSearchCV
-import numpy as np
-import utils
-from pathlib import Path
-from pyod.models.abod import ABOD
 import matplotlib.pyplot as plt
+import numpy as np
+import pandas as pd
+from pyod.models.abod import ABOD
+from sklearn.model_selection import GridSearchCV, train_test_split
+
+import utils
 
 df = utils.load("data/tracks.csv", dummies=True, buckets="basic", fill=True)
 
@@ -64,13 +65,26 @@ X_train, X_test, y_train, y_test = train_test_split(
 
 # TRYING ABOD
 print("Making Abod")
-clf = ABOD(n_neighbors=10, contamination=0.01)
+clf = ABOD(n_neighbors=10, contamination=0.011)
+
+print("fitting")
 clf.fit(X)
+
 clf.decision_scores_
+
+print("predicting")
 outliers = clf.predict(X)
+
 print("outliers:", len(outliers))
 print(np.unique(outliers, return_counts=True))
 
 plt.hist(clf.decision_scores_, bins=20)
 plt.axvline(np.min(clf.decision_scores_[np.where(outliers == 1)]), c="k")
 plt.show()
+
+print(outliers)
+print(type(outliers))
+
+miao = pd.Series(outliers)
+print(miao)
+miao.to_csv("strange results/abod.csv")
