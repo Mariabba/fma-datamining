@@ -390,7 +390,3 @@ def treat_outliers(df: pd.DataFrame) -> pd.DataFrame:
     print(df.info())
     pass
     return df
-
-
-tracks = load("data/tracks.csv", dummies=True, buckets="basic", fill=True)
-treat_outliers(tracks)
