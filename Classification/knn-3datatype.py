@@ -64,7 +64,7 @@ def draw_confusion_matrix(Clf, X, y):
     ]
 
     for title, normalize in titles_options:
-        disp = plot_confusion_matrix(Clf, X, y, cmap="OrRd", normalize=normalize)
+        disp = plot_confusion_matrix(Clf, X, y, cmap="PuRd", normalize=normalize)
         disp.ax_.set_title(title)
 
     plt.show()
@@ -75,50 +75,7 @@ def conf_mat_disp(confusion_matrix, disp_labels):
         confusion_matrix=confusion_matrix, display_labels=disp_labels
     )
 
-    disp.plot(cmap="OrRd")
-
-
-def draw_roc_curve(Y_test, Y_pred, diz, k):
-    fig, ax = plt.subplots()  # figsize = (13,30)
-
-    fpr, tpr, _ = roc_curve(Y_test, Y_pred)
-    roc_auc = auc(fpr, tpr)
-    roc_auc = roc_auc_score(Y_test, Y_pred, average=None)
-
-    diz[k] = {"fpr": fpr.tolist(), "tpr": tpr.tolist(), "roc": roc_auc}
-
-    ax.plot(fpr, tpr, color="#994D00", label="ROC curve (area = %0.2f)" % (roc_auc))
-    ax.plot([0, 1], [0, 1], "r--")
-    ax.set_xlim([0.0, 1.0])
-    ax.set_ylim([0.0, 1.05])
-    ax.set_xlabel("False Positive Rate")
-    ax.set_ylabel("True Positive Rate")
-    ax.set_title("Roc curve of the model")
-    ax.tick_params(axis="both")
-    ax.legend(loc="lower right", title="AUC", fontsize=14, frameon=True)
-
-    fig.tight_layout()
-    plt.show()
-
-
-def draw_precision_recall_curve(Y_test, Y_pred):
-    fig, ax = plt.subplots()
-
-    pr_ap = average_precision_score(Y_test, Y_pred, average=None)
-    precision, recall, ap_thresholds = precision_recall_curve(Y_test, Y_pred)
-
-    ax.plot(precision, recall, color="#994D00", label="AP %0.4f" % (pr_ap))
-    # ax.plot([0, 1], [no_skill, no_skill], 'r--', label='%0.4f' % no_skill)
-    ax.set_xlim([0.0, 1.0])
-    ax.set_ylim([0.0, 1.05])
-    ax.set_xlabel("Recall")
-    ax.set_ylabel("Precision")
-    ax.tick_params(axis="both")
-    ax.legend(loc="upper right", title="AP", frameon=True)
-    ax.set_title("Model Precision-Recall curve")
-
-    fig.tight_layout()
-    plt.show()
+    disp.plot(cmap="PuRd")
 
 
 # DATASET
@@ -137,7 +94,8 @@ column2drop = [
     ("track", "genres_all"),
 ]
 df.drop(column2drop, axis=1, inplace=True)
-
+print(df["album", "type"].unique())
+print(df["album", "type"].value_counts())
 df = df[df["album", "type"] != "Contest"]
 
 # feature to reshape
@@ -153,6 +111,7 @@ for col in column2encode:
     label_encoders[col] = le
 
 print(df.info())
+print(df["album", "type"].value_counts())
 y = mso.matrix(df)
 y = plt.show()
 
@@ -179,7 +138,7 @@ print("Accuracy:", metrics.accuracy_score(y_test, Y_pred))
 # confusion matrix
 print("\033[1m" "Confusion matrix" "\033[0m")
 
-plot_confusion_matrix(knn, X_test, y_test, cmap="OrRd")
+plot_confusion_matrix(knn, X_test, y_test, cmap="PuRd")
 draw_confusion_matrix(knn, X_test, y_test)
 
 print()

@@ -109,9 +109,9 @@ b = sns.boxplot(data=df, orient="h")
 b.set(ylabel="Class", xlabel="Normalization Value")
 plt.show()
 """
-#X = df.drop(columns=[("album", "type")])
-#y = df[("album", "type")]
-#X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.3, random_state=100, stratify=y)
+# X = df.drop(columns=[("album", "type")])
+# y = df[("album", "type")]
+# X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.3, random_state=100, stratify=y)
 
 X = df.values
 
@@ -137,8 +137,6 @@ print(outlier_values.describe())
 print(outlier_values.value_counts())
 print(outlier_values.info())
 """
-
-
 
 
 """
@@ -178,6 +176,7 @@ plt.axvline(np.min(clf.decision_scores_[np.where(y_test_pred==1)]), c='k')
 plt.show()
 """
 
+
 def tuning_param(df):
     print(df.info)
     print(df.head)
@@ -185,6 +184,7 @@ def tuning_param(df):
     print(X_train, X_test)
     from pyod.models.combination import aom, moa, average, maximization
     from pyod.utils.utility import standardizer
+
     # Standardize data
     X_train_norm, X_test_norm = standardizer(X_train, X_test)
     # Test a range of k-neighbors from 10 to 200. There will be 20 k-NN models.
@@ -197,7 +197,7 @@ def tuning_param(df):
     # Modeling
     for i in range(n_clf):
         k = k_list[i]
-        clf = KNN(n_neighbors=k, method='largest')
+        clf = KNN(n_neighbors=k, method="largest")
         clf.fit(X_train_norm)
 
         # Store the results in each column:
@@ -210,14 +210,15 @@ def tuning_param(df):
     # The test_scores_norm is 500 x 20. The "average" function will take the average of the 20 columns. The result "y_by_average" is a single column:
     y_by_average = average(test_scores_norm)
     import matplotlib.pyplot as plt
-    plt.hist(y_by_average, bins='auto')  # arguments are passed to np.histogram
+
+    plt.hist(y_by_average, bins="auto")  # arguments are passed to np.histogram
     plt.title("Combination by average")
     plt.show()
 
     df_test = pd.DataFrame(X_test)
-    df_test['y_by_average_score'] = y_by_average
-    df_test['y_by_average_cluster'] = np.where(df_test['y_by_average_score'] < 0, 0, 1)
-    print(df_test['y_by_average_cluster'].value_counts())
+    df_test["y_by_average_score"] = y_by_average
+    df_test["y_by_average_cluster"] = np.where(df_test["y_by_average_score"] < 0, 0, 1)
+    print(df_test["y_by_average_cluster"].value_counts())
 
 
 tuning_param(df)
