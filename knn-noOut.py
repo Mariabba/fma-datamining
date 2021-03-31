@@ -53,7 +53,6 @@ from pandas import DataFrame
 import utils
 from pathlib import Path
 
-
 # FUNCTION
 
 
@@ -79,7 +78,9 @@ def conf_mat_disp(confusion_matrix, disp_labels):
 
 
 # DATASET
-df = utils.load("../data/tracks.csv", dummies=True, buckets="continuous", fill=True)
+df = utils.load(
+    "data/tracks.csv", dummies=True, buckets="continuous", fill=True, outliers=True
+)
 column2drop = [
     ("album", "title"),
     ("artist", "name"),
@@ -92,6 +93,8 @@ column2drop = [
     ("track", "tags"),
     ("track", "genres"),  # todo da trattare se si vuole inserire solo lei
     ("track", "genres_all"),
+    "Unnamed: 0",
+    "0",
 ]
 df.drop(column2drop, axis=1, inplace=True)
 print(df["album", "type"].unique())
@@ -111,11 +114,6 @@ for col in column2encode:
     label_encoders[col] = le
 
 print(df.info())
-
-y = mso.matrix(df)
-y = plt.show()
-
-print("cosa?", df["album", "type"].unique())
 
 # Create KNN Object.
 knn = KNeighborsClassifier(
@@ -159,23 +157,3 @@ print("F1-score %s" % f1_score(y_test, Y_pred, labels=[0, 1], average=None))
 print("Precision %s" % precision_score(y_test, Y_pred, labels=[0, 1], average=None))
 
 print("Recall %s" % recall_score(y_test, Y_pred, labels=[0, 1], average=None))
-
-"""
-# TODO TESTARE I PARAMENTRI MIGLIORI
-# List Hyperparameters that we want to tune.
-print("STA FACENDO LA GRIDSEARCH")
-n_neighbors = list(range(1, 10))
-p = [1, 2]
-# Convert to dictionary
-hyperparameters = dict(n_neighbors=n_neighbors, p=p)
-# Create new KNN object
-knn_2 = KNeighborsClassifier()
-# Use GridSearch
-clf = GridSearchCV(knn_2, hyperparameters)
-# Fit the model
-best_model = clf.fit(x, y)
-# Print The value of best Hyperparameters
-print("Best p:", best_model.best_estimator_.get_params()["p"])
-print("Best n_neighbors:", best_model.best_estimator_.get_params()["n_neighbors"])
-
-"""
