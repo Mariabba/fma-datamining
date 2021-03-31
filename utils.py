@@ -380,15 +380,17 @@ def treat_outliers(df: pd.DataFrame) -> pd.DataFrame:
     """
     Inserire qui trattamento outlier. Accetta dataframe e deve restituire dataframe.
     """
-    """
+
     #read outliers
     df_outliers = pd.read_csv("strange results/abod1072.csv")
-    #select only rows with target outliers == 1
-    df_outliers = df_outliers[df_outliers['0'] == 1]
-    #save index outliers rows
-    index = df_outliers.index.values.tolist()
-    #delete rows from df
-    df = df.loc[~df.index.isin(index)]
-    """
+    #append column outliers flag to df
+    df = pd.concat([df, df_outliers], axis=1)
+    #select only rows with target outliers == 0 ---> keep only inliers
+    df = df[df['0'] == 0]
+    print(df.info())
     pass
     return df
+
+
+tracks = load("data/tracks.csv", dummies=True, buckets="basic", fill=True)
+treat_outliers(tracks)
