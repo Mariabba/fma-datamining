@@ -15,12 +15,12 @@ except ModuleNotFoundError:
 def load_tracks_xyz(
     filepath="data/tracks.csv",
     buckets="basic",
-    dummies=False,
-    fill=False,
-    outliers=False,
+    dummies=True,
+    fill=True,
+    outliers=True,
 ):
     """
-    Same usage as load()
+    Same usage as load(), with everything turned on though
     Returns tuple of pd.Dataframe from tracks.csv: (train_df, validation_df, test_df)
     """
     df = load(filepath, buckets, dummies, fill, outliers)
@@ -86,8 +86,6 @@ def load(
     del df[("track", "bit_rate")]
 
     # start of parameter choices
-    if outliers:
-        df = treat_outliers(df)
     if buckets == "basic":
         df = discretizer(df)
     elif buckets == "continuous":
@@ -103,6 +101,8 @@ def load(
         df = dummy_maker(df)
     if fill:
         df = fill_missing(df)
+    if outliers:
+        df = treat_outliers(df)
 
     df.attrs["df_name"] = filename
     return df
@@ -379,14 +379,14 @@ def check_rules(df: pd.DataFrame, rules_path: str) -> pd.DataFrame:
 def treat_outliers(df: pd.DataFrame) -> pd.DataFrame:
     """
     Inserire qui trattamento outlier. Accetta dataframe e deve restituire dataframe.
+    Testato solo con: buckets="basic", dummies=True, fill=True
     """
+    print(df.shape[0])
+    assert (
+        df.shape[0] == 99404
+    ), "treat_outliers only tested with dummies=True, fill=True"
 
-    # read outliers
     df_outliers = pd.read_csv("strange results/abod1072.csv")
-    # append column outliers flag to df
-    df = pd.concat([df, df_outliers], axis=1)
-    print(df.info())
-    # select only rows with target outliers == 0 ---> keep only inliers
-    df = df[df["0"] == 0]
-    pass
-    return df
+    df_outliers = df_outliers.set_index(df.index)
+
+    return df[df_outliers["0"] == 0]
