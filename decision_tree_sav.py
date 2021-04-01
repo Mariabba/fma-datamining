@@ -159,7 +159,9 @@ def tuning_param_gridsearch(df, target1, target2):
         X, y, stratify=y, test_size=0.25
     )
     print(X_train.shape, X_test.shape)
-    clf = DecisionTreeClassifier(criterion='entropy', min_samples_split=20, min_samples_leaf=100)
+    clf = DecisionTreeClassifier(
+        criterion="entropy", min_samples_split=20, min_samples_leaf=100
+    )
 
     def report(results, n_top=3):
         for i in range(1, n_top + 1):
@@ -296,6 +298,6 @@ def build_model(
 tracks = load_data("data/tracks.csv")
 # tuning_param(tracks, "album", "type")
 tuning_param_gridsearch(tracks, "album", "type")
-#build_model(tracks, "album", "type", 100, 100, 8, "entropy")
-#build_model(tracks, "album", "type", 2, 1, 20, "entropy")
+# build_model(tracks, "album", "type", 100, 100, 8, "entropy")
+# build_model(tracks, "album", "type", 2, 1, 20, "entropy")
 build_model(tracks, "album", "type", 20, 100, 7, "entropy")
