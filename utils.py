@@ -385,8 +385,13 @@ def treat_outliers(df: pd.DataFrame) -> pd.DataFrame:
     df_outliers = pd.read_csv("strange results/abod1072.csv")
     # append column outliers flag to df
     df = pd.concat([df, df_outliers], axis=1)
+    print(df.info())
     # select only rows with target outliers == 0 ---> keep only inliers
     df = df[df["0"] == 0]
-    print(df.info())
     pass
     return df
+
+
+df = load("data/tracks.csv", dummies=True, buckets="basic", fill=True)
+print(df.info())
+treat_outliers(df)
