@@ -93,8 +93,6 @@ column2drop = [
     ("track", "tags"),
     ("track", "genres"),  # todo da trattare se si vuole inserire solo lei
     ("track", "genres_all"),
-    "Unnamed: 0",
-    "0",
 ]
 df.drop(column2drop, axis=1, inplace=True)
 print(df["album", "type"].unique())
