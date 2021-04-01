@@ -4,6 +4,7 @@ import numpy as np
 import pandas as pd
 import matplotlib as mpl
 import matplotlib.pyplot as plt
+from imblearn.over_sampling import SMOTE, RandomOverSampler
 from imblearn.under_sampling import RandomUnderSampler
 from matplotlib.colors import ListedColormap
 import missingno as mso
@@ -50,7 +51,7 @@ from sklearn.model_selection import (
 from sklearn.inspection import permutation_importance
 
 from sklearn.neighbors import KNeighborsClassifier
-
+from imblearn.over_sampling import SMOTE
 from pandas import DataFrame
 
 from pandas import DataFrame
@@ -66,7 +67,7 @@ def draw_confusion_matrix(Clf, X, y):
     ]
 
     for title, normalize in titles_options:
-        disp = plot_confusion_matrix(Clf, X, y, cmap="PuRd", normalize=normalize)
+        disp = plot_confusion_matrix(Clf, X, y, cmap="summer", normalize=normalize)
         disp.ax_.set_title(title)
 
     plt.show()
@@ -77,7 +78,7 @@ def conf_mat_disp(confusion_matrix, disp_labels):
         confusion_matrix=confusion_matrix, display_labels=disp_labels
     )
 
-    disp.plot(cmap="PuRd")
+    disp.plot(cmap="summer")
 
 
 # DATASET
@@ -122,7 +123,8 @@ print(df.info())
 
 # Create KNN Object CLASSIC
 knn = KNeighborsClassifier(
-    n_neighbors=2, p=1
+    n_neighbors=2,
+    p=1,
 )  # valori migliori dalla gridsearch n = 2, p=1, levarli per avere la standard
 # Create x and y variables.
 x = df.drop(columns=[("album", "type")])
@@ -140,7 +142,7 @@ draw_confusion_matrix
 print("Accuracy:", metrics.accuracy_score(y_test, Y_pred))
 # confusion matrix
 print("\033[1m" "Confusion matrix" "\033[0m")
-plot_confusion_matrix(knn, X_test, y_test, cmap="PuRd")
+plot_confusion_matrix(knn, X_test, y_test)
 draw_confusion_matrix(knn, X_test, y_test)
 print()
 print("\033[1m" "Classification report test" "\033[0m")
@@ -149,50 +151,21 @@ print()
 print("\033[1m" "Metrics" "\033[0m")
 print()
 print("Accuracy %s" % accuracy_score(y_test, Y_pred))
-print("F1-score %s" % f1_score(y_test, Y_pred, labels=[0, 1], average=None))
-print("Precision %s" % precision_score(y_test, Y_pred, labels=[0, 1], average=None))
-print("Recall %s" % recall_score(y_test, Y_pred, labels=[0, 1], average=None))
+print("F1-score %s" % f1_score(y_test, Y_pred, average=None))
+print("Precision %s" % precision_score(y_test, Y_pred, average=None))
+print("Recall %s" % recall_score(y_test, Y_pred, average=None))
 
 """EMBALANCE LEARNING"""
-# PRINTING PCA FOR COMPARISON
 
-print("Train shape")  # , X_train.shape())
-pca = PCA(n_components=4)
-pca.fit(X_train)
-X_pca = pca.transform(X_train)
-X_pca.shape
+"""CLASS WEIGHT"""
+print("\033[1m" "Making KNN with Class Weight" "\033[0m")
 
-plt.scatter(
-    X_pca[:, 0],
-    X_pca[:, 1],
-    c=y_train,
-    cmap="Paired",
-    edgecolor="k",
-    alpha=0.7,
-)
-plt.title("Standard KNN-PCA")
-plt.show()
-
-
-"""UNDERSAMPLING-RANDOM UNDERSAMPLING"""
-rus = RandomUnderSampler(random_state=42)
-X_res, y_res = rus.fit_resample(X_train, y_train)
-print("Resampled dataset shape %s" % Counter(y_res))
-
-pca = PCA(n_components=4)
-pca.fit(X_train)
-X_pca = pca.transform(X_res)
-
-plt.scatter(X_pca[:, 0], X_pca[:, 1], c=y_res, cmap="Paired", edgecolor="k", alpha=0.7)
-plt.title("KNN-PCA with Random Undersampling")
-plt.show()
-
-clf = KNeighborsClassifier(n_neighbors=2, p=1)
-clf.fit(X_res, y_res)
+clf = KNeighborsClassifier(n_neighbors=2, p=1, weights="distance")
+clf.fit(X_train, y_train)
 
 y_pred = clf.predict(X_test)
 
-print("Accuracy Of UnderSampling %s" % accuracy_score(y_test, y_pred))
-print("F1-score Of UnderSampling %s" % f1_score(y_test, y_pred, average=None))
+print("Accuracy Of weight-knn %s" % accuracy_score(y_test, y_pred))
+print("F1-score Of weight-knn %s" % f1_score(y_test, y_pred, average=None))
 draw_confusion_matrix(knn, X_test, y_pred)
 print(classification_report(y_test, y_pred))
