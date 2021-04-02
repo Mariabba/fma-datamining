@@ -62,11 +62,11 @@ from pathlib import Path
 def draw_confusion_matrix(Clf, X, y):
     titles_options = [
         ("Confusion matrix, without normalization", None),
-        ("Normalized confusion matrix", "true"),
+        ("KNN RandomUnderSampling confusion matrix", "true"),
     ]
 
     for title, normalize in titles_options:
-        disp = plot_confusion_matrix(Clf, X, y, cmap="PuRd", normalize=normalize)
+        disp = plot_confusion_matrix(Clf, X, y, cmap="BuGn", normalize=normalize)
         disp.ax_.set_title(title)
 
     plt.show()
@@ -77,7 +77,7 @@ def conf_mat_disp(confusion_matrix, disp_labels):
         confusion_matrix=confusion_matrix, display_labels=disp_labels
     )
 
-    disp.plot(cmap="PuRd")
+    disp.plot(cmap="BuGn")
 
 
 # DATASET
@@ -164,7 +164,7 @@ plt.scatter(
     X_pca[:, 0],
     X_pca[:, 1],
     c=y_train,
-    cmap="Paired",
+    cmap="Set2",
     edgecolor="k",
     alpha=0.5,
 )
@@ -182,8 +182,8 @@ pca = PCA(n_components=4)
 pca.fit(X_train)
 X_pca = pca.transform(X_res)
 
-plt.scatter(X_pca[:, 0], X_pca[:, 1], c=y_res, cmap="Paired", edgecolor="k", alpha=0.5)
-plt.title("KNN-PCA with Random Undersampling")
+plt.scatter(X_pca[:, 0], X_pca[:, 1], c=y_res, cmap="Set2", edgecolor="k", alpha=0.5)
+plt.title("KNN-PCA with RandomUnderSampling")
 plt.show()
 
 clf = KNeighborsClassifier(n_neighbors=2, p=1)

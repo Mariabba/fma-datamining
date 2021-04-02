@@ -63,11 +63,11 @@ from pathlib import Path
 def draw_confusion_matrix(Clf, X, y):
     titles_options = [
         ("Confusion matrix, without normalization", None),
-        ("Normalized confusion matrix", "true"),
+        ("KNN with ClassWeight confusion matrix", "true"),
     ]
 
     for title, normalize in titles_options:
-        disp = plot_confusion_matrix(Clf, X, y, cmap="summer", normalize=normalize)
+        disp = plot_confusion_matrix(Clf, X, y, cmap="PuBu", normalize=normalize)
         disp.ax_.set_title(title)
 
     plt.show()
@@ -78,7 +78,7 @@ def conf_mat_disp(confusion_matrix, disp_labels):
         confusion_matrix=confusion_matrix, display_labels=disp_labels
     )
 
-    disp.plot(cmap="summer")
+    disp.plot(cmap="PuBu")
 
 
 # DATASET

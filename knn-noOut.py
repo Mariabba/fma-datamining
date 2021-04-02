@@ -59,11 +59,11 @@ from pathlib import Path
 def draw_confusion_matrix(Clf, X, y):
     titles_options = [
         ("Confusion matrix, without normalization", None),
-        ("Normalized confusion matrix", "true"),
+        ("KNN confusion matrix", "true"),
     ]
 
     for title, normalize in titles_options:
-        disp = plot_confusion_matrix(Clf, X, y, cmap="PuRd", normalize=normalize)
+        disp = plot_confusion_matrix(Clf, X, y, cmap="Purples", normalize=normalize)
         disp.ax_.set_title(title)
 
     plt.show()
@@ -74,7 +74,7 @@ def conf_mat_disp(confusion_matrix, disp_labels):
         confusion_matrix=confusion_matrix, display_labels=disp_labels
     )
 
-    disp.plot(cmap="PuRd")
+    disp.plot(cmap="Purples")
 
 
 # DATASET
@@ -134,7 +134,7 @@ print("Accuracy:", metrics.accuracy_score(y_test, Y_pred))
 # confusion matrix
 print("\033[1m" "Confusion matrix" "\033[0m")
 
-plot_confusion_matrix(knn, X_test, y_test, cmap="PuRd")
+plot_confusion_matrix(knn, X_test, y_test, cmap="Purples")
 draw_confusion_matrix(knn, X_test, y_test)
 
 print()
@@ -150,8 +150,8 @@ print()
 
 print("Accuracy %s" % accuracy_score(y_test, Y_pred))
 
-print("F1-score %s" % f1_score(y_test, Y_pred, labels=[0, 1], average=None))
+print("F1-score %s" % f1_score(y_test, Y_pred, average=None))
 
-print("Precision %s" % precision_score(y_test, Y_pred, labels=[0, 1], average=None))
+print("Precision %s" % precision_score(y_test, Y_pred, average=None))
 
-print("Recall %s" % recall_score(y_test, Y_pred, labels=[0, 1], average=None))
+print("Recall %s" % recall_score(y_test, Y_pred, average=None))

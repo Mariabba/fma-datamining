@@ -60,7 +60,7 @@ from pathlib import Path
 def draw_confusion_matrix(Clf, X, y):
     titles_options = [
         ("Confusion matrix, without normalization", None),
-        ("Normalized confusion matrix", "true"),
+        ("KNN confusion matrix", "true"),
     ]
 
     for title, normalize in titles_options:
@@ -79,7 +79,7 @@ def conf_mat_disp(confusion_matrix, disp_labels):
 
 
 # DATASET
-df = utils.load("../data/tracks.csv", dummies=True, buckets="continuous", fill=True)
+df = utils.load("data/tracks.csv", dummies=True, buckets="continuous", fill=True)
 column2drop = [
     ("album", "title"),
     ("artist", "name"),
@@ -154,11 +154,11 @@ print()
 
 print("Accuracy %s" % accuracy_score(y_test, Y_pred))
 
-print("F1-score %s" % f1_score(y_test, Y_pred, labels=[0, 1], average=None))
+print("F1-score %s" % f1_score(y_test, Y_pred, average=None))
 
-print("Precision %s" % precision_score(y_test, Y_pred, labels=[0, 1], average=None))
+print("Precision %s" % precision_score(y_test, Y_pred, average=None))
 
-print("Recall %s" % recall_score(y_test, Y_pred, labels=[0, 1], average=None))
+print("Recall %s" % recall_score(y_test, Y_pred, average=None))
 
 """
 # TODO TESTARE I PARAMENTRI MIGLIORI

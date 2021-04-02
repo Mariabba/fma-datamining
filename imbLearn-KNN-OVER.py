@@ -63,11 +63,11 @@ from pathlib import Path
 def draw_confusion_matrix(Clf, X, y):
     titles_options = [
         ("Confusion matrix, without normalization", None),
-        ("Normalized confusion matrix", "true"),
+        ("KNN RandomOverSampling confusion matrix", "true"),
     ]
 
     for title, normalize in titles_options:
-        disp = plot_confusion_matrix(Clf, X, y, cmap="summer", normalize=normalize)
+        disp = plot_confusion_matrix(Clf, X, y, cmap="OrRd", normalize=normalize)
         disp.ax_.set_title(title)
 
     plt.show()
@@ -78,7 +78,7 @@ def conf_mat_disp(confusion_matrix, disp_labels):
         confusion_matrix=confusion_matrix, display_labels=disp_labels
     )
 
-    disp.plot(cmap="summer")
+    disp.plot(cmap="OrRd")
 
 
 # DATASET
@@ -165,7 +165,7 @@ plt.scatter(
     X_pca[:, 0],
     X_pca[:, 1],
     c=y_train,
-    cmap="Dark2",
+    cmap="Set2",
     edgecolor="k",
     alpha=0.5,
 )
@@ -204,6 +204,7 @@ print(classification_report(y_test, y_pred))
 """
 
 """RANDOM OVERSAMPLING"""
+
 print("\033[1m" "Making Oversampling with Random" "\033[0m")
 ros = RandomOverSampler(random_state=42)
 X_res, y_res = ros.fit_resample(X_train, y_train)
@@ -216,8 +217,8 @@ pca = PCA(n_components=4)
 pca.fit(X_train)
 X_pca = pca.transform(X_res)
 
-plt.scatter(X_pca[:, 0], X_pca[:, 1], c=y_res, cmap="Dark2", edgecolor="k", alpha=0.5)
-plt.title("KNN-PCA with SMOTE Oversampling")
+plt.scatter(X_pca[:, 0], X_pca[:, 1], c=y_res, cmap="Set2", edgecolor="k", alpha=0.5)
+plt.title("KNN-PCA with RandomOverSampling")
 plt.show()
 
 # Classification knn with oversampling
