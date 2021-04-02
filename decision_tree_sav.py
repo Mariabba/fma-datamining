@@ -7,6 +7,7 @@ import pandas as pd
 
 # import pydotplus
 # from pydotplus import graphviz
+from matplotlib import pyplot
 from scipy.constants import lb
 from sklearn import tree, metrics
 from sklearn.metrics import (
@@ -20,7 +21,13 @@ from sklearn.metrics import (
     f1_score,
     classification_report,
     average_precision_score,
+    roc_auc_score,
+    precision_score,
+    recall_score,
+    make_scorer,
+    precision_recall_curve,
 )
+
 from sklearn.model_selection import (
     GridSearchCV,
     RandomizedSearchCV,
@@ -102,6 +109,9 @@ def load_data(path):
         ("track", "license"),
         ("track", "listens"),
     ]
+
+    df = df[df["album", "type"] != "Contest"]
+
     for col in column2encode:
         le = LabelEncoder()
         df[col] = le.fit_transform(df[col])
@@ -198,7 +208,7 @@ def build_model(
     X = df[attributes].values
     y = df[target1, target2]
 
-    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.25)
+    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.25, stratify=y)
 
     print(X_train.shape, X_test.shape)
     # build a model
@@ -215,23 +225,20 @@ def build_model(
     for col, imp in zip(attributes, clf.feature_importances_):
         print(col, imp)
 
-    # Apply the decision tree on the training set
-    print("Apply the decision tree on the training set: \n")
-    y_pred = clf.predict(X_train)
-    print("Accuracy %s" % accuracy_score(y_train, y_pred))
-    print("F1-score %s" % f1_score(y_train, y_pred, average=None))
-
-    print(classification_report(y_train, y_pred))
-
-    confusion_matrix(y_train, y_pred)
+    pyplot.bar([x for x in range(len(clf.feature_importances_))], clf.feature_importances_)
+    pyplot.show()
 
     # Apply the decision tree on the test set and evaluate the performance
     print("Apply the decision tree on the test set and evaluate the performance: \n")
     y_pred = clf.predict(X_test)
 
+    print(classification_report(y_test, y_pred))
+
+    print("\033[1m" "Metrics" "\033[0m")
+
     print("Accuracy %s" % accuracy_score(y_test, y_pred))
     print("F1-score %s" % f1_score(y_test, y_pred, average=None))
-    print(classification_report(y_test, y_pred))
+
     confusion_matrix(y_test, y_pred)
 
     # ROC Curve
@@ -246,7 +253,7 @@ def build_model(
     roc_auc = dict()
     by_test = lb.transform(y_test)
     by_pred = lb.transform(y_pred)
-    for i in range(5):
+    for i in range(4):
         fpr[i], tpr[i], _ = roc_curve(by_test[:, i], by_pred[:, i])
         roc_auc[i] = auc(fpr[i], tpr[i])
 
@@ -254,7 +261,7 @@ def build_model(
     print(roc_auc)
 
     plt.figure(figsize=(8, 5))
-    for i in range(5):
+    for i in range(4):
         plt.plot(
             fpr[i],
             tpr[i],
@@ -269,6 +276,7 @@ def build_model(
     plt.tick_params(axis="both", which="major", labelsize=22)
     plt.legend(loc="lower right", fontsize=14, frameon=False)
     plt.show()
+
 
     # Model Accuracy, how often is the classifier correct?
     draw_confusion_matrix
@@ -297,7 +305,7 @@ def build_model(
 
 tracks = load_data("data/tracks.csv")
 # tuning_param(tracks, "album", "type")
-tuning_param_gridsearch(tracks, "album", "type")
+# tuning_param_gridsearch(tracks, "album", "type")
 # build_model(tracks, "album", "type", 100, 100, 8, "entropy")
 # build_model(tracks, "album", "type", 2, 1, 20, "entropy")
-build_model(tracks, "album", "type", 20, 100, 7, "entropy")
+build_model(tracks, "album", "type", 20, 100, 20, "entropy")
