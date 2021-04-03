@@ -1,4 +1,4 @@
-# DataMining2-project
+# Guidelines
 
 ## Module 1 - Introduction, Imbalanced Learning and Anomaly Detection
 
@@ -21,3 +21,66 @@ N.B. When “solving the classification task”, remember, (i) to test, when nee
 **2-Besides the numerical evaluation draw your conclusions** about the various classifiers, e.g. for Neural Networks: what are the parameter sets or the convergence criteria which avoid overfitting? For Ensemble classifiers how the number of base models impacts the classification performance? For any classifier which is the minimum amount of data required to guarantee an acceptable level of performance? Is this level the same for any classifier? What is revealing the feature importance of Random Forests?
 
 **3-Select two continuous attributes, define a regression problem** and try to solve it using different techniques reporting various evaluation measures. Plot the two-dimensional dataset. Then generalize to multiple linear regression and observe how the performance varies.
+
+
+# Usage
+## utils.py
+import utils
+
+### utils.load_tracks_xyz -> dict
+```python
+- filepath="data/tracks.csv",
+- buckets="basic",
+- dummies=True,
+- fill=True,
+- outliers=True,
+- extractclass=None
+```
+
+Parameter usage is the same as `utils.load_tracks()`, below. (However note that in this other version, values are all True by default.)
+
+**Returns** a dict of 3 **pd.Dataframe** from tracks.csv. The dataframes are contained in a dict for which the keys are _"train"_, _"vali"_, _"test"_.
+
+However if extractclass=*some_column* this function **returns** a **dict** with keys: [*"train_x"*, *"train_y"*, *"vali_x"*, *"vali_y"*, *"test_x"*, *"test_y"*]. Each of the three **_x** versions contains all the attributes except *some_column*. Each of the three **_y** versions contains just *some_column*. All of the 6 versions are type **pd.Dataframe**. The correct row indexes are retained in all dataframes.
+
+#### Examples
+##### Load the three dataframes
+```python
+import utils
+dfs = utils.load_tracks_xyz()
+
+print(dfs['train'].info())
+print(dfs['vali'].info())
+print(dfs['test'].info())
+```
+
+##### You can reassign
+```python
+train = dfs['train']
+print(train.info())
+```
+
+##### If you want to extract a class
+```python
+dfs = utils.load_tracks_xyz(extractclass=("track", "listens"))
+
+print(dfs['train_x'].info())
+print(dfs['train_y'].info())  # Dataframe, contains only ("track", "listens")
+```
+
+### utils.load_tracks -> pd.Dataframe
+```python
+- filepath="data/tracks.csv",
+- buckets="basic",
+- dummies=False,
+- fill=False,
+- outliers=False
+```
+
+- filepath is only changed when you put your files inside of subfolders
+- buckets (_basic_, _continuous_, _discrete_): basic is discretizations we use for everything, discrete only for methods who prefer discrete attributes (like decision tree), continuous only for methods who prefer continuous attributes (like knn)
+- dummies: Makes dummies out of columns with coverage <10% and a few more special cases hard coded in `utils.dummy_maker()`
+- fill: will fill missing values but so far it only deletes rows that contain outliers
+- outliers: **if true must be used with fill=_True_** and removes outliers determined by `abod1072.csv`.
+
+**Returns** a single pd.Dataframe.
