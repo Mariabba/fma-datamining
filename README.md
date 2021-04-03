@@ -16,7 +16,7 @@ N.B. When “solving the classification task”, remember, (i) to test, when nee
 
 ## Module 2 - Advanced Classification Methods
 
-**1-Solve the classification task **defined in Module 1 (or define new ones) with the other classification methods analyzed during the course:*Naive Bayes Classifier, Logistic Regression, Rule-based Classifiers, Support Vector Machines, Neural Networks, Ensemble Methods* and evaluate each classifier with the techniques presented in Module 1 (accuracy, precision, recall, F1-score, ROC curve). Perform hyper-parameter tuning phases and justify your choices.
+**1-Solve the classification task** defined in Module 1 (or define new ones) with the other classification methods analyzed during the course:*Naive Bayes Classifier, Logistic Regression, Rule-based Classifiers, Support Vector Machines, Neural Networks, Ensemble Methods* and evaluate each classifier with the techniques presented in Module 1 (accuracy, precision, recall, F1-score, ROC curve). Perform hyper-parameter tuning phases and justify your choices.
 
 **2-Besides the numerical evaluation draw your conclusions** about the various classifiers, e.g. for Neural Networks: what are the parameter sets or the convergence criteria which avoid overfitting? For Ensemble classifiers how the number of base models impacts the classification performance? For any classifier which is the minimum amount of data required to guarantee an acceptable level of performance? Is this level the same for any classifier? What is revealing the feature importance of Random Forests?
 
