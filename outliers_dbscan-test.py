@@ -184,11 +184,11 @@ plt.show()
 
 # PLOT per trovare best esp
 sns.set()
-neigh = NearestNeighbors(n_neighbors=100)
+neigh = NearestNeighbors(n_neighbors=5)
 nbrs = neigh.fit(X)
 distances, indices = nbrs.kneighbors(X)
 distances = np.sort(distances, axis=0)
-distances = distances[:, 10]
+distances = distances[:, 1]
 plt.plot(distances)
 plt.show()
 """
@@ -197,6 +197,7 @@ plt.show()
 
 print("DBSCAN")
 dbscan = DBSCAN(eps=5000, min_samples=24)
+
 dbscan = dbscan.fit(X)
 labels = dbscan.labels_
 # Number of clusters in labels, ignoring noise if present.

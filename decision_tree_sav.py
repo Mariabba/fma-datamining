@@ -208,7 +208,9 @@ def build_model(
     X = df[attributes].values
     y = df[target1, target2]
 
-    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.25, stratify=y)
+    X_train, X_test, y_train, y_test = train_test_split(
+        X, y, test_size=0.25, stratify=y
+    )
 
     print(X_train.shape, X_test.shape)
     # build a model
@@ -225,7 +227,9 @@ def build_model(
     for col, imp in zip(attributes, clf.feature_importances_):
         print(col, imp)
 
-    pyplot.bar([x for x in range(len(clf.feature_importances_))], clf.feature_importances_)
+    pyplot.bar(
+        [x for x in range(len(clf.feature_importances_))], clf.feature_importances_
+    )
     pyplot.show()
 
     # Apply the decision tree on the test set and evaluate the performance
@@ -276,7 +280,6 @@ def build_model(
     plt.tick_params(axis="both", which="major", labelsize=22)
     plt.legend(loc="lower right", fontsize=14, frameon=False)
     plt.show()
-
 
     # Model Accuracy, how often is the classifier correct?
     draw_confusion_matrix

@@ -1,7 +1,12 @@
+import matplotlib
 import matplotlib.pyplot as plt
 import numpy as np
+import outlier as outlier
 import pandas as pd
 from pyod.models.abod import ABOD
+from pyod.utils.data import get_outliers_inliers
+from scipy.stats import stats
+
 from sklearn.model_selection import GridSearchCV, train_test_split
 
 import utils
@@ -78,9 +83,30 @@ outliers = clf.predict(X)
 print("outliers:", len(outliers))
 print(np.unique(outliers, return_counts=True))
 
-plt.hist(clf.decision_scores_, bins=20)
+plt.hist(clf.decision_scores_)
 plt.axvline(np.min(clf.decision_scores_[np.where(outliers == 1)]), c="k")
+plt.title("ABOD outliers identification")
+plt.ylabel("Record")
+plt.xticks(rotation=30)
+plt.xlabel("")
 plt.show()
+
+# TRying to print better abod
+x_outliers, x_inliers = get_outliers_inliers(X_train, y_train)
+
+n_inliers = len(x_inliers)
+n_outliers = len(x_outliers)
+
+F1 = X_train[:, [0]].reshape(-1, 1)
+F2 = X_train[:, [1]].reshape(-1, 1)
+
+xx, yy = np.meshgrid(np.linspace(-10, 10, 200), np.linspace(-10, 10, 200))
+# scatterplot
+plt.scatter(F1, F2)
+
+plt.title("Outliers Visualization")
+plt.show()
+
 
 print(outliers)
 print(type(outliers))
