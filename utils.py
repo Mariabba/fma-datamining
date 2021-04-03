@@ -18,24 +18,39 @@ def load_tracks_xyz(
     dummies=True,
     fill=True,
     outliers=True,
-):
+    extractclass=None,
+) -> dict:
     """
     Same usage as load(), with everything turned on though
     Returns tuple of pd.Dataframe from tracks.csv: (train_df, validation_df, test_df)
+
+    If extractclass=column : returns a dict of [train_x, train_y, vali_x, vali_y, test_x, test_y]
     """
     df = load(filepath, buckets, dummies, fill, outliers)
+
+    # split train, vali, test
     mask_train = df[("set", "split")] == "training"
     mask_vali = df[("set", "split")] == "validation"
     mask_test = df[("set", "split")] == "test"
-
     df_train = df[mask_train]
     df_vali = df[mask_vali]
     df_test = df[mask_test]
-
     del df_train[("set", "split")]
     del df_vali[("set", "split")]
     del df_test[("set", "split")]
-    return df_train, df_vali, df_test
+
+    all_dfs = {"train": df_train, "vali": df_vali, "test": df_test}
+
+    # extractclass
+    if not extractclass:
+        return all_dfs
+    else:
+        results = {}
+        for key, dataf in all_dfs.items():
+            attributes = [col for col in dataf.columns if col != extractclass]
+            results[f"{key}_x"] = dataf[attributes]
+            results[f"{key}_y"] = dataf[extractclass]
+        return results
 
 
 def load_tracks(
@@ -381,7 +396,6 @@ def treat_outliers(df: pd.DataFrame) -> pd.DataFrame:
     Inserire qui trattamento outlier. Accetta dataframe e deve restituire dataframe.
     Testato solo con: buckets="basic", dummies=True, fill=True
     """
-    print(df.shape[0])
     assert (
         df.shape[0] == 99404
     ), "treat_outliers only tested with dummies=True, fill=True"
