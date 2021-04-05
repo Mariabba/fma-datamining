@@ -226,18 +226,27 @@ def build_model(
     for col, imp in zip(attributes, clf.feature_importances_):
         print(col, imp)
 
-    top_n=10
-    feat_imp = pd.DataFrame(columns=['columns','importance'])
+    top_n = 10
+    feat_imp = pd.DataFrame(columns=["columns", "importance"])
     for col, imp in zip(attributes, clf.feature_importances_):
-        feat_imp = feat_imp.append({'columns': col, 'importance':imp }, ignore_index=True)
+        feat_imp = feat_imp.append(
+            {"columns": col, "importance": imp}, ignore_index=True
+        )
     print(feat_imp)
 
-    feat_imp.sort_values(by='importance', ascending=False, inplace=True)
+    feat_imp.sort_values(by="importance", ascending=False, inplace=True)
     feat_imp = feat_imp.iloc[:top_n]
 
-    feat_imp.plot(title='Top 10 features contribution',x='columns',fontsize=8.5, rot=15,   y='importance',kind='bar', colormap='Pastel1')
+    feat_imp.plot(
+        title="Top 10 features contribution",
+        x="columns",
+        fontsize=8.5,
+        rot=15,
+        y="importance",
+        kind="bar",
+        colormap="Pastel1",
+    )
     plt.show()
-
 
     """
     pyplot.bar(

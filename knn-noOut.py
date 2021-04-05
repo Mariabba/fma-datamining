@@ -16,6 +16,7 @@ from sklearn.preprocessing import (
     StandardScaler,
     LabelEncoder,
     label_binarize,
+    LabelBinarizer,
 )
 from sklearn.preprocessing import KBinsDiscretizer
 
@@ -155,3 +156,39 @@ print("F1-score %s" % f1_score(y_test, Y_pred, average=None))
 print("Precision %s" % precision_score(y_test, Y_pred, average=None))
 
 print("Recall %s" % recall_score(y_test, Y_pred, average=None))
+
+"""ROC Curve"""
+
+lb = LabelBinarizer()
+lb.fit(y_test)
+lb.classes_.tolist()
+
+fpr = dict()
+tpr = dict()
+roc_auc = dict()
+by_test = lb.transform(y_test)
+by_pred = lb.transform(Y_pred)
+for i in range(4):
+    fpr[i], tpr[i], _ = roc_curve(by_test[:, i], by_pred[:, i])
+    roc_auc[i] = auc(fpr[i], tpr[i])
+
+    roc_auc = roc_auc_score(by_test, by_pred, average=None)
+
+
+plt.figure(figsize=(8, 5))
+for i in range(4):
+    plt.plot(
+        fpr[i],
+        tpr[i],
+        label="%s ROC curve (area = %0.2f)" % (lb.classes_.tolist()[i], roc_auc[i]),
+    )
+
+plt.plot([0, 1], [0, 1], "k--")
+plt.xlim([0.0, 1.0])
+plt.ylim([0.0, 1.05])
+plt.title("KNN Roc-Curve")
+plt.xlabel("False Positive Rate", fontsize=10)
+plt.ylabel("True Positive Rate", fontsize=10)
+plt.tick_params(axis="both", which="major", labelsize=12)
+plt.legend(loc="lower right", fontsize=7, frameon=False)
+plt.show()
