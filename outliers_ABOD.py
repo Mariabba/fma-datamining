@@ -113,4 +113,4 @@ print(type(outliers))
 
 miao = pd.Series(outliers)
 print(miao)
-miao.to_csv("strange results/abod.csv")
+miao.to_csv("strange_results/abod.csv")

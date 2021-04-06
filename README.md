@@ -84,3 +84,19 @@ print(dfs['train_y'].info())  # Dataframe, contains only ("track", "listens")
 - outliers: **if true must be used with fill=_True_** and removes outliers determined by `abod1072.csv`.
 
 **Returns** a single pd.Dataframe.
+
+# Filenaming guidelines
+| Module | Filename |
+|:--|:--|
+1 Starting classification | starting_***method***_***type***.py
+1 Anomaly detection | outliers_***method***_***type***.py
+1 Imbalanced learning | imbalance_***method***_***type***.py
+2 Advanced Classification | advcl_***method***_***type***.py
+2 Regression | regression_***method***_***type***.py
+
+(_***type*** is optional for all files)
+
+Example:
+- imbalance_KNN_over.py
+- advcl_SVM_linear.py
+- regression_linear.py

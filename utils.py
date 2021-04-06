@@ -400,7 +400,7 @@ def treat_outliers(df: pd.DataFrame) -> pd.DataFrame:
         df.shape[0] == 99404
     ), "treat_outliers only tested with dummies=True, fill=True"
 
-    df_outliers = pd.read_csv("strange results/abod1072.csv")
+    df_outliers = pd.read_csv("strange_results/abod1072.csv")
     df_outliers = df_outliers.set_index(df.index)
 
     return df[df_outliers["0"] == 0]
