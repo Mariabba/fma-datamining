@@ -1,6 +1,7 @@
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
+from scikitplot.metrics import plot_lift_curve
 
 from sklearn.metrics import (
     accuracy_score,
@@ -135,7 +136,6 @@ for i in range(4):
     roc_auc[i] = auc(fpr[i], tpr[i])
 
     roc_auc = roc_auc_score(by_test, by_pred, average=None)
-
 
 plt.figure(figsize=(8, 5))
 for i in range(4):
