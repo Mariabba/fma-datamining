@@ -95,10 +95,22 @@ def load(
     df = df.convert_dtypes()
 
     # Columns that we're not interested in for ANY method
-    del df[("set", "subset")]
-    del df[("artist", "latitude")]
-    del df[("artist", "longitude")]
-    del df[("track", "bit_rate")]
+    columns2drop = [
+        ("album", "date_released"),  # meh
+        ("album", "id"),
+        ("album", "title"),
+        ("album", "tracks"),
+        ("artist", "active_year_begin"),
+        ("artist", "id"),
+        ("artist", "latitude"),
+        ("artist", "longitude"),
+        ("artist", "members"),  # meh
+        ("artist", "name"),
+        ("set", "subset"),
+        ("track", "bit_rate"),  # meh
+        ("track", "date_recorded"),
+    ]
+    df = df.drop(columns2drop, axis=1)
 
     # start of parameter choices
     if buckets == "basic":
@@ -178,6 +190,41 @@ def discretizer(df: pd.DataFrame) -> pd.DataFrame:
         df[("track", "date_created")]
     ).dt.year.astype("Int64")
 
+    # here we treat genres
+    toplvl_genres = {
+        12: "Rock",
+        15: "Electronic",
+        38: "Experimental",
+        21: "Hip-Hop",
+        17: "Folk",
+        1235: "Instrumental",
+        10: "Pop",
+        2: "International",
+        5: "Classical",
+        8: "Old-Time / Historic",
+        4: "Jazz",
+        9: "Country",
+        14: "Soul-RnB",
+        20: "Spoken",
+        3: "Blues",
+        13: "Easy Listening",
+    }
+
+    miao = df[[("track", "genres_all")]]
+    miao.columns = miao.columns.get_level_values(1)
+
+    sc = set(["[", "]", "'", "'", " "])
+    for index, row in miao.iterrows():
+        temp = "".join([c for c in row["genres_all"] if c not in sc])
+        row["genres_all"] = temp.split(",")
+
+    for index, row in miao.iterrows():
+        for element in toplvl_genres:
+            if element in row["genres_all"]:
+                row["only_top"] = element
+
+    # miao = miao.eval("only_top=x if x in genres_all")
+    # print(miao)
     return df
 
 
@@ -317,14 +364,11 @@ def fill_missing(df: pd.DataFrame) -> pd.DataFrame:
     )
 
     # Deletion of columns
-    del df[("artist", "active_year_begin")]
     del df[("artist", "associated_labels")]
     del df[("artist", "related_projects")]
 
     # eliminate per andare avanti che potrebbero servire in seguito
-    del df[("album", "date_released")]
     del df[("artist", "location")]
-    del df[("artist", "members")]
     del df[("track", "genre_top")]
 
     # elimino le row che non hanno album type
@@ -333,7 +377,6 @@ def fill_missing(df: pd.DataFrame) -> pd.DataFrame:
     # elimino le row che hanno valori mancanti in artist_date_created , track:license e track title
     df = df[df[("artist", "date_created")].notna()]
     df = df[df[("track", "license")].notna()]
-    df = df[df[("track", "title")].notna()]
     df = df[df[("album", "date_created")].notna()]
 
     return df
