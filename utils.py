@@ -119,6 +119,7 @@ def load(
     if outliers:
         df = treat_outliers(df)
 
+    df = df[df["album", "type"] != "Contest"]
     df.attrs["df_name"] = filename
     return df
 
