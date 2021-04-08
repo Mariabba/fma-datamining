@@ -69,25 +69,9 @@ def report(results, n_top=3):
 
 
 def load_data(path):
-    df = utils.load(path, dummies=True)
-
-    # feature to drop
-    column2drop = [
-        ("album", "title"),
-        ("album", "tags"),  # might be usefull to include them, but how?
-        ("album", "id"),
-        ("set", "split"),
-        ("track", "title"),
-        ("artist", "id"),
-        ("artist", "name"),
-        ("artist", "tags"),  # might be usefull to include them, but how?
-        ("track", "tags"),  # might be usefull to include them, but how?
-        ("track", "genres"),
-        ("track", "genres_all"),
-        ("track", "number"),
-    ]
-    df.drop(column2drop, axis=1, inplace=True)
-
+    df = utils.load_tracks(
+        path, outliers=False
+    )
     # feature to reshape
     label_encoders = dict()
     column2encode = [
@@ -104,7 +88,6 @@ def load_data(path):
         ("track", "license"),
         ("track", "listens"),
     ]
-    df = df[df["album", "type"] != "Contest"]
 
     for col in column2encode:
         le = LabelEncoder()
@@ -305,5 +288,5 @@ def build_model(
 tracks = load_data("../data/tracks.csv")
 # tuning_param(tracks, "album", "type")
 # tuning_param_gridsearch(tracks, "album", "type")
-# build_model(tracks, "album", "type", 100, 100, 8, "entropy")
-# build_model(tracks, "album", "type", 2, 1, 20, "entropy")
+build_model(tracks, "album", "type", 100, 100, 8, "entropy")
+#build_model(tracks, "album", "type", 2, 1, 20, "entropy")

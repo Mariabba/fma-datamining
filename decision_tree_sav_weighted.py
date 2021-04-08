@@ -247,7 +247,7 @@ def build_model(
     print("\033[1m" "Metrics" "\033[0m")
 
     print("Accuracy %s" % accuracy_score(df["test_y"], y_pred))
-    print("F1-score %s" % f1_score(df["test_y"], y_pred, average="weighted", zero_division=0))
+    print("F1-score %s" % f1_score(df["test_y"], y_pred, average=None))
 
     confusion_matrix(df["test_y"], y_pred)
 
