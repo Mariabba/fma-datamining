@@ -143,6 +143,10 @@ def load(
     if outliers:
         df = treat_outliers(df)
 
+    try:
+        del df[("track", "title")]
+    except:
+        pass
     df.attrs["df_name"] = filename
     return df
 
