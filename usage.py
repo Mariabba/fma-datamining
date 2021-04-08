@@ -11,8 +11,11 @@ tracks = utils.load(
 )
 # artists = utils.load("data/raw_artists.csv")
 
-"""
 print(tracks.info())
+tracks = utils.load_tracks(buckets="discrete")
+print(tracks.info())
+
+"""
 exit()
 threshold = 0.9
 

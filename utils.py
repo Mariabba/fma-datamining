@@ -5,6 +5,7 @@ from pathlib import Path
 import numpy as np
 import pandas as pd
 from langdetect import detect
+from sklearn.preprocessing import MultiLabelBinarizer
 
 try:
     from rich.progress import Progress, track
@@ -56,9 +57,9 @@ def load_tracks_xyz(
 def load_tracks(
     filepath="data/tracks.csv",
     buckets="basic",
-    dummies=False,
-    fill=False,
-    outliers=False,
+    dummies=True,
+    fill=True,
+    outliers=True,
 ) -> pd.DataFrame:
     return load(filepath, buckets, dummies, fill, outliers)
 
@@ -72,6 +73,7 @@ def load(
     dummies=True|False default False,
     fill=True|False default False
     """
+
     filepath = Path(filepath)
     filename = filepath.name
 
@@ -98,31 +100,41 @@ def load(
     columns2drop = [
         ("album", "date_released"),  # meh
         ("album", "id"),
+        ("album", "tags"),  # meh
         ("album", "title"),
-        ("album", "tracks"),
+        ("album", "tracks"),  # meh
         ("artist", "active_year_begin"),
+        ("artist", "associated_labels"),  # meh
         ("artist", "id"),
         ("artist", "latitude"),
+        ("artist", "location"),  # meh
         ("artist", "longitude"),
         ("artist", "members"),  # meh
         ("artist", "name"),
+        ("artist", "related_projects"),  # meh
+        ("artist", "tags"),  # meh
         ("set", "subset"),
         ("track", "bit_rate"),  # meh
         ("track", "date_recorded"),
+        ("track", "genres"),
+        ("track", "number"),  # meh
+        ("track", "tags"),  # meh
     ]
     df = df.drop(columns2drop, axis=1)
 
+    # Rows we're not interested in for any method
+    df = df[df["album", "type"] != "Contest"]
+
     # start of parameter choices
     if buckets == "basic":
-        df = discretizer(df)
+        pass
     elif buckets == "continuous":
-        df = discretizer(df)
         df = discretizer_continuousmethods(df)
     elif buckets == "discrete":
-        df = discretizer(df)
         df = discretizer_discretemethods(df)
     else:
         raise ValueError(docstring)
+    df = discretizer(df)
 
     if dummies:
         df = dummy_maker(df)
@@ -131,7 +143,6 @@ def load(
     if outliers:
         df = treat_outliers(df)
 
-    df = df[df["album", "type"] != "Contest"]
     df.attrs["df_name"] = filename
     return df
 
@@ -140,6 +151,7 @@ def correct_dtypes(df: pd.DataFrame) -> pd.DataFrame:
     """
     Used for tracks.csv to convert into category, datetime types
     """
+
     columns = [
         ("track", "tags"),
         ("album", "tags"),
@@ -179,6 +191,7 @@ def discretizer(df: pd.DataFrame) -> pd.DataFrame:
     """
     General discretizations that we use for EVERYTHING.
     """
+
     # datetime manipulation
     df[("album", "date_created")] = pd.to_datetime(
         df[("album", "date_created")]
@@ -190,41 +203,6 @@ def discretizer(df: pd.DataFrame) -> pd.DataFrame:
         df[("track", "date_created")]
     ).dt.year.astype("Int64")
 
-    # here we treat genres
-    toplvl_genres = {
-        12: "Rock",
-        15: "Electronic",
-        38: "Experimental",
-        21: "Hip-Hop",
-        17: "Folk",
-        1235: "Instrumental",
-        10: "Pop",
-        2: "International",
-        5: "Classical",
-        8: "Old-Time / Historic",
-        4: "Jazz",
-        9: "Country",
-        14: "Soul-RnB",
-        20: "Spoken",
-        3: "Blues",
-        13: "Easy Listening",
-    }
-
-    miao = df[[("track", "genres_all")]]
-    miao.columns = miao.columns.get_level_values(1)
-
-    sc = set(["[", "]", "'", "'", " "])
-    for index, row in miao.iterrows():
-        temp = "".join([c for c in row["genres_all"] if c not in sc])
-        row["genres_all"] = temp.split(",")
-
-    for index, row in miao.iterrows():
-        for element in toplvl_genres:
-            if element in row["genres_all"]:
-                row["only_top"] = element
-
-    # miao = miao.eval("only_top=x if x in genres_all")
-    # print(miao)
     return df
 
 
@@ -232,6 +210,7 @@ def discretizer_continuousmethods(df: pd.DataFrame) -> pd.DataFrame:
     """
     Discretizations that we use for methods that prefer or require continuous variables (like KNN)
     """
+
     pass
 
     return df
@@ -241,6 +220,7 @@ def discretizer_discretemethods(df: pd.DataFrame) -> pd.DataFrame:
     """
     Discretizations that we use for methods that prefer or require discrete variables (like xxx)
     """
+
     bins = [-np.inf, -1, 0, np.inf]
     labels = ["no_info", "no_comments", "commented"]
     df["album", "comments"] = pd.cut(df["album", "comments"], bins=bins, labels=labels)
@@ -317,6 +297,59 @@ def discretizer_discretemethods(df: pd.DataFrame) -> pd.DataFrame:
     ]
     df["track", "listens"] = pd.cut(df["track", "listens"], bins=bins, labels=labels)
 
+    # here we treat genres
+    toplvl_genres = {
+        12: "Rock",
+        15: "Electronic",
+        38: "Experimental",
+        21: "Hip-Hop",
+        17: "Folk",
+        1235: "Instrumental",
+        10: "Pop",
+        2: "International",
+        5: "Classical",
+        8: "Old-Time / Historic",
+        4: "Jazz",
+        9: "Country",
+        14: "Soul-RnB",
+        20: "Spoken",
+        3: "Blues",
+        13: "Easy Listening",
+        0: "top genre missing",
+    }
+
+    def search_for_life(value) -> str:
+        for element in value:
+            if element in toplvl_genres:
+                return toplvl_genres[element]
+        return toplvl_genres[0]
+
+    def search_for_death(value) -> list:
+        results = []
+        for element in value:
+            if element in toplvl_genres:
+                results.append(toplvl_genres[element])
+        if results:
+            return results
+        else:
+            return [toplvl_genres[0]]
+
+    s = df[("track", "genres_all")]
+    s = s.apply(search_for_death)
+
+    mlb = MultiLabelBinarizer()
+    my_dummies = pd.DataFrame(
+        mlb.fit_transform(s), columns=mlb.classes_, index=df.index
+    )
+
+    df = pd.concat([df, my_dummies], axis=1)
+
+    # todo:
+    # test this to check it's correct
+    # prioritize genre_top when present
+    # delete genre_top genres_all
+    # finire di cancellare colonne da excel
+
     return df
 
 
@@ -342,7 +375,6 @@ def dummy_maker(df, threshold=0.9) -> pd.DataFrame:
         ("artist", "bio"),
         ("album", "producer"),
         ("artist", "website"),
-        # ("album", "type"),
     ]
 
     low_coverage.extend(special_cases)
@@ -358,23 +390,18 @@ def dummy_maker(df, threshold=0.9) -> pd.DataFrame:
 
 
 def fill_missing(df: pd.DataFrame) -> pd.DataFrame:
+
     # fill language_code
-    df["track", "language_code"] = df["track", "language_code"].fillna(
-        detect(str(df["track", "title"]))
-    )
+    try:
+        df["track", "language_code"] = df["track", "language_code"].fillna(
+            detect(str(df["track", "title"]))
+        )
+        del df[("track", "title")]
+    except:
+        pass
 
-    # Deletion of columns
-    del df[("artist", "associated_labels")]
-    del df[("artist", "related_projects")]
-
-    # eliminate per andare avanti che potrebbero servire in seguito
-    del df[("artist", "location")]
-    del df[("track", "genre_top")]
-
-    # elimino le row che non hanno album type
+    # elimino le row che hanno valori mancanti
     df = df[df[("album", "type")].notna()]
-
-    # elimino le row che hanno valori mancanti in artist_date_created , track:license e track title
     df = df[df[("artist", "date_created")].notna()]
     df = df[df[("track", "license")].notna()]
     df = df[df[("album", "date_created")].notna()]
@@ -386,6 +413,7 @@ def check_rules(df: pd.DataFrame, rules_path: str) -> pd.DataFrame:
     """
     Checks rules_path (possibly 'data/rules.txt') and returns a dataframe with the error count for each rule
     """
+
     with open(Path(rules_path), "r") as reader:
         file_contents = reader.readlines()
     rules = [x.split() for x in file_contents]
@@ -442,7 +470,7 @@ def treat_outliers(df: pd.DataFrame) -> pd.DataFrame:
     """
     assert (
         df.shape[0] == 99404
-    ), "treat_outliers only tested with dummies=True, fill=True"
+    ), "treat_outliers only tested with dummies=True, fill=True - did we recently change the shape of df?"
 
     df_outliers = pd.read_csv("strange_results/abod1072.csv")
     df_outliers = df_outliers.set_index(df.index)

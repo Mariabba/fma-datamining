@@ -37,7 +37,7 @@ import utils
 - extractclass=None
 ```
 
-Parameter usage is the same as `utils.load_tracks()`, below. (However note that in this other version, values are all True by default.)
+Parameter usage is the same as `utils.load_tracks()`, below.
 
 **Returns** a dict of 3 **pd.Dataframe** from tracks.csv. The dataframes are contained in a dict for which the keys are _"train"_, _"vali"_, _"test"_.
 
@@ -72,9 +72,9 @@ print(dfs['train_y'].info())  # Dataframe, contains only ("track", "listens")
 ```python
 - filepath="data/tracks.csv",
 - buckets="basic",
-- dummies=False,
-- fill=False,
-- outliers=False
+- dummies=True,
+- fill=True,
+- outliers=True
 ```
 
 - filepath is only changed when you put your files inside of subfolders
