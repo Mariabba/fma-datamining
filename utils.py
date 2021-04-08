@@ -148,6 +148,8 @@ def load(
 
     # delete columns that we used in some method
     del df[("track", "title")]
+    del df[("track", "genre_top")]
+    del df[("track", "genres_all")]
 
     df.attrs["df_name"] = filename
     return df
@@ -349,12 +351,6 @@ def discretizer_discretemethods(df: pd.DataFrame) -> pd.DataFrame:
     )
 
     df = pd.concat([df, my_dummies], axis=1)
-
-    # todo:
-    # test this to check it's correct
-    # prioritize genre_top when present
-    # delete genre_top genres_all
-    # finire di cancellare colonne da excel
 
     return df
 
