@@ -61,7 +61,10 @@ def load_tracks(
     fill=True,
     outliers=True,
 ) -> pd.DataFrame:
-    return load(filepath, buckets, dummies, fill, outliers)
+    df = load(filepath, buckets, dummies, fill, outliers)
+    del df[("set", "split")]
+
+    return df
 
 
 def load(
@@ -143,10 +146,9 @@ def load(
     if outliers:
         df = treat_outliers(df)
 
-    try:
-        del df[("track", "title")]
-    except:
-        pass
+    # delete columns that we used in some method
+    del df[("track", "title")]
+
     df.attrs["df_name"] = filename
     return df
 
@@ -396,13 +398,9 @@ def dummy_maker(df, threshold=0.9) -> pd.DataFrame:
 def fill_missing(df: pd.DataFrame) -> pd.DataFrame:
 
     # fill language_code
-    try:
-        df["track", "language_code"] = df["track", "language_code"].fillna(
-            detect(str(df["track", "title"]))
-        )
-        del df[("track", "title")]
-    except:
-        pass
+    df["track", "language_code"] = df["track", "language_code"].fillna(
+        detect(str(df["track", "title"]))
+    )
 
     # elimino le row che hanno valori mancanti
     df = df[df[("album", "type")].notna()]
