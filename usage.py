@@ -6,14 +6,12 @@ import utils
 pretty.install()
 # genres = utils.load("data/genres.csv")
 # echonest = utils.load("data/echonest.csv")
-tracks = utils.load(
-    "data/tracks.csv", buckets="basic", dummies=True, fill=True, outliers=True
-)
+tracks = utils.load_tracks(buckets="continuous", dummies=True, fill=True, outliers=True)
 # artists = utils.load("data/raw_artists.csv")
 
 print(tracks.info())
 
-# exit()
+exit()
 threshold = 0.9
 
 low_coverage = []

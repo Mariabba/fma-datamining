@@ -1,5 +1,6 @@
 import ast
 from pathlib import Path
+import pickle
 
 import numpy as np
 import pandas as pd
@@ -114,6 +115,10 @@ def load(
          This will still work as usual anyways. :kiss: [/magenta]\n"""
         )
 
+    pipi = check_pickle(buckets, dummies, fill, outliers)
+    if pipi["status"]:  # must be boolean
+        return pipi["df"]  # must be dataframe
+
     filepath = Path(filepath)
     filename = filepath.name
 
@@ -189,6 +194,7 @@ def load(
     del df[("track", "genres_all")]
 
     df.attrs["df_name"] = filename
+    save_pickle(df, buckets, dummies, fill, outliers)
     return df
 
 
@@ -512,3 +518,37 @@ def treat_outliers(df: pd.DataFrame) -> pd.DataFrame:
     df_outliers = df_outliers.set_index(df.index)
 
     return df[df_outliers["0"] == 0]
+
+
+def check_pickle(buckets, dummies, fill, outliers):
+    pipi = {"status": False, "df": None}
+    path_to_pickle = make_pick_encoding(buckets, dummies, fill, outliers)
+
+    try:
+        pipi["df"] = pd.read_pickle(path_to_pickle)
+        pipi["status"] = True
+    except FileNotFoundError:
+        pass
+
+    return pipi
+
+
+def save_pickle(df, buckets, dummies, fill, outliers):
+    path_to_pickle = make_pick_encoding(buckets, dummies, fill, outliers)
+    df.to_pickle(path_to_pickle)
+
+
+def make_pick_encoding(buckets, dummies, fill, outliers) -> Path:
+    """
+    Remember that I put tracks hardcoded in here. If necessary other csv than tracks, must change it with
+    filename logic like in load()
+    """
+    encoded = "-"
+    encoded += "0" if buckets == "basic" else "1" if buckets == "continuous" else "2"
+    encoded += "1" if dummies else "0"
+    encoded += "1" if fill else "0"
+    encoded += "1" if outliers else "0"
+    encoded = "data/picks/tracks" + encoded + ".pkl"
+    path_to_pickle = Path(encoded)
+
+    return path_to_pickle
