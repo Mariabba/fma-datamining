@@ -471,7 +471,7 @@ def treat_outliers(df: pd.DataFrame) -> pd.DataFrame:
     Testato solo con: buckets="basic", dummies=True, fill=True
     """
     assert (
-        df.shape[0] == 99404
+        df.shape[0] == 99391
     ), "treat_outliers only tested with dummies=True, fill=True - did we recently change the shape of df?"
 
     df_outliers = pd.read_csv("strange_results/abod1072.csv")

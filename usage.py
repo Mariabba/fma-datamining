@@ -47,4 +47,3 @@ print(low_coverage)
 # df_knn = tracks[[blablaslsadasdldsaldsa]]
 
 print(tracks[("album", "type")].unique())
-

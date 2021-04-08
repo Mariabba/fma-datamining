@@ -92,8 +92,12 @@ column2drop = [
     ("track", "language_code"),
     ("track", "number"),
     ("track", "tags"),
-    ("track", "genres"),  # todo da trattare se si vuole inserire solo lei
+    ("track", "genres"),
     ("track", "genres_all"),
+    ("album", "id"),
+    ("album", "tracks"),
+    ("artist", "id"),
+    ("track", "date_recorded"),
 ]
 df.drop(column2drop, axis=1, inplace=True)
 print(df["album", "type"].unique())
@@ -106,6 +110,18 @@ column2encode = [
     ("album", "listens"),
     ("album", "type"),
     ("track", "license"),
+    ("album", "comments"),
+    ("album", "date_created"),
+    ("album", "favorites"),
+    ("artist", "comments"),
+    ("artist", "date_created"),
+    ("artist", "favorites"),
+    ("track", "comments"),
+    ("track", "date_created"),
+    ("track", "duration"),
+    ("track", "favorites"),
+    ("track", "interest"),
+    ("track", "listens"),
 ]
 for col in column2encode:
     le = LabelEncoder()
@@ -126,36 +142,22 @@ X_train, X_test, y_train, y_test = train_test_split(x, y, stratify=y, test_size=
 print(X_train.shape, X_test.shape)
 # Training the model.
 knn.fit(X_train, y_train)
-# Predict test data set.
+
+# Apply the knn on the training set
+print("Apply the KNN on the training set: \n")
+y_pred = knn.predict(X_train)
+print("Accuracy %s" % accuracy_score(y_train, y_pred))
+print("F1-score %s" % f1_score(y_train, y_pred, average=None))
+print(classification_report(y_train, y_pred))
+
+# Apply the KNN on the test set and evaluate the performance
+print("Apply the KNN on the test set and evaluate the performance: \n")
 Y_pred = knn.predict(X_test)
-
-# Checking performance our model with classification report.
-draw_confusion_matrix
-print("Accuracy:", metrics.accuracy_score(y_test, Y_pred))
-# confusion matrix
-print("\033[1m" "Confusion matrix" "\033[0m")
-
-plot_confusion_matrix(knn, X_test, y_test, cmap="Purples")
+print("Accuracy %s" % accuracy_score(y_test, Y_pred))
+print("F1-score %s" % f1_score(y_test, Y_pred, average=None))
+print(classification_report(y_test, Y_pred))
 draw_confusion_matrix(knn, X_test, y_test)
 
-print()
-
-print("\033[1m" "Classification report test" "\033[0m")
-print(classification_report(y_test, Y_pred))
-
-
-print()
-
-print("\033[1m" "Metrics" "\033[0m")
-print()
-
-print("Accuracy %s" % accuracy_score(y_test, Y_pred))
-
-print("F1-score %s" % f1_score(y_test, Y_pred, average=None))
-
-print("Precision %s" % precision_score(y_test, Y_pred, average=None))
-
-print("Recall %s" % recall_score(y_test, Y_pred, average=None))
 
 """ROC Curve"""
 
@@ -174,7 +176,6 @@ for i in range(4):
 
     roc_auc = roc_auc_score(by_test, by_pred, average=None)
 
-
 plt.figure(figsize=(8, 5))
 for i in range(4):
     plt.plot(
@@ -186,7 +187,7 @@ for i in range(4):
 plt.plot([0, 1], [0, 1], "k--")
 plt.xlim([0.0, 1.0])
 plt.ylim([0.0, 1.05])
-plt.title("KNN Roc-Curve")
+plt.title("KNN  Roc-Curve")
 plt.xlabel("False Positive Rate", fontsize=10)
 plt.ylabel("True Positive Rate", fontsize=10)
 plt.tick_params(axis="both", which="major", labelsize=12)

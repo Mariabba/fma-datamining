@@ -74,7 +74,9 @@ def report(results, n_top=3):
 
 
 def load_data(path):
-    df = utils.load(path, dummies=True, buckets="discrete", fill=True) #TODO Load tracks method
+    df = utils.load(
+        path, dummies=True, buckets="discrete", fill=True
+    )  # TODO Load tracks method
 
     # feature to drop
     column2drop = [
@@ -153,7 +155,11 @@ def tuning_param(df, target1, target2):
     }
 
     clf = DecisionTreeClassifier(
-        criterion="gini", max_depth=None, min_samples_split=2, min_samples_leaf=1, class_weight='balanced'
+        criterion="gini",
+        max_depth=None,
+        min_samples_split=2,
+        min_samples_leaf=1,
+        class_weight="balanced",
     )
 
     random_search = RandomizedSearchCV(clf, param_distributions=param_list, n_iter=100)
@@ -222,7 +228,7 @@ def build_model(
         max_depth=max_depth,
         min_samples_split=min_samples_split,
         min_samples_leaf=min_samples_leaf,
-        class_weight='balanced',
+        class_weight="balanced",
     )
     clf.fit(X_train, y_train)
     # value importance
@@ -337,4 +343,4 @@ tuning_param(tracks, "album", "type")
 # tuning_param_gridsearch(tracks, "album", "type")
 # build_model(tracks, "album", "type", 100, 100, 8, "entropy")
 # build_model(tracks, "album", "type", 2, 1, 20, "entropy")
-#build_model(tracks, "album", "type", 20, 100, 20, "entropy")
+# build_model(tracks, "album", "type", 20, 100, 20, "entropy")

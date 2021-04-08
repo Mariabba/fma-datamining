@@ -8,56 +8,35 @@ from pyod.utils.data import get_outliers_inliers
 from scipy.stats import stats
 
 from sklearn.model_selection import GridSearchCV, train_test_split
+from sklearn.preprocessing import LabelEncoder
 
 import utils
 
-df = utils.load("data/tracks.csv", dummies=True, buckets="basic", fill=True)
-
+df = utils.load_tracks(
+    "data/tracks.csv", dummies=True, buckets="basic", fill=True, outliers=False
+)
+df.info()
 
 column2drop = [
-    ("album", "tags"),
-    ("artist", "tags"),
-    ("track", "tags"),
-    ("track", "genres"),
+    ("track", "genre_top"),
     ("track", "genres_all"),
-    ("track", "license"),
     ("track", "language_code"),
-    ("album", "title"),
-    ("artist", "name"),
-    ("set", "split"),
-    ("track", "title"),
-    ("album", "id"),
-    ("artist", "id"),
-    ("album", "date_created"),
+    ("track", "license"),
 ]
 df.drop(column2drop, axis=1, inplace=True)
 
 # Riformatto le date
 
 df["artist", "date_created"] = df["artist", "date_created"].astype("Int64")
-# stampo qualche valore
+# encoding
+label_encoders = dict()
+column2encode = []
+for col in column2encode:
+    le = LabelEncoder()
+    df[col] = le.fit_transform(df[col])
+    label_encoders[col] = le
 
-print(df["artist", "date_created"].unique())
-print(df["album", "listens"].unique())
-print(df["album", "information"].unique())
-column2drop = [
-    ("album", "engineer"),
-    ("album", "information"),
-    ("album", "producer"),
-    ("artist", "active_year_end"),
-    ("artist", "wikipedia_page"),
-    ("artist", "website"),
-    ("artist", "bio"),
-    ("track", "composer"),
-    ("track", "date_recorded"),
-    ("track", "information"),
-    ("track", "lyricist"),
-    ("track", "publisher"),
-    ("artist", "date_created"),
-    ("track", "date_recorded"),
-    ("track", "date_created"),
-]
-df.drop(column2drop, axis=1, inplace=True)
+
 df.info()
 
 class_name = ("album", "type")
@@ -113,4 +92,4 @@ print(type(outliers))
 
 miao = pd.Series(outliers)
 print(miao)
-miao.to_csv("strange_results/abod.csv")
+miao.to_csv("strange_results/abod1072.csv")
