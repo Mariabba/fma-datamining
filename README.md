@@ -30,6 +30,7 @@ import utils
 ### utils.load_tracks_xyz -> dict
 ```python
 - filepath="data/tracks.csv",
+- splits=3,
 - buckets="basic",
 - dummies=True,
 - fill=True,
@@ -37,11 +38,23 @@ import utils
 - extractclass=None
 ```
 
-Parameter usage is the same as `utils.load_tracks()`, below.
+Parameter usage is the same as `utils.load_tracks()`, below, except for these differences:
 
+
+If extractclass=column : returns a dict of [train_x, train_y, vali_x, vali_y, test_x, test_y]
+    or if extractclass=column, splits = 2 : returns dict of [train_x, train_y, test_x, test_y]
+
+#### with splits=3 (default)
 **Returns** a dict of 3 **pd.Dataframe** from tracks.csv. The dataframes are contained in a dict for which the keys are _"train"_, _"vali"_, _"test"_.
 
-However if extractclass=*some_column* this function **returns** a **dict** with keys: [*"train_x"*, *"train_y"*, *"vali_x"*, *"vali_y"*, *"test_x"*, *"test_y"*]. Each of the three **_x** versions contains all the attributes except *some_column*. Each of the three **_y** versions contains just *some_column*. All of the 6 versions are type **pd.Dataframe**. The correct row indexes are retained in all dataframes.
+If **extractclass**=*some_column* this function **returns** a **dict** of 6 items with keys: [*"train_x"*, *"train_y"*, *"vali_x"*, *"vali_y"*, *"test_x"*, *"test_y"*].
+
+Each of the three **_x** versions are type **pd.Dataframe** and contain all the attributes except *some_column*. Each of the three **_y** versions are **pd.Series** and contain just *some_column*. The correct row indexes are retained in all.
+
+#### with splits=2
+**Returns** dict of 2 **pd.Dataframe** from tracks.csv: [_"train"_, _"test"_]
+
+If **extractclass**=*some_column* **returns** a **dict** with keys: [*"train_x"*, *"train_y"*, *"test_x"*, *"test_y"*].
 
 #### Examples
 ##### Load the three dataframes
@@ -65,7 +78,7 @@ print(train.info())
 dfs = utils.load_tracks_xyz(extractclass=("track", "listens"))
 
 print(dfs['train_x'].info())
-print(dfs['train_y'].info())  # Dataframe, contains only ("track", "listens")
+print(dfs['train_y'].describe())  # Series, contains only ("track", "listens")
 ```
 
 ### utils.load_tracks -> pd.Dataframe
@@ -77,7 +90,7 @@ print(dfs['train_y'].info())  # Dataframe, contains only ("track", "listens")
 - outliers=True
 ```
 
-- filepath is only changed when you put your files inside of subfolders
+- filepath should only be changed when you put your files inside of subfolders
 - buckets (_basic_, _continuous_, _discrete_): basic is discretizations we use for everything, discrete only for methods who prefer discrete attributes (like decision tree), continuous only for methods who prefer continuous attributes (like knn)
 - dummies: Makes dummies out of columns with coverage <10% and a few more special cases hard coded in `utils.dummy_maker()`
 - fill: will fill missing values but so far it only deletes rows that contain outliers

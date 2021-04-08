@@ -1,5 +1,4 @@
 import ast
-from datetime import datetime
 from pathlib import Path
 
 import numpy as np
@@ -8,39 +7,54 @@ from langdetect import detect
 from sklearn.preprocessing import MultiLabelBinarizer
 
 try:
-    from rich.progress import Progress, track
+    from rich import print
 except ModuleNotFoundError:
     pass
 
 
 def load_tracks_xyz(
     filepath="data/tracks.csv",
+    splits=3,
     buckets="basic",
     dummies=True,
     fill=True,
     outliers=True,
     extractclass=None,
+    _good=True,
 ) -> dict:
-    """
-    Same usage as load(), with everything turned on though
-    Returns tuple of pd.Dataframe from tracks.csv: (train_df, validation_df, test_df)
+    docstring = """
+    Same usage as load_tracks(), except for these differences:
+    Returns dict of pd.Dataframe from tracks.csv: ["train", "vali", "test"]
+
+    If splits = 2, returns dict of pd.Dataframe from tracks.csv: ["train", "test"]
 
     If extractclass=column : returns a dict of [train_x, train_y, vali_x, vali_y, test_x, test_y]
+    or if extractclass=column, splits = 2 : returns dict of [train_x, train_y, test_x, test_y]
     """
-    df = load(filepath, buckets, dummies, fill, outliers)
+    df = load(filepath, buckets, dummies, fill, outliers, _good)
 
     # split train, vali, test
     mask_train = df[("set", "split")] == "training"
-    mask_vali = df[("set", "split")] == "validation"
-    mask_test = df[("set", "split")] == "test"
     df_train = df[mask_train]
-    df_vali = df[mask_vali]
-    df_test = df[mask_test]
     del df_train[("set", "split")]
-    del df_vali[("set", "split")]
-    del df_test[("set", "split")]
 
-    all_dfs = {"train": df_train, "vali": df_vali, "test": df_test}
+    if splits == 3:
+        mask_vali = df[("set", "split")] == "validation"
+        mask_test = df[("set", "split")] == "test"
+        df_vali = df[mask_vali]
+        df_test = df[mask_test]
+        del df_vali[("set", "split")]
+        del df_test[("set", "split")]
+        all_dfs = {"train": df_train, "vali": df_vali, "test": df_test}
+    elif splits == 2:
+        mask_test = (df[("set", "split")] == "test") | (
+            df[("set", "split")] == "validation"
+        )
+        df_test = df[mask_test]
+        del df_test[("set", "split")]
+        all_dfs = {"train": df_train, "test": df_test}
+    else:
+        raise ValueError(docstring)
 
     # extractclass
     if not extractclass:
@@ -60,22 +74,45 @@ def load_tracks(
     dummies=True,
     fill=True,
     outliers=True,
+    _good=True,
 ) -> pd.DataFrame:
-    df = load(filepath, buckets, dummies, fill, outliers)
+    docstring = """
+    usage: load_tracks(string filepath default data/tracks.csv,
+    buckets='basic|continuous|discrete' default basic,
+    dummies=True|False default True,
+    fill=True|False default True,
+    outliers=True|False default True
+    """
+
+    # integrity check
+    if buckets not in ["basic", "continuous", "discrete"]:
+        raise ValueError(docstring)
+
+    df = load(filepath, buckets, dummies, fill, outliers, _good)
     del df[("set", "split")]
 
     return df
 
 
 def load(
-    filepath: str, buckets="basic", dummies=False, fill=False, outliers=False
+    filepath: str,
+    buckets="basic",
+    dummies=False,
+    fill=False,
+    outliers=False,
+    _good=False,
 ) -> pd.DataFrame:
-    docstring = """
-    usage: load(string filepath,
-    buckets='basic|continuous|discrete' default basic,
-    dummies=True|False default False,
-    fill=True|False default False
     """
+    private function
+    """
+
+    if not _good:
+        print(
+            """\n[magenta]Warning: utils.load() should be a private method. :vampire:
+         Use utils.load_tracks() or utils.load_tracks_xyz() instead.
+         See README.md for usage.
+         This will still work as usual anyways. :kiss: [/magenta]\n"""
+        )
 
     filepath = Path(filepath)
     filename = filepath.name
@@ -136,7 +173,7 @@ def load(
     elif buckets == "discrete":
         df = discretizer_discretemethods(df)
     else:
-        raise ValueError(docstring)
+        raise ValueError
     df = discretizer(df)
 
     if dummies:
