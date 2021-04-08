@@ -40,10 +40,6 @@ import utils
 
 Parameter usage is the same as `utils.load_tracks()`, below, except for these differences:
 
-
-If extractclass=column : returns a dict of [train_x, train_y, vali_x, vali_y, test_x, test_y]
-    or if extractclass=column, splits = 2 : returns dict of [train_x, train_y, test_x, test_y]
-
 #### with splits=3 (default)
 **Returns** a dict of 3 **pd.Dataframe** from tracks.csv. The dataframes are contained in a dict for which the keys are _"train"_, _"vali"_, _"test"_.
 
