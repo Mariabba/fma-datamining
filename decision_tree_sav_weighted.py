@@ -38,6 +38,7 @@ from sklearn.preprocessing import LabelEncoder
 from sklearn.tree import DecisionTreeClassifier
 
 import utils
+from sklearn.utils import class_weight
 
 os.environ["PATH"] += (
     os.pathsep
@@ -75,7 +76,7 @@ def report(results, n_top=3):
 
 def load_data(path):
     dfs = utils.load_tracks_xyz(
-        buckets="discrete", splits=2, extractclass=("album", "type"), outliers=False
+        buckets="discrete", splits=2, extractclass=("album", "type"), outliers=True
     )
     # feature to reshape
     label_encoders = dict()
@@ -174,11 +175,16 @@ def build_model(
     df, target1, target2, min_samples_split, min_samples_leaf, max_depth, criterion
 ):
 
+    #class_weights = dict(class_weight.compute_class_weight('balanced',
+    #                                                  np.unique(df["train_y"]),
+    #                                                  df["train_y"]))
     clf = DecisionTreeClassifier(
         criterion=criterion,
         max_depth=max_depth,
         min_samples_split=min_samples_split,
         min_samples_leaf=min_samples_leaf,
+        #class_weight={0:1, 1:4, 2:3, 3:5}
+        class_weight={0:0.28, 1:4.70, 2:3.60, 3:31.46}
     )
     clf.fit(df["train_x"], df["train_y"])
     # value importance
