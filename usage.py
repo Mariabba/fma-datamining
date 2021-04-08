@@ -13,7 +13,7 @@ tracks = utils.load(
 
 print(tracks.info())
 
-exit()
+# exit()
 threshold = 0.9
 
 low_coverage = []
