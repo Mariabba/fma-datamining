@@ -383,9 +383,10 @@ def discretizer_discretemethods(df: pd.DataFrame) -> pd.DataFrame:
     s = s.apply(search_for_death)
 
     mlb = MultiLabelBinarizer()
-    my_dummies = pd.DataFrame(
-        mlb.fit_transform(s), columns=mlb.classes_, index=df.index
-    )
+    dumm = mlb.fit_transform(s)
+    index_columns = pd.MultiIndex.from_product([["genre"], mlb.classes_])
+
+    my_dummies = pd.DataFrame(dumm, columns=index_columns, index=df.index)
 
     df = pd.concat([df, my_dummies], axis=1)
 
