@@ -79,36 +79,27 @@ def conf_mat_disp(confusion_matrix, disp_labels):
 
 
 # DATASET
-df = utils.load(
-    "data/tracks.csv", dummies=True, buckets="continuous", fill=True, outliers=True
+# DATASET
+# df = utils.load_tracks(
+#   "data/tracks.csv", dummies=True, buckets="continuous", fill=True, outliers=True
+# )
+
+dfs = utils.load_tracks_xyz(
+    buckets="continuous", splits=2, extractclass=("album", "type")
 )
+
 column2drop = [
-    ("album", "title"),
-    ("artist", "name"),
-    ("set", "split"),
-    ("track", "title"),
-    ("album", "tags"),
-    ("artist", "tags"),
     ("track", "language_code"),
-    ("track", "number"),
-    ("track", "tags"),
-    ("track", "genres"),
-    ("track", "genres_all"),
-    ("album", "id"),
-    ("album", "tracks"),
-    ("artist", "id"),
-    ("track", "date_recorded"),
 ]
-df.drop(column2drop, axis=1, inplace=True)
-print(df["album", "type"].unique())
-print(df["album", "type"].value_counts())
-df = df[df["album", "type"] != "Contest"]
+
+dfs["train_x"].drop(column2drop, axis=1, inplace=True)
+dfs["test_x"].drop(column2drop, axis=1, inplace=True)
+# print(["album", "type"].unique())
 
 # feature to reshape
 label_encoders = dict()
 column2encode = [
     ("album", "listens"),
-    ("album", "type"),
     ("track", "license"),
     ("album", "comments"),
     ("album", "date_created"),
@@ -125,11 +116,15 @@ column2encode = [
 ]
 for col in column2encode:
     le = LabelEncoder()
-    df[col] = le.fit_transform(df[col])
+    dfs["train_x"][col] = le.fit_transform(dfs["train_x"][col])
+    dfs["test_x"][col] = le.fit_transform(dfs["test_x"][col])
     label_encoders[col] = le
 
-print(df.info())
-
+le1 = LabelEncoder()
+dfs["train_y"] = le1.fit_transform(dfs["train_y"])
+dfs["test_y"] = le1.fit_transform(dfs["test_y"])
+label_encoders[("album", "type")] = le1
+"""
 # Create KNN Object.
 knn = KNeighborsClassifier(
     n_neighbors=2, p=1
@@ -159,7 +154,7 @@ print(classification_report(y_test, Y_pred))
 draw_confusion_matrix(knn, X_test, y_test)
 
 
-"""ROC Curve"""
+#""" """ROC Curve""" """
 
 lb = LabelBinarizer()
 lb.fit(y_test)
@@ -193,3 +188,4 @@ plt.ylabel("True Positive Rate", fontsize=10)
 plt.tick_params(axis="both", which="major", labelsize=12)
 plt.legend(loc="lower right", fontsize=7, frameon=False)
 plt.show()
+"""

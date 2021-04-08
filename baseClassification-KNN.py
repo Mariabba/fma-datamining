@@ -85,23 +85,9 @@ df = utils.load_tracks(
 )
 
 column2drop = [
-    # ("album", "title"),
-    # ("artist", "name"),
-    # ("set", "split"),
-    # ("track", "title"),
-    # ("album", "tags"),
-    # ("artist", "tags"),
     ("track", "language_code"),
-    # ("track", "number"),
-    # ("track", "tags"),
-    # ("track", "genres"),
-    ("track", "genres_all"),
-    ("track", "genre_top"),
-    # ("album", "id"),
-    # ("album", "tracks"),
-    # ("artist", "id"),
-    # ("track", "date_recorded"),
 ]
+
 df.drop(column2drop, axis=1, inplace=True)
 print(df["album", "type"].unique())
 
