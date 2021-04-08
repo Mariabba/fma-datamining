@@ -108,9 +108,7 @@ def load_data(path):
 
 
 def tuning_param(target1, target2):
-    df = utils.load_tracks(
-        "data/tracks.csv", outliers=False
-    )
+    df = utils.load_tracks("data/tracks.csv", outliers=False)
     # feature to reshape
     label_encoders = dict()
     column2encode = [
@@ -139,9 +137,7 @@ def tuning_param(target1, target2):
     X = df[attributes].values
     y = df[target1, target2]
 
-    X_train, X_test, y_train, y_test = train_test_split(
-        X, y, test_size=0.20
-    )
+    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.20)
     print(X_train.shape, X_test.shape)
 
     # tuning hyperparam with randomize search
@@ -171,11 +167,12 @@ def tuning_param(target1, target2):
     random_search.fit(X, y)
     report(random_search.cv_results_, n_top=10)
 
+
 def build_model(
     df, target1, target2, min_samples_split, min_samples_leaf, max_depth, criterion
 ):
 
-    #class_weights = dict(class_weight.compute_class_weight('balanced',
+    # class_weights = dict(class_weight.compute_class_weight('balanced',
     #                                                  np.unique(df["train_y"]),
     #                                                  df["train_y"]))
     clf = DecisionTreeClassifier(
@@ -183,16 +180,14 @@ def build_model(
         max_depth=max_depth,
         min_samples_split=min_samples_split,
         min_samples_leaf=min_samples_leaf,
-        #class_weight={0:1, 1:4, 2:3, 3:5}
-        class_weight={0:0.28, 1:4.70, 2:3.60, 3:31.46}
+        # class_weight={0:1, 1:4, 2:3, 3:5}
+        class_weight={0: 0.28, 1: 4.70, 2: 3.60, 3: 31.46},
     )
     clf.fit(df["train_x"], df["train_y"])
     # value importance
 
     # split dataset train and set
-    dfs = utils.load_tracks(
-        "data/tracks.csv", outliers=False, buckets="discrete"
-    )
+    dfs = utils.load_tracks("data/tracks.csv", outliers=False, buckets="discrete")
     attributes = [col for col in dfs.columns if col != (target1, target2)]
     X = dfs[attributes].values
     y = dfs[target1, target2]
@@ -247,7 +242,10 @@ def build_model(
     print("\033[1m" "Metrics" "\033[0m")
 
     print("Accuracy %s" % accuracy_score(df["test_y"], y_pred))
-    print("F1-score %s" % f1_score(df["test_y"], y_pred, average="weighted", zero_division=0))
+    print(
+        "F1-score %s"
+        % f1_score(df["test_y"], y_pred, average="weighted", zero_division=0)
+    )
 
     confusion_matrix(df["test_y"], y_pred)
 
@@ -298,12 +296,11 @@ def build_model(
     print()
 
 
-
 tracks = load_data("data/tracks.csv")
-#tuning_param("album", "type")
+# tuning_param("album", "type")
 
-#build_model(tracks, "album", "type", 100, 100, 8, "entropy")
-#build_model(tracks, "album", "type", 2, 1, 20, "entropy")
-#build_model(tracks, "album", "type", 20, 100, 20, "entropy")
-#build_model(tracks, "album", "type", 20, 20, 9, "gini")
+# build_model(tracks, "album", "type", 100, 100, 8, "entropy")
+# build_model(tracks, "album", "type", 2, 1, 20, "entropy")
+# build_model(tracks, "album", "type", 20, 100, 20, "entropy")
+# build_model(tracks, "album", "type", 20, 20, 9, "gini")
 build_model(tracks, "album", "type", 10, 10, 9, "gini")

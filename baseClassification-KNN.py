@@ -143,7 +143,7 @@ Y_pred = knn.predict(X_test)
 print("Accuracy %s" % accuracy_score(y_test, Y_pred))
 print("F1-score %s" % f1_score(y_test, Y_pred, average=None))
 print(classification_report(y_test, Y_pred))
-draw_confusion_matrix(knn, X_test, y_test)
+draw_confusion_matrix(knn, X_test, Y_pred)
 
 """ROC Curve"""
 
