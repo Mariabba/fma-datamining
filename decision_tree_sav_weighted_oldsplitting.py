@@ -27,6 +27,7 @@ from IPython.display import Image
 from sklearn.model_selection import StratifiedShuffleSplit
 
 import os
+from sklearn.utils import class_weight
 
 os.environ["PATH"] += (
     os.pathsep
@@ -145,7 +146,7 @@ def tuning_param_gridsearch(df, target1, target2):
     y = df[target1, target2]
 
     X_train, X_test, y_train, y_test = train_test_split(
-        X, y, stratify=y, test_size=0.25
+        X, y, stratify=y, test_size=0.20
     )
     print(X_train.shape, X_test.shape)
     clf = DecisionTreeClassifier(
@@ -188,16 +189,17 @@ def build_model(
     X = df[attributes].values
     y = df[target1, target2]
 
-    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.25)
+    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.20, stratify=y)
 
     print(X_train.shape, X_test.shape)
     # build a model
-
     clf = DecisionTreeClassifier(
         criterion=criterion,
         max_depth=max_depth,
         min_samples_split=min_samples_split,
         min_samples_leaf=min_samples_leaf,
+        #class_weight={0:1, 1:4, 2:3, 3:5}
+        class_weight='balanced'
     )
     clf.fit(X_train, y_train)
 
@@ -269,23 +271,36 @@ def build_model(
     draw_confusion_matrix(clf, X_test, y_test)
 
     print()
-    """
-    #visualize the tree
-    dot_data = tree.export_graphviz(clf, out_file=None,
-                                    feature_names=attributes,
-                                    class_names=clf.classes_,
-                                    filled=True, rounded=True,
-                                    special_characters=True)
-    graph = pydotplus.graph_from_dot_data(dot_data)
-    Image(graph.create_png())
 
-    graph2 = graphviz.Source(dot_data)
-    graph2.format = "png"
-    graph2.render("tree")
-    """
+    for col, imp in zip(attributes, clf.feature_importances_):
+        print(col, imp)
+
+    top_n = 10
+    feat_imp = pd.DataFrame(columns=["columns", "importance"])
+    for col, imp in zip(attributes, clf.feature_importances_):
+        feat_imp = feat_imp.append(
+            {"columns": col, "importance": imp}, ignore_index=True
+        )
+    print(feat_imp)
+
+    feat_imp.sort_values(by="importance", ascending=False, inplace=True)
+    feat_imp = feat_imp.iloc[:top_n]
+
+    feat_imp.plot(
+        title="Top 10 features contribution",
+        x="columns",
+        fontsize=8.5,
+        rot=15,
+        y="importance",
+        kind="bar",
+        colormap="Pastel1",
+    )
+    plt.show()
 
 
-tracks = load_data("../data/tracks.csv")
+
+
+tracks = load_data("data/tracks.csv")
 # tuning_param(tracks, "album", "type")
 # tuning_param_gridsearch(tracks, "album", "type")
 build_model(tracks, "album", "type", 100, 100, 8, "entropy")
