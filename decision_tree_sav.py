@@ -82,6 +82,7 @@ def load_data(path):
         ("album", "tags"),  # might be usefull to include them, but how?
         ("album", "id"),
         ("album", "tracks"),
+        ("track", "date_recorded"),
         ("set", "split"),
         ("track", "title"),
         ("artist", "id"),

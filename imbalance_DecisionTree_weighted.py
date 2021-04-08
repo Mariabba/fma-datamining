@@ -74,7 +74,7 @@ def report(results, n_top=3):
 
 
 def load_data(path):
-    df = utils.load(path, dummies=True, buckets="discrete", fill=True)
+    df = utils.load(path, dummies=True, buckets="discrete", fill=True) #TODO Load tracks method
 
     # feature to drop
     column2drop = [
@@ -82,6 +82,7 @@ def load_data(path):
         ("album", "tags"),  # might be usefull to include them, but how?
         ("album", "id"),
         ("album", "tracks"),
+        ("track", "date_recorded"),
         ("set", "split"),
         ("track", "title"),
         ("artist", "id"),
