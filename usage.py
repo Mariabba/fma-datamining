@@ -7,12 +7,15 @@ pretty.install()
 # genres = utils.load("data/genres.csv")
 # echonest = utils.load("data/echonest.csv")
 tracks = utils.load(
-    "data/tracks.csv", buckets="basic", dummies=True, fill=True, outliers=True
+    "data/tracks.csv", buckets="basic", dummies=False, fill=False, outliers=False
 )
 # artists = utils.load("data/raw_artists.csv")
 
 print(tracks.info())
+tracks = utils.load_tracks(buckets="discrete")
+print(tracks.info())
 
+"""
 exit()
 threshold = 0.9
 
@@ -47,3 +50,4 @@ print(low_coverage)
 # df_knn = tracks[[blablaslsadasdldsaldsa]]
 
 print(tracks[("album", "type")].unique())
+"""
