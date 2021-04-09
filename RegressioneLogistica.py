@@ -51,7 +51,7 @@ attributes = [col for col in df.columns if col != class_name]
 X = df[attributes].values
 y = df[class_name]
 
-X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=100)
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.1, random_state=100)
 clf = LogisticRegression(random_state=0, multi_class='multinomial', solver='lbfgs', max_iter=1000)
 clf.fit(X_train, y_train)
 
