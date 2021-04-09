@@ -69,6 +69,33 @@ def load_tracks_xyz(
         return results
 
 
+def load_small_tracks(
+    filepath="data/tracks.csv",
+    buckets="basic",
+    dummies=True,
+    fill=True,
+    outliers=True,
+    _good=True,
+) -> pd.DataFrame:
+    df = load_tracks(filepath, buckets, dummies, fill, outliers, _good)
+
+    columns_to_keep = [
+        ("artist", "website"),
+        ("album", "producer"),
+        ("artist", "bio"),
+        ("album", "information"),
+        ("album", "engineer"),
+        ("artist", "active_year_end"),
+        ("track", "publisher"),
+        ("track", "duration"),  # continuous from here on out
+        ("track", "listens"),
+        ("track", "interest"),
+    ]
+
+    df = df[columns_to_keep]
+    return df
+
+
 def load_tracks(
     filepath="data/tracks.csv",
     buckets="basic",
