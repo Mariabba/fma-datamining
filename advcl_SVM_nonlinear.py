@@ -26,31 +26,23 @@ def draw_confusion_matrix(Clf, X, y):
     ]
 
     for title, normalize in titles_options:
-        disp = plot_confusion_matrix(Clf, X, y, cmap="Purples", normalize=normalize)
+        disp = plot_confusion_matrix(Clf, X, y, cmap="Blues", normalize=normalize)
         disp.ax_.set_title(title)
 
     plt.show()
 
 
-df = utils.load(
+# DATASET
+df = utils.load_tracks(
     "data/tracks.csv", dummies=True, buckets="continuous", fill=True, outliers=True
 )
 
 column2drop = [
-    ("album", "title"),
-    ("artist", "name"),
-    ("set", "split"),
-    ("track", "title"),
-    ("album", "tags"),
-    ("artist", "tags"),
     ("track", "language_code"),
-    ("track", "number"),
-    ("track", "tags"),
-    ("track", "genres"),
-    ("track", "genres_all"),
 ]
+
 df.drop(column2drop, axis=1, inplace=True)
-df = df[df["album", "type"] != "Contest"]
+print(df["album", "type"].unique())
 
 # feature to reshape
 label_encoders = dict()
@@ -58,15 +50,12 @@ column2encode = [
     ("album", "listens"),
     ("album", "type"),
     ("track", "license"),
-    ("album", "id"),
     ("album", "comments"),
     ("album", "date_created"),
     ("album", "favorites"),
-    ("album", "tracks"),
     ("artist", "comments"),
     ("artist", "date_created"),
     ("artist", "favorites"),
-    ("artist", "id"),
     ("track", "comments"),
     ("track", "date_created"),
     ("track", "duration"),
@@ -79,6 +68,7 @@ for col in column2encode:
     df[col] = le.fit_transform(df[col])
     label_encoders[col] = le
 df.info()
+
 class_name = ("album", "type")
 
 attributes = [col for col in df.columns if col != class_name]
@@ -94,29 +84,32 @@ X_train = scaler.fit_transform(X_train)
 X_test = scaler.fit_transform(X_test)
 
 """NON LINEAR SVM CLASSIFIER"""
-"""valori con rbf
-Accuracy 0.9167005695687551
-F1-score [0.95982775 0.30219334 0.65465936 0.52244898]
+"""valori con rbf test
+Accuracy 0.9138018714401953
+F1-score  [0.95813611 0.2641196  0.65204003 0.49795918]
               precision    recall  f1-score   support
-           0       0.94      0.99      0.96     17183
-           1       0.80      0.19      0.30       998
-           2       0.67      0.64      0.65      1302
-           3       1.00      0.35      0.52       181
-    accuracy                           0.92     19664
-   macro avg       0.85      0.54      0.61     19664
-weighted avg       0.91      0.92      0.90     19664
+           0       0.93      0.98      0.96     17183
+           1       0.77      0.16      0.26       998
+           2       0.65      0.65      0.65      1302
+           3       0.95      0.34      0.50       181
+    accuracy                           0.91     19664
+   macro avg       0.83      0.53      0.59     19664
+weighted avg       0.91      0.91      0.90     19664
+
+
 
 valori con polynomial
-Accuracy 0.9203620829943043
-F1-score [0.96153082 0.32885375 0.67344544 0.67137809]
+Accuracy 0.9156834825061025
+F1-score  [0.95881468 0.29975826 0.66126543 0.5530303 ]
               precision    recall  f1-score   support
-           0       0.94      0.99      0.96     17183
-           1       0.78      0.21      0.33       998
-           2       0.69      0.66      0.67      1302
-           3       0.93      0.52      0.67       181
+           0       0.94      0.98      0.96     17183
+           1       0.77      0.19      0.30       998
+           2       0.66      0.66      0.66      1302
+           3       0.88      0.40      0.55       181
     accuracy                           0.92     19664
-   macro avg       0.83      0.60      0.66     19664
-weighted avg       0.91      0.92      0.91     19664
+   macro avg       0.81      0.56      0.62     19664
+weighted avg       0.91      0.92      0.90     19664
+
 
 valori con linear(stessa porcheria delle minear SVM)
 
@@ -125,15 +118,24 @@ si fa una prova con l'rbf e una con il polynomial per avere i valori besti
 """
 clf = SVC(
     gamma="auto",
-    kernel="rbf",
+    kernel="poly",
 )
 clf.fit(X_train, y_train)
 
-y_pred = clf.predict(X_test)
+# Apply on the training set
+print("Apply  on the training set: \n")
+Y_pred = clf.predict(X_train)
+print("Accuracy  %s" % accuracy_score(y_train, Y_pred))
+print("F1-score %s" % f1_score(y_train, Y_pred, average=None))
+print(classification_report(y_train, Y_pred))
 
+# Apply on the test set and evaluate the performance
+print("Apply on the test set and evaluate the performance: \n")
+y_pred = clf.predict(X_test)
 print("Accuracy %s" % accuracy_score(y_test, y_pred))
-print("F1-score %s" % f1_score(y_test, y_pred, average=None))
+print("F1-score  %s" % f1_score(y_test, y_pred, average=None))
 print(classification_report(y_test, y_pred))
+
 draw_confusion_matrix(clf, X_test, y_test)
 
 """ROC CURVE"""

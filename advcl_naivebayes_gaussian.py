@@ -32,36 +32,17 @@ def draw_confusion_matrix(Clf, X, y):
     plt.show()
 
 
-"""
-df = utils.load_tracks_xyz(buckets="continuous", extractclass=("album", "type"))
-# train_x, train_y, vali_x, vali_y, test_x, test_y
-clf = GaussianNB()
-clf.fit(df["train_x"], df["train_y"])
-print(clf)
-# y_pred = clf.predict(df["vali_x"])
-# print("Accuracy %s" % accuracy_score(df["vali_y"], y_pred))
-# print("F1-score %s" % f1_score(y_test, y_pred, average=None))
-# print(classification_report(y_test, y_pred))
-"""
-df = utils.load(
+# DATASET
+df = utils.load_tracks(
     "data/tracks.csv", dummies=True, buckets="continuous", fill=True, outliers=True
 )
 
 column2drop = [
-    ("album", "title"),
-    ("artist", "name"),
-    ("set", "split"),
-    ("track", "title"),
-    ("album", "tags"),
-    ("artist", "tags"),
     ("track", "language_code"),
-    ("track", "number"),
-    ("track", "tags"),
-    ("track", "genres"),
-    ("track", "genres_all"),
 ]
+
 df.drop(column2drop, axis=1, inplace=True)
-df = df[df["album", "type"] != "Contest"]
+print(df["album", "type"].unique())
 
 # feature to reshape
 label_encoders = dict()
@@ -69,15 +50,12 @@ column2encode = [
     ("album", "listens"),
     ("album", "type"),
     ("track", "license"),
-    ("album", "id"),
     ("album", "comments"),
     ("album", "date_created"),
     ("album", "favorites"),
-    ("album", "tracks"),
     ("artist", "comments"),
     ("artist", "date_created"),
     ("artist", "favorites"),
-    ("artist", "id"),
     ("track", "comments"),
     ("track", "date_created"),
     ("track", "duration"),
@@ -113,11 +91,21 @@ X_train, X_test, y_train, y_test = train_test_split(
 clf = GaussianNB()
 clf.fit(X_train, y_train)
 
-y_pred = clf.predict(X_test)
 
+# Apply on the training set
+print("Apply  on the training set: \n")
+Y_pred = clf.predict(X_train)
+print("Accuracy  %s" % accuracy_score(y_train, Y_pred))
+print("F1-score %s" % f1_score(y_train, Y_pred, average=None))
+print(classification_report(y_train, Y_pred))
+
+# Apply on the test set and evaluate the performance
+print("Apply on the test set and evaluate the performance: \n")
+y_pred = clf.predict(X_test)
 print("Accuracy %s" % accuracy_score(y_test, y_pred))
-print("F1-score %s" % f1_score(y_test, y_pred, average=None))
+print("F1-score  %s" % f1_score(y_test, y_pred, average=None))
 print(classification_report(y_test, y_pred))
+
 draw_confusion_matrix(clf, X_test, y_test)
 
 """ROC Curve"""

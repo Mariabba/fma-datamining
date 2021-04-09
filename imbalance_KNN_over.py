@@ -84,7 +84,7 @@ def conf_mat_disp(confusion_matrix, disp_labels):
 
 # DATASET
 df = utils.load_tracks(
-    "data/tracks.csv", dummies=True, buckets="continuous", fill=True, outliers=False
+    "data/tracks.csv", dummies=True, buckets="continuous", fill=True, outliers=True
 )
 
 column2drop = [
@@ -139,7 +139,6 @@ Y_pred = knn.predict(X_test)
 print("Accuracy %s" % accuracy_score(y_test, Y_pred))
 print("F1-score %s" % f1_score(y_test, Y_pred, average=None))
 print(classification_report(y_test, Y_pred))
-draw_confusion_matrix(knn, X_test, y_test)
 
 
 """EMBALANCE LEARNING"""
@@ -162,7 +161,7 @@ plt.scatter(
 plt.title("Standard KNN-PCA")
 plt.show()
 
-"""SMOTE OVERSAMPLING
+"""SMOTE OVERSAMPLING"""
 print("\033[1m" "Making Oversampling with Smote" "\033[0m")
 print("Original dataset shape y train %s" % Counter(y_train))
 
@@ -182,18 +181,28 @@ plt.title("KNN-PCA with SMOTE Oversampling")
 plt.show()
 
 # Classification knn with oversampling
-clf = KNeighborsClassifier(n_neighbors=2, p=1)
+clf = KNeighborsClassifier(n_neighbors=5, p=1)
 clf.fit(X_res, y_res)
 
-y_pred = clf.predict(X_test)
+# Apply the knn on the training set
+print("Apply the KNN-OVERSAMPLE on the training set: \n")
+y_pred = clf.predict(X_train)
+print("Accuracy KNN-OVERSAMPLE %s" % accuracy_score(y_train, y_pred))
+print("F1-score KNN-OVERSAMPLE %s" % f1_score(y_train, y_pred, average=None))
+print(classification_report(y_train, y_pred))
 
-print("Accuracy Of UnderSampling %s" % accuracy_score(y_test, y_pred))
-print("F1-score Of UnderSampling %s" % f1_score(y_test, y_pred, average=None))
-draw_confusion_matrix(knn, X_test, y_pred)
+# Apply the KNN on the test set and evaluate the performance
+print("Apply the KNN-OVERSAMPLE on the test set and evaluate the performance: \n")
+y_pred = clf.predict(X_test)
+print("Accuracy KNN-OVERSAMPLE %s" % accuracy_score(y_test, y_pred))
+print("F1-score KNN-OVERSAMPLE %s" % f1_score(y_test, y_pred, average=None))
 print(classification_report(y_test, y_pred))
+
+
+draw_confusion_matrix(clf, X_test, y_test)
 """
 
-"""RANDOM OVERSAMPLING"""
+RANDOM OVERSAMPLING
 
 print("\033[1m" "Making Oversampling with Random" "\033[0m")
 ros = RandomOverSampler(random_state=42)
@@ -231,7 +240,7 @@ print(classification_report(y_test, y_pred))
 
 
 draw_confusion_matrix(clf, X_test, y_test)
-
+"""
 """ROC Curve"""
 
 lb = LabelBinarizer()
@@ -260,7 +269,7 @@ for i in range(4):
 plt.plot([0, 1], [0, 1], "k--")
 plt.xlim([0.0, 1.0])
 plt.ylim([0.0, 1.05])
-plt.title("KNN-Oversampling Roc-Curve")
+plt.title("KNN-SMOTE-OverS Roc-Curve")
 plt.xlabel("False Positive Rate", fontsize=10)
 plt.ylabel("True Positive Rate", fontsize=10)
 plt.tick_params(axis="both", which="major", labelsize=12)

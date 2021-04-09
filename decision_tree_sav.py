@@ -107,9 +107,7 @@ def load_data(path):
 
 
 def tuning_param(target1, target2):
-    df = utils.load_tracks(
-        "data/tracks.csv", outliers=False
-    )
+    df = utils.load_tracks("data/tracks.csv", outliers=False)
     # feature to reshape
     label_encoders = dict()
     column2encode = [
@@ -138,9 +136,7 @@ def tuning_param(target1, target2):
     X = df[attributes].values
     y = df[target1, target2]
 
-    X_train, X_test, y_train, y_test = train_test_split(
-        X, y, test_size=0.20
-    )
+    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.20)
     print(X_train.shape, X_test.shape)
 
     # tuning hyperparam with randomize search
@@ -170,6 +166,7 @@ def tuning_param(target1, target2):
     random_search.fit(X, y)
     report(random_search.cv_results_, n_top=10)
 
+
 def build_model(
     df, target1, target2, min_samples_split, min_samples_leaf, max_depth, criterion
 ):
@@ -184,9 +181,7 @@ def build_model(
     # value importance
 
     # split dataset train and set
-    dfs = utils.load_tracks(
-        "data/tracks.csv", outliers=False, buckets="discrete"
-    )
+    dfs = utils.load_tracks("data/tracks.csv", outliers=False, buckets="discrete")
     attributes = [col for col in dfs.columns if col != (target1, target2)]
     X = dfs[attributes].values
     y = dfs[target1, target2]
@@ -292,12 +287,11 @@ def build_model(
     print()
 
 
-
 tracks = load_data("data/tracks.csv")
-#tuning_param("album", "type")
+# tuning_param("album", "type")
 
-#build_model(tracks, "album", "type", 100, 100, 8, "entropy")
-#build_model(tracks, "album", "type", 2, 1, 20, "entropy")
-#build_model(tracks, "album", "type", 20, 100, 20, "entropy")
-#build_model(tracks, "album", "type", 20, 20, 9, "gini")
+# build_model(tracks, "album", "type", 100, 100, 8, "entropy")
+# build_model(tracks, "album", "type", 2, 1, 20, "entropy")
+# build_model(tracks, "album", "type", 20, 100, 20, "entropy")
+# build_model(tracks, "album", "type", 20, 20, 9, "gini")
 build_model(tracks, "album", "type", 10, 10, 9, "gini")
