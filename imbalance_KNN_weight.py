@@ -145,8 +145,8 @@ print(classification_report(y_test, Y_pred))
 
 """CLASS WEIGHT"""
 print("\033[1m" "Making KNN with Class Weight" "\033[0m")
-
-clf = KNeighborsClassifier(n_neighbors=5, p=1, weights="distance")
+# gidsearch: weights': 'distance', 'p': 1, 'n_neighbors': 7}
+clf = KNeighborsClassifier(n_neighbors=7, p=1, weights="distance")
 clf.fit(X_train, y_train)
 
 # Apply the knn on the training set
@@ -201,7 +201,7 @@ plt.tick_params(axis="both", which="major", labelsize=12)
 plt.legend(loc="lower right", fontsize=7, frameon=False)
 plt.show()
 
-"""RANDOM SEARCH PIU' VELOCE"""
+"""RANDOM SEARCH PIU' VELOCE
 
 print("STA FACENDO LA GRIDSEARCH")
 param_list = {
@@ -222,3 +222,4 @@ print(
         random_search.cv_results_["rank_test_score"][0]
     ],
 )
+"""
