@@ -33,41 +33,26 @@ def draw_confusion_matrix(Clf, X, y):
     plt.show()
 
 
-df = utils.load(
-    "data/tracks.csv", dummies=True, buckets="continuous", fill=True, outliers=True
+# DATASET
+df = utils.load_tracks(
+    "data/tracks.csv", dummies=True, buckets="discrete", fill=True, outliers=True
 )
 
-column2drop = [
-    ("album", "title"),
-    ("artist", "name"),
-    ("set", "split"),
-    ("track", "title"),
-    ("album", "tags"),
-    ("artist", "tags"),
-    ("track", "language_code"),
-    ("track", "number"),
-    ("track", "tags"),
-    ("track", "genres"),
-    ("track", "genres_all"),
-]
-df.drop(column2drop, axis=1, inplace=True)
-df = df[df["album", "type"] != "Contest"]
+print(df["album", "type"].unique())
 
 # feature to reshape
 label_encoders = dict()
 column2encode = [
+    ("track", "language_code"),
     ("album", "listens"),
     ("album", "type"),
     ("track", "license"),
-    ("album", "id"),
     ("album", "comments"),
     ("album", "date_created"),
     ("album", "favorites"),
-    ("album", "tracks"),
     ("artist", "comments"),
     ("artist", "date_created"),
     ("artist", "favorites"),
-    ("artist", "id"),
     ("track", "comments"),
     ("track", "date_created"),
     ("track", "duration"),
@@ -80,6 +65,8 @@ for col in column2encode:
     df[col] = le.fit_transform(df[col])
     label_encoders[col] = le
 df.info()
+
+
 class_name = ("album", "type")
 
 attributes = [col for col in df.columns if col != class_name]
@@ -107,11 +94,20 @@ clf = RandomForestClassifier(
 )
 clf.fit(X_train, y_train)
 
-y_pred = clf.predict(X_test)
+# Apply on the training set
+print("Apply  on the training set: \n")
+Y_pred = clf.predict(X_train)
+print("Accuracy  %s" % accuracy_score(y_train, Y_pred))
+print("F1-score %s" % f1_score(y_train, Y_pred, average=None))
+print(classification_report(y_train, Y_pred))
 
+# Apply on the test set and evaluate the performance
+print("Apply on the test set and evaluate the performance: \n")
+y_pred = clf.predict(X_test)
 print("Accuracy %s" % accuracy_score(y_test, y_pred))
-print("F1-score %s" % f1_score(y_test, y_pred, average=None))
+print("F1-score  %s" % f1_score(y_test, y_pred, average=None))
 print(classification_report(y_test, y_pred))
+
 draw_confusion_matrix(clf, X_test, y_test)
 
 """ROC CURVE"""
@@ -149,7 +145,7 @@ plt.legend(loc="lower right", fontsize=7, frameon=False)
 plt.show()
 
 """Feature Importance"""
-nbr_features = 30
+nbr_features = 43
 
 tree_feature_importances = clf.feature_importances_
 sorted_idx = tree_feature_importances.argsort()[-nbr_features:]
@@ -177,6 +173,7 @@ plt.boxplot(result.importances[sorted_idx].T, vert=False, labels=attributes)
 plt.title("Permutation Importances (test set)")
 plt.tight_layout()
 plt.show()
+
 """
 print("STA FACENDO LA GRIDSEARCH")
 param_list = {

@@ -83,7 +83,7 @@ def conf_mat_disp(confusion_matrix, disp_labels):
 
 # DATASET
 df = utils.load_tracks(
-    "data/tracks.csv", dummies=True, buckets="continuous", fill=True, outliers=False
+    "data/tracks.csv", dummies=True, buckets="continuous", fill=True, outliers=True
 )
 
 column2drop = [
@@ -138,7 +138,7 @@ Y_pred = knn.predict(X_test)
 print("Accuracy %s" % accuracy_score(y_test, Y_pred))
 print("F1-score %s" % f1_score(y_test, Y_pred, average=None))
 print(classification_report(y_test, Y_pred))
-draw_confusion_matrix(knn, X_test, y_test)
+
 
 """EMBALANCE LEARNING"""
 # PRINTING PCA FOR COMPARISON

@@ -26,31 +26,23 @@ def draw_confusion_matrix(Clf, X, y):
     ]
 
     for title, normalize in titles_options:
-        disp = plot_confusion_matrix(Clf, X, y, cmap="Purples", normalize=normalize)
+        disp = plot_confusion_matrix(Clf, X, y, cmap="Blues", normalize=normalize)
         disp.ax_.set_title(title)
 
     plt.show()
 
 
-df = utils.load(
+# DATASET
+df = utils.load_tracks(
     "data/tracks.csv", dummies=True, buckets="continuous", fill=True, outliers=True
 )
 
 column2drop = [
-    ("album", "title"),
-    ("artist", "name"),
-    ("set", "split"),
-    ("track", "title"),
-    ("album", "tags"),
-    ("artist", "tags"),
     ("track", "language_code"),
-    ("track", "number"),
-    ("track", "tags"),
-    ("track", "genres"),
-    ("track", "genres_all"),
 ]
+
 df.drop(column2drop, axis=1, inplace=True)
-df = df[df["album", "type"] != "Contest"]
+print(df["album", "type"].unique())
 
 # feature to reshape
 label_encoders = dict()
@@ -58,15 +50,12 @@ column2encode = [
     ("album", "listens"),
     ("album", "type"),
     ("track", "license"),
-    ("album", "id"),
     ("album", "comments"),
     ("album", "date_created"),
     ("album", "favorites"),
-    ("album", "tracks"),
     ("artist", "comments"),
     ("artist", "date_created"),
     ("artist", "favorites"),
-    ("artist", "id"),
     ("track", "comments"),
     ("track", "date_created"),
     ("track", "duration"),
@@ -79,6 +68,7 @@ for col in column2encode:
     df[col] = le.fit_transform(df[col])
     label_encoders[col] = le
 df.info()
+
 class_name = ("album", "type")
 
 attributes = [col for col in df.columns if col != class_name]
@@ -97,13 +87,23 @@ clf = LinearSVC(
 )
 clf.fit(X_train, y_train)
 
-y_pred = clf.predict(X_test)
+# Apply on the training set
+print("Apply  on the training set: \n")
+Y_pred = clf.predict(X_train)
+print("Accuracy  %s" % accuracy_score(y_train, Y_pred))
+print("F1-score %s" % f1_score(y_train, Y_pred, average=None))
+print(classification_report(y_train, Y_pred))
 
+# Apply on the test set and evaluate the performance
+print("Apply on the test set and evaluate the performance: \n")
+y_pred = clf.predict(X_test)
 print("Accuracy %s" % accuracy_score(y_test, y_pred))
-print("F1-score %s" % f1_score(y_test, y_pred, average=None))
+print("F1-score  %s" % f1_score(y_test, y_pred, average=None))
 print(classification_report(y_test, y_pred))
+
 draw_confusion_matrix(clf, X_test, y_test)
 
+"""ROC CURVE"""
 
 lb = LabelBinarizer()
 lb.fit(y_test)

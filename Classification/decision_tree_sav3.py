@@ -69,9 +69,7 @@ def report(results, n_top=3):
 
 
 def load_data(path):
-    df = utils.load_tracks(
-        path, outliers=False, buckets="discrete"
-    )
+    df = utils.load_tracks(path, outliers=False, buckets="discrete")
     # feature to reshape
     label_encoders = dict()
     column2encode = [
@@ -289,4 +287,4 @@ tracks = load_data("../data/tracks.csv")
 # tuning_param(tracks, "album", "type")
 # tuning_param_gridsearch(tracks, "album", "type")
 build_model(tracks, "album", "type", 100, 100, 8, "entropy")
-#build_model(tracks, "album", "type", 2, 1, 20, "entropy")
+# build_model(tracks, "album", "type", 2, 1, 20, "entropy")

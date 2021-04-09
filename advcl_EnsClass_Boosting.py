@@ -36,41 +36,26 @@ def draw_confusion_matrix(Clf, X, y):
     plt.show()
 
 
-df = utils.load(
-    "data/tracks.csv", dummies=True, buckets="continuous", fill=True, outliers=True
+# DATASET
+df = utils.load_tracks(
+    "data/tracks.csv", dummies=True, buckets="discrete", fill=True, outliers=True
 )
 
-column2drop = [
-    ("album", "title"),
-    ("artist", "name"),
-    ("set", "split"),
-    ("track", "title"),
-    ("album", "tags"),
-    ("artist", "tags"),
-    ("track", "language_code"),
-    ("track", "number"),
-    ("track", "tags"),
-    ("track", "genres"),
-    ("track", "genres_all"),
-]
-df.drop(column2drop, axis=1, inplace=True)
-df = df[df["album", "type"] != "Contest"]
+print(df["album", "type"].unique())
 
 # feature to reshape
 label_encoders = dict()
 column2encode = [
+    ("track", "language_code"),
     ("album", "listens"),
     ("album", "type"),
     ("track", "license"),
-    ("album", "id"),
     ("album", "comments"),
     ("album", "date_created"),
     ("album", "favorites"),
-    ("album", "tracks"),
     ("artist", "comments"),
     ("artist", "date_created"),
     ("artist", "favorites"),
-    ("artist", "id"),
     ("track", "comments"),
     ("track", "date_created"),
     ("track", "duration"),
@@ -83,6 +68,8 @@ for col in column2encode:
     df[col] = le.fit_transform(df[col])
     label_encoders[col] = le
 df.info()
+
+
 class_name = ("album", "type")
 
 attributes = [col for col in df.columns if col != class_name]
@@ -92,38 +79,38 @@ y = df[class_name]
 X_train, X_test, y_train, y_test = train_test_split(
     X, y, test_size=0.2, random_state=100, stratify=y
 )
-"""
-""" """ADA BOOST DECISION TREE""" """
-RISULTATI
-Accuracy 0.9840317331163547
-F1-score [0.99161718 0.89662028 0.970396   0.84679666]
-              precision    recall  f1-score   support
-           0       0.99      0.99      0.99     17183
-           1       0.89      0.90      0.90       998
-           2       0.97      0.97      0.97      1302
-           3       0.85      0.84      0.85       181
-    accuracy                           0.98     19664
-   macro avg       0.93      0.93      0.93     19664
-weighted avg       0.98      0.98      0.98     19664
 
-""" """
+"""ADA BOOST DECISION TREE
+
 clf = AdaBoostClassifier(
     base_estimator=DecisionTreeClassifier(
-        criterion="gini", max_depth=None, min_samples_split=2, min_samples_leaf=1
+        criterion="gini",
+        max_depth=9,
+        min_samples_split=10,
+        min_samples_leaf=10,
     ),
     n_estimators=100,
     random_state=0,
 )
 clf.fit(X_train, y_train)
 
-y_pred = clf.predict(X_test)
+# Apply on the training set
+print("Apply  on the training set: \n")
+Y_pred = clf.predict(X_train)
+print("Accuracy  %s" % accuracy_score(y_train, Y_pred))
+print("F1-score %s" % f1_score(y_train, Y_pred, average=None))
+print(classification_report(y_train, Y_pred))
 
+# Apply on the test set and evaluate the performance
+print("Apply on the test set and evaluate the performance: \n")
+y_pred = clf.predict(X_test)
 print("Accuracy %s" % accuracy_score(y_test, y_pred))
-print("F1-score %s" % f1_score(y_test, y_pred, average=None))
+print("F1-score  %s" % f1_score(y_test, y_pred, average=None))
 print(classification_report(y_test, y_pred))
+
 draw_confusion_matrix(clf, X_test, y_test)
 
-#ROC CURVE
+# ROC CURVE
 lb = LabelBinarizer()
 lb.fit(y_test)
 lb.classes_.tolist()
@@ -157,9 +144,10 @@ plt.tick_params(axis="both", which="major", labelsize=12)
 plt.legend(loc="lower right", fontsize=7, frameon=False)
 plt.show()
 
+
 """
-"""BOOSTING RANDOM FOREST"""
-"""
+"""BOOSTING RANDOM FOREST
+
 Risultati, ci mette anche lei mezz'ora
 Accuracy 0.9798616761594793
 F1-score [0.98922749 0.87834821 0.94351631 0.80921053]
@@ -188,13 +176,21 @@ clf = AdaBoostClassifier(
 )
 clf.fit(X_train, y_train)
 
+# Apply on the training set
+print("Apply  on the training set: \n")
+Y_pred = clf.predict(X_train)
+print("Accuracy  %s" % accuracy_score(y_train, Y_pred))
+print("F1-score %s" % f1_score(y_train, Y_pred, average=None))
+print(classification_report(y_train, Y_pred))
+
+# Apply on the test set and evaluate the performance
+print("Apply on the test set and evaluate the performance: \n")
 y_pred = clf.predict(X_test)
-
 print("Accuracy %s" % accuracy_score(y_test, y_pred))
-print("F1-score %s" % f1_score(y_test, y_pred, average=None))
+print("F1-score  %s" % f1_score(y_test, y_pred, average=None))
 print(classification_report(y_test, y_pred))
-draw_confusion_matrix(clf, X_test, y_test)
 
+draw_confusion_matrix(clf, X_test, y_test)
 """ROC CURVE"""
 lb = LabelBinarizer()
 lb.fit(y_test)
