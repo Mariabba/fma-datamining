@@ -42,7 +42,7 @@ from sklearn.metrics import (
 from sklearn.metrics import average_precision_score
 from sklearn.metrics import plot_confusion_matrix, ConfusionMatrixDisplay
 import seaborn as sns
-from sklearn.model_selection import train_test_split
+from sklearn.model_selection import train_test_split, RandomizedSearchCV
 from sklearn.model_selection import (
     cross_val_score,
     cross_validate,
@@ -200,3 +200,25 @@ plt.ylabel("True Positive Rate", fontsize=10)
 plt.tick_params(axis="both", which="major", labelsize=12)
 plt.legend(loc="lower right", fontsize=7, frameon=False)
 plt.show()
+
+"""RANDOM SEARCH PIU' VELOCE"""
+
+print("STA FACENDO LA GRIDSEARCH")
+param_list = {
+    "n_neighbors": list(np.arange(1, 10)),
+    "p": [1, 2],
+    "weights": ["uniform", "distance"],
+}
+
+random_search = RandomizedSearchCV(clf, param_distributions=param_list, n_iter=20, cv=5)
+random_search.fit(X_train, y_train)
+clf = random_search.best_estimator_
+
+y_pred = clf.predict(X_test)
+# Print The value of best Hyperparameters
+print(
+    "Best:",
+    random_search.cv_results_["params"][
+        random_search.cv_results_["rank_test_score"][0]
+    ],
+)
