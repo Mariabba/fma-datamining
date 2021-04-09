@@ -59,32 +59,10 @@ g = sns.jointplot(
 )
 plt.show()
 
-exit()
-
 # Multivariate
-column2drop = [
-    ("album", "title"),
-    ("album", "type"),
-    ("artist", "name"),
-    ("track", "title"),
-    ("album", "tags"),
-    ("artist", "tags"),
-    ("track", "language_code"),
-    ("track", "license"),
-    ("track", "number"),
-    ("track", "tags"),
-    ("track", "genres"),  # todo da trattare se si vuole inserire solo lei
-    ("track", "genres_all"),
-]
+column2drop = []
 
-all_dfs = utils.load_tracks_xyz(buckets="continuous", extractclass=("track", "listens"))
-
-for df in all_dfs:
-    try:
-        all_dfs[df] = all_dfs[df].drop(column2drop, axis=1)
-    except ValueError:
-        pass
-
+tracks = utils.load_small_tracks(buckets="continuous")
 
 reg = LinearRegression()
 reg.fit(all_dfs["train_x"].values, all_dfs["train_y"])
