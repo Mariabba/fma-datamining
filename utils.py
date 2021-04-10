@@ -80,6 +80,7 @@ def load_small_tracks(
     df = load_tracks(filepath, buckets, dummies, fill, outliers, _good)
 
     columns_to_keep = [
+        ("album", "type"),
         ("artist", "website"),
         ("album", "producer"),
         ("artist", "bio"),
