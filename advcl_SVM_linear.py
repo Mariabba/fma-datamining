@@ -32,7 +32,7 @@ def draw_confusion_matrix(Clf, X, y):
     plt.show()
 
 
-# DATASET
+# DATASET COMPLETO
 df = utils.load_tracks(
     "data/tracks.csv", dummies=True, buckets="continuous", fill=True, outliers=True
 )
@@ -43,7 +43,7 @@ column2drop = [
 
 df.drop(column2drop, axis=1, inplace=True)
 
-"""CAMBIO ALBUM TYPE IN BINARIA"""
+# CAMBIO ALBUM TYPE IN BINARIA
 print("prima", df["album", "type"].unique())
 df["album", "type"] = df["album", "type"].replace(
     ["Single Tracks", "Live Performance", "Radio Program"],
@@ -75,7 +75,22 @@ for col in column2encode:
     df[col] = le.fit_transform(df[col])
     label_encoders[col] = le
 df.info()
-
+"""
+# DATASET PICCOLINO
+df = utils.load_small_tracks(buckets="discrete")
+label_encoders = dict()
+column2encode = [
+    ("track", "duration"),
+    ("track", "interest"),
+    ("track", "listens"),
+    ("album", "type"),
+]
+for col in column2encode:
+    le = LabelEncoder()
+    df[col] = le.fit_transform(df[col])
+    label_encoders[col] = le
+df.info()
+"""
 class_name = ("album", "type")
 
 attributes = [col for col in df.columns if col != class_name]
@@ -87,10 +102,12 @@ X_train, X_test, y_train, y_test = train_test_split(
 )
 
 """LINEAR SVM """
+# Best: {'random_state': 42, 'max_iter': 5000, 'loss': 'squared_hinge', 'C': 100}
 clf = LinearSVC(
-    C=1,  # best param 0.1
+    C=100,  # best param 0.01
     random_state=42,
-    max_iter=3000,  # if i put minor iteration the results are worst, balanced class worst
+    max_iter=5000,  # 3000 per completo
+    loss="squared_hinge",
 )
 clf.fit(X_train, y_train)
 
@@ -132,7 +149,7 @@ for i in range(1):
     plt.plot(
         fpr[i],
         tpr[i],
-        # label="%s ROC curve (area = %0.2f)" % (lb.classes_.tolist()[i], roc_auc[i]),
+        label="%s ROC curve (area = %0.2f)" % (lb.classes_.tolist()[i], roc_auc[i]),
     )
 
 plt.plot([0, 1], [0, 1], "k--")
@@ -146,7 +163,7 @@ plt.legend(loc="lower right", fontsize=7, frameon=False)
 plt.show()
 
 
-"""RANDOM SEARCH PIU' VELOCE"""
+"""RANDOM SEARCH PIU' VELOCE
 
 print("STA FACENDO LA GRIDSEARCH")
 param_list = {
@@ -168,3 +185,4 @@ print(
         random_search.cv_results_["rank_test_score"][0]
     ],
 )
+"""

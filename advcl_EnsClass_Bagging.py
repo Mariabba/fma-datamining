@@ -35,7 +35,8 @@ def draw_confusion_matrix(Clf, X, y):
     plt.show()
 
 
-# DATASET
+"""
+# DATASET COMPLETO
 df = utils.load_tracks(
     "data/tracks.csv", dummies=True, buckets="discrete", fill=True, outliers=True
 )
@@ -61,6 +62,21 @@ column2encode = [
     ("track", "favorites"),
     ("track", "interest"),
     ("track", "listens"),
+]
+for col in column2encode:
+    le = LabelEncoder()
+    df[col] = le.fit_transform(df[col])
+    label_encoders[col] = le
+df.info()
+"""
+# DATASET PICCOLINO
+df = utils.load_small_tracks(buckets="discrete")
+label_encoders = dict()
+column2encode = [
+    ("track", "duration"),
+    ("track", "interest"),
+    ("track", "listens"),
+    ("album", "type"),
 ]
 for col in column2encode:
     le = LabelEncoder()

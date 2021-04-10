@@ -36,6 +36,7 @@ def draw_confusion_matrix(Clf, X, y):
     plt.show()
 
 
+"""
 # DATASET
 df = utils.load_tracks(
     "data/tracks.csv", dummies=True, buckets="discrete", fill=True, outliers=True
@@ -68,7 +69,21 @@ for col in column2encode:
     df[col] = le.fit_transform(df[col])
     label_encoders[col] = le
 df.info()
-
+"""
+# DATASET PICCOLINO
+df = utils.load_small_tracks(buckets="discrete")
+label_encoders = dict()
+column2encode = [
+    ("track", "duration"),
+    ("track", "interest"),
+    ("track", "listens"),
+    ("album", "type"),
+]
+for col in column2encode:
+    le = LabelEncoder()
+    df[col] = le.fit_transform(df[col])
+    label_encoders[col] = le
+df.info()
 
 class_name = ("album", "type")
 
@@ -80,7 +95,7 @@ X_train, X_test, y_train, y_test = train_test_split(
     X, y, test_size=0.2, random_state=100, stratify=y
 )
 
-"""ADA BOOST DECISION TREE
+"""ADA BOOST DECISION TREE"""
 
 clf = AdaBoostClassifier(
     base_estimator=DecisionTreeClassifier(
@@ -145,7 +160,6 @@ plt.legend(loc="lower right", fontsize=7, frameon=False)
 plt.show()
 
 
-"""
 """BOOSTING RANDOM FOREST
 
 Risultati, ci mette anche lei mezz'ora
@@ -159,7 +173,7 @@ F1-score [0.98922749 0.87834821 0.94351631 0.80921053]
     accuracy                           0.98     19664
    macro avg       0.99      0.84      0.91     19664
 weighted avg       0.98      0.98      0.98     19664
-"""
+
 clf = AdaBoostClassifier(
     base_estimator=RandomForestClassifier(
         n_estimators=100,
@@ -191,6 +205,7 @@ print("F1-score  %s" % f1_score(y_test, y_pred, average=None))
 print(classification_report(y_test, y_pred))
 
 draw_confusion_matrix(clf, X_test, y_test)
+"""
 """ROC CURVE"""
 lb = LabelBinarizer()
 lb.fit(y_test)
