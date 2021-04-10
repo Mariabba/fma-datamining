@@ -14,13 +14,13 @@ import numpy as np
 import matplotlib.pyplot as plt
 from sklearn.linear_model import LinearRegression, Ridge, Lasso
 
-class_name = ('album', 'type')
+class_name = ("album", "type")
 
-df = utils.load_tracks(
-    "data/tracks.csv", outliers=False, buckets="continuous"
+df = utils.load_tracks("data/tracks.csv", outliers=False, buckets="continuous")
+df["album", "type"] = df["album", "type"].replace(
+    ["Single Tracks", "Live Performance", "Radio Program"],
+    ["NotAlbum", "NotAlbum", "NotAlbum"],
 )
-df['album', 'type'] = df['album', 'type'].replace(['Single Tracks', 'Live Performance', 'Radio Program'],
-                                                  ['NotAlbum', 'NotAlbum', 'NotAlbum'])
 
 column2drop = [
     ("track", "language_code"),
@@ -46,8 +46,10 @@ attributes = [col for col in df.columns if col != class_name]
 X = df[attributes].values
 y = df[class_name]
 
-X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=100, stratify=y)
-clf = LogisticRegression(random_state=0, max_iter=1000, C=0.1, penalty='l2')
+X_train, X_test, y_train, y_test = train_test_split(
+    X, y, test_size=0.2, random_state=100, stratify=y
+)
+clf = LogisticRegression(random_state=0, max_iter=1000, C=0.1, penalty="l2")
 clf.fit(X_train, y_train)
 """
 n = -2
@@ -75,8 +77,8 @@ print("Apply the decision tree on the test set and evaluate the performance: \n"
 
 y_pred = clf.predict(X_test)
 
-print('Accuracy %s' % accuracy_score(y_test, y_pred))
-print('F1-score %s' % f1_score(y_test, y_pred, average=None))
+print("Accuracy %s" % accuracy_score(y_test, y_pred))
+print("F1-score %s" % f1_score(y_test, y_pred, average=None))
 print(classification_report(y_test, y_pred))
 
 

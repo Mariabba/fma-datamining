@@ -32,7 +32,7 @@ def draw_confusion_matrix(Clf, X, y):
     plt.show()
 
 
-# DATASET
+# DATASET Completo
 df = utils.load_tracks(
     "data/tracks.csv", dummies=True, buckets="continuous", fill=True, outliers=True
 )
@@ -68,8 +68,24 @@ for col in column2encode:
     df[col] = le.fit_transform(df[col])
     label_encoders[col] = le
 df.info()
-class_name = ("album", "type")
 """
+
+# DATASET PICCOLINO
+df = utils.load_small_tracks(buckets="continuous")
+label_encoders = dict()
+column2encode = [
+    ("track", "duration"),
+    ("track", "interest"),
+    ("track", "listens"),
+    ("album", "type"),
+]
+for col in column2encode:
+    le = LabelEncoder()
+    df[col] = le.fit_transform(df[col])
+    label_encoders[col] = le
+df.info()
+
+
 print("LISTA COLONNE")
 column_names = list(df.columns)
 for column_name in column_names:
@@ -79,6 +95,8 @@ for column_name in column_names:
     else:
         print(column_name, unique_values, sep="\t")
 """
+
+class_name = ("album", "type")
 attributes = [col for col in df.columns if col != class_name]
 X = df[attributes].values
 y = df[class_name]

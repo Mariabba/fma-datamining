@@ -31,7 +31,7 @@ def draw_confusion_matrix(Clf, X, y):
     plt.show()
 
 
-# DATASET
+# DATASET COMPLETO
 df = utils.load_tracks(
     "data/tracks.csv", dummies=True, buckets="continuous", fill=True, outliers=True
 )
@@ -67,15 +67,29 @@ for col in column2encode:
     df[col] = le.fit_transform(df[col])
     label_encoders[col] = le
 df.info()
-
-
+"""
+# DATASET PICCOLINO
+df = utils.load_small_tracks(buckets="continuous")
+label_encoders = dict()
+column2encode = [
+    ("track", "duration"),
+    ("track", "interest"),
+    ("track", "listens"),
+    ("album", "type"),
+]
+for col in column2encode:
+    le = LabelEncoder()
+    df[col] = le.fit_transform(df[col])
+    label_encoders[col] = le
+df.info()
+"""
 class_name = ("album", "type")
 attributes = [col for col in df.columns if col != class_name]
 X = df[attributes].values
 y = df[class_name]
 
 X_train, X_test, y_train, y_test = train_test_split(
-    X, y, test_size=0.2, random_state=400, stratify=y
+    X, y, test_size=0.2, random_state=300, stratify=y
 )
 
 """NB CATEGORICAL"""

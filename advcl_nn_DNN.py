@@ -1,3 +1,5 @@
+from keras import Sequential
+from keras.layers import Dense
 from sklearn.preprocessing import StandardScaler
 from sklearn.neural_network import MLPClassifier
 from sklearn.metrics import accuracy_score, f1_score, classification_report
@@ -83,25 +85,20 @@ X_train, X_test, y_train, y_test = train_test_split(
     X, y, test_size=0.2, random_state=100, stratify=y
 )
 
-"""NN single layer base PERCEPTRON"""
-clf = MLPClassifier(random_state=0)
-clf.fit(X_train, y_train)
+"""DEEP NN-KERAS"""
 
-# Apply on the training set
-print("Apply  on the training set: \n")
-Y_pred = clf.predict(X_train)
-print("Accuracy  %s" % accuracy_score(y_train, Y_pred))
-print("F1-score %s" % f1_score(y_train, Y_pred, average=None))
-print(classification_report(y_train, Y_pred))
 
-# Apply on the test set and evaluate the performance
-print("Apply on the test set and evaluate the performance: \n")
-y_pred = clf.predict(X_test)
-print("Accuracy %s" % accuracy_score(y_test, y_pred))
-print("F1-score  %s" % f1_score(y_test, y_pred, average=None))
-print(classification_report(y_test, y_pred))
+def build_model():
+    n_feature = X_train.shape[1]
+    model = Sequential()
+    model.add(Dense(128, input_dim=n_feature, activation="relu"))
+    model.add(Dense(64, activation="relu"))
+    model.add(Dense(1, activation="sigmoid"))
 
-draw_confusion_matrix(clf, X_test, y_test)
+    model.compile(loss="binary_crossentropy", optimizer="adam", metrics=["accuracy"])
+    return model
 
-plt.plot(clf.loss_curve_)
-plt.show()
+
+model1 = build_model()
+
+history1 = model1.fit(X_train, y_train, epochs=10, batch_size=10).history

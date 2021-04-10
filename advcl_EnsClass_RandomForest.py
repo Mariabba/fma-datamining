@@ -65,7 +65,22 @@ for col in column2encode:
     df[col] = le.fit_transform(df[col])
     label_encoders[col] = le
 df.info()
-
+"""
+# DATASET PICCOLINO
+df = utils.load_small_tracks(buckets="discrete")
+label_encoders = dict()
+column2encode = [
+    ("track", "duration"),
+    ("track", "interest"),
+    ("track", "listens"),
+    ("album", "type"),
+]
+for col in column2encode:
+    le = LabelEncoder()
+    df[col] = le.fit_transform(df[col])
+    label_encoders[col] = le
+df.info()
+"""
 
 class_name = ("album", "type")
 
