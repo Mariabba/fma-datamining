@@ -180,10 +180,11 @@ plt.tick_params(axis="both", which="major", labelsize=12)
 plt.legend(loc="lower right", fontsize=7, frameon=False)
 plt.show()
 
-"""
+
 # TODO TESTARE I PARAMENTRI MIGLIORI
 # List Hyperparameters that we want to tune.
-print("STA FACENDO LA GRIDSEARCH") = list(range(1, 10))
+print("STA FACENDO LA GRIDSEARCH")
+n_neighbors = list(range(1, 10))
 p = [1, 2]
 # Convert to dictionary
 hyperparameters = dict(n_neighbors=n_neighbors, p=p)
@@ -196,7 +197,7 @@ best_model = clf.fit(x, y)
 # Print The value of best Hyperparameters
 print("Best p:", best_model.best_estimator_.get_params()["p"])
 print("Best n_neighbors:", best_model.best_estimator_.get_params()["n_neighbors"])
-"""
+
 
 """RANDOM SEARCH PIU' VELOCE"""
 """
