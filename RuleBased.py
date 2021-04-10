@@ -10,23 +10,23 @@ import wittgenstein as lw
 
 from sklearn.model_selection import train_test_split
 
-class_name = ('album', 'type')
+class_name = ("album", "type")
 
 df = utils.load_tracks(buckets="discrete")
-column2drop = [
-    ("track", "license")
-]
+column2drop = [("track", "license")]
 df.drop(column2drop, axis=1, inplace=True)
 
 print(df.info())
-df['album', 'type'] = df['album', 'type'].replace(['Single Tracks', 'Live Performance', 'Radio Program'],
-                                                  ['NotAlbum', 'NotAlbum', 'NotAlbum'])
+df["album", "type"] = df["album", "type"].replace(
+    ["Single Tracks", "Live Performance", "Radio Program"],
+    ["NotAlbum", "NotAlbum", "NotAlbum"],
+)
 
 attributes = [col for col in df.columns if col != class_name]
 X = df[attributes].values
 y = df[class_name]
 
-dfX = pd.get_dummies(df[[c for c in df.columns if c != class_name]], prefix_sep='=')
+dfX = pd.get_dummies(df[[c for c in df.columns if c != class_name]], prefix_sep="=")
 dfY = df[class_name]
 df = pd.concat([dfX, dfY], axis=1)
 print(df.info())

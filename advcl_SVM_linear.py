@@ -11,7 +11,7 @@ from sklearn.metrics import (
     roc_auc_score,
     plot_confusion_matrix,
 )
-from sklearn.model_selection import train_test_split
+from sklearn.model_selection import train_test_split, RandomizedSearchCV
 from sklearn.naive_bayes import GaussianNB, CategoricalNB
 from sklearn.preprocessing import LabelEncoder, LabelBinarizer
 from sklearn.svm import LinearSVC
@@ -42,7 +42,14 @@ column2drop = [
 ]
 
 df.drop(column2drop, axis=1, inplace=True)
-print(df["album", "type"].unique())
+
+"""CAMBIO ALBUM TYPE IN BINARIA"""
+print("prima", df["album", "type"].unique())
+df["album", "type"] = df["album", "type"].replace(
+    ["Single Tracks", "Live Performance", "Radio Program"],
+    ["NotAlbum", "NotAlbum", "NotAlbum"],
+)
+print("dopo", df["album", "type"].unique())
 
 # feature to reshape
 label_encoders = dict()
@@ -81,7 +88,7 @@ X_train, X_test, y_train, y_test = train_test_split(
 
 """LINEAR SVM """
 clf = LinearSVC(
-    C=0.01,  # best param 0.1
+    C=1,  # best param 0.1
     random_state=42,
     max_iter=3000,  # if i put minor iteration the results are worst, balanced class worst
 )
@@ -114,19 +121,18 @@ tpr = dict()
 roc_auc = dict()
 by_test = lb.transform(y_test)
 by_pred = lb.transform(y_pred)
-for i in range(4):
+for i in range(1):
     fpr[i], tpr[i], _ = roc_curve(by_test[:, i], by_pred[:, i])
     roc_auc[i] = auc(fpr[i], tpr[i])
 
     roc_auc = roc_auc_score(by_test, by_pred, average=None)
 
-
 plt.figure(figsize=(8, 5))
-for i in range(4):
+for i in range(1):
     plt.plot(
         fpr[i],
         tpr[i],
-        label="%s ROC curve (area = %0.2f)" % (lb.classes_.tolist()[i], roc_auc[i]),
+        # label="%s ROC curve (area = %0.2f)" % (lb.classes_.tolist()[i], roc_auc[i]),
     )
 
 plt.plot([0, 1], [0, 1], "k--")
@@ -138,3 +144,27 @@ plt.ylabel("True Positive Rate", fontsize=10)
 plt.tick_params(axis="both", which="major", labelsize=12)
 plt.legend(loc="lower right", fontsize=7, frameon=False)
 plt.show()
+
+
+"""RANDOM SEARCH PIU' VELOCE"""
+
+print("STA FACENDO LA GRIDSEARCH")
+param_list = {
+    "loss": ["hinge", "squared_hinge"],
+    "C": [0.1, 0.01, 1, 10, 100],
+    "random_state": [10, 20, 30, 40, 50],
+    "max_iter": [1000, 2000, 3000, 4000, 5000],
+}
+
+random_search = RandomizedSearchCV(clf, param_distributions=param_list, n_iter=20, cv=5)
+random_search.fit(X_train, y_train)
+clf = random_search.best_estimator_
+
+y_pred = clf.predict(X_test)
+# Print The value of best Hyperparameters
+print(
+    "Best:",
+    random_search.cv_results_["params"][
+        random_search.cv_results_["rank_test_score"][0]
+    ],
+)
