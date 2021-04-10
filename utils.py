@@ -91,7 +91,6 @@ def load_small_tracks(
         ("track", "duration"),  # continuous from here on out
         ("track", "listens"),
         ("track", "interest"),
-        ("album", "type"),
     ]
 
     df = df[columns_to_keep]
