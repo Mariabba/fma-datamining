@@ -57,39 +57,13 @@ from sklearn.decomposition import PCA
 from sklearn.neighbors import NearestNeighbors
 
 # DATASET
-df = utils.load("../data/tracks.csv", dummies=True, buckets="continuous", fill=True)
+df = utils.load_tracks(buckets="continuous", outliers=False)
+
 column2drop = [
-    ("album", "type"),
-    ("album", "tags"),
-    ("artist", "tags"),
-    ("track", "tags"),
-    ("track", "genres"),
-    ("track", "genres_all"),
-    ("track", "license"),
     ("track", "language_code"),
-    ("album", "title"),
-    ("artist", "name"),
-    ("set", "split"),
-    ("track", "title"),
-    ("album", "id"),
-    ("artist", "id"),
-    ("album", "engineer"),
-    ("album", "information"),
-    ("album", "producer"),
-    ("artist", "active_year_end"),
-    ("artist", "wikipedia_page"),
-    ("artist", "website"),
-    ("artist", "bio"),
-    ("track", "composer"),
-    ("track", "date_recorded"),
-    ("track", "information"),
-    ("track", "lyricist"),
-    ("track", "publisher"),
-    ("album", "date_created"),
-    ("artist", "date_created"),
-    ("track", "date_recorded"),
-    ("track", "date_created"),
+    ("track", "license")
 ]
+
 df.drop(column2drop, axis=1, inplace=True)
 print(df.info())
 """
@@ -113,7 +87,7 @@ plt.show()
 # y = df[("album", "type")]
 # X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.3, random_state=100, stratify=y)
 
-X = df.values
+#X = df.values
 
 """
 # instantiate model
@@ -176,7 +150,7 @@ plt.axvline(np.min(clf.decision_scores_[np.where(y_test_pred==1)]), c='k')
 plt.show()
 """
 
-
+"""
 def tuning_param(df):
     print(df.info)
     print(df.head)
@@ -222,3 +196,4 @@ def tuning_param(df):
 
 
 tuning_param(df)
+"""
