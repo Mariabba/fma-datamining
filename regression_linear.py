@@ -17,7 +17,7 @@ console = Console()
 table = Table(show_header=True, header_style="bold magenta")
 table.add_column("Method", style="green")
 # table.add_column("Coefficients")
-table.add_column("R^2", justify="right")
+table.add_column("R²", justify="right")
 table.add_column("MSE", justify="right")
 table.add_column("MAE", justify="right")
 
