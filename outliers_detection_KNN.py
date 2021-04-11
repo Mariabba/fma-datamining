@@ -66,15 +66,16 @@ column2drop = [
 
 df.drop(column2drop, axis=1, inplace=True)
 print(df.info())
-"""
+
+
 def normalize(feature):
     scaler = StandardScaler()
     df[feature] = scaler.fit_transform(df[[feature]])
 
 
-for col in df.columns:
+colum2encode = [col for col in df.columns if col != ("album", "type")]
+for col in colum2encode:
     normalize(col)
-"""
 
 """
 # FACCIO  IL PLOTTING BOXPLOT del Df completo
@@ -83,26 +84,23 @@ b = sns.boxplot(data=df, orient="h")
 b.set(ylabel="Class", xlabel="Normalization Value")
 plt.show()
 """
-# X = df.drop(columns=[("album", "type")])
-# y = df[("album", "type")]
-# X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.3, random_state=100, stratify=y)
+X = df.drop(columns=[("album", "type")])
+y = df[("album", "type")]
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.3, random_state=100, stratify=y)
 
-#X = df.values
-
-"""
 # instantiate model
-nbrs = NearestNeighbors(n_neighbors = 3)
+nbrs = NearestNeighbors(n_neighbors=3)
 # fit model
 nbrs.fit(X)
 
 # distances and indexes of k-neaighbors from model outputs
 distances, indexes = nbrs.kneighbors(X)
 # plot mean of k-distances of each observation
-plt.plot(distances.mean(axis =1))
+plt.plot(distances.mean(axis=1))
 plt.show()
 
 # visually determine cutoff values > 10
-outlier_index = np.where(distances.mean(axis = 1) > 0.8)
+outlier_index = np.where(distances.mean(axis=1) > 1)
 print(outlier_index)
 
 # filter outlier values
@@ -110,8 +108,6 @@ outlier_values = df.iloc[outlier_index]
 print(outlier_values.describe())
 print(outlier_values.value_counts())
 print(outlier_values.info())
-"""
-
 
 """
 # train kNN detector
