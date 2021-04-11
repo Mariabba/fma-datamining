@@ -29,7 +29,7 @@ def draw_confusion_matrix(Clf, X, y):
     ]
 
     for title, normalize in titles_options:
-        disp = plot_confusion_matrix(Clf, X, y, cmap="copper_r", normalize=normalize)
+        disp = plot_confusion_matrix(Clf, X, y, cmap="YlGn", normalize=normalize)
         disp.ax_.set_title(title)
 
     plt.show()
@@ -55,8 +55,8 @@ df = utils.load_tracks(buckets="discrete")
 df = df.head(1000)
 
 column2drop = [
-    # ("track", "license"),
-    # ("track", "language_code"),
+    ("track", "license"),
+    ("track", "language_code"),
 ]
 df.drop(column2drop, axis=1, inplace=True)
 
