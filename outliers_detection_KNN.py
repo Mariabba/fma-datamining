@@ -89,18 +89,20 @@ y = df[("album", "type")]
 X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.3, random_state=100, stratify=y)
 
 # instantiate model
-nbrs = NearestNeighbors(n_neighbors=3)
+nbrs = NearestNeighbors(n_neighbors=5, p=1)
 # fit model
 nbrs.fit(X)
 
 # distances and indexes of k-neaighbors from model outputs
 distances, indexes = nbrs.kneighbors(X)
 # plot mean of k-distances of each observation
-plt.plot(distances.mean(axis=1))
+plt.ylabel("k-neaighbors distance")
+plt.plot(distances.mean(axis=1), color='black')
+plt.axhline(y=1.5, color='r', linestyle='-')
 plt.show()
 
 # visually determine cutoff values > 10
-outlier_index = np.where(distances.mean(axis=1) > 1)
+outlier_index = np.where(distances.mean(axis=1) > 3.8)
 print(outlier_index)
 
 # filter outlier values

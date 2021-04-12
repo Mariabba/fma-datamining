@@ -52,8 +52,7 @@ def report(results, n_top=3):
 class_name = ('album', 'type')
 
 df = utils.load_tracks(buckets="discrete")
-df = df.head(1000)
-
+#df=df.head(1000)
 column2drop = [
     ("track", "license"),
     ("track", "language_code"),
@@ -92,9 +91,8 @@ print(df.info())
 X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=100, stratify=y)
 
 ripper_clf = lw.RIPPER()
-
+"""
 ripper_clf.fit(X_train, y_train, class_feat=("album", "type"), pos_class=0, k=1, prune_size=0.33)
-
 print(ripper_clf)
 
 # Collect performance metrics
@@ -105,14 +103,7 @@ print(ripper_clf.ruleset_.out_pretty())
 print(f'precision: {precision} recall: {recall} conds: {cond_count}')
 
 
-"""
-# grid search
-param_grid = {"prune_size": [0.33, 0.5], "k": [1, 2], "class_feat": ["album", "type"], "pos_class": [0]}
-grid = GridSearchCV(estimator=ripper_clf, param_grid=param_grid)
-grid.fit(X_train, y_train)
-clf = grid.best_estimator_
-print(report(grid.cv_results_, n_top=3))
-"""
+
 
 # Apply the decision tree on the training set
 print("Apply the decision tree on the training set: \n")
@@ -154,3 +145,13 @@ plt.ylabel('True Positive Rate', fontsize=20)
 plt.tick_params(axis='both', which='major', labelsize=22)
 plt.legend(loc="lower right", fontsize=14, frameon=False)
 plt.show()
+
+
+"""
+print("GRID SEARCH:")
+# grid search
+param_grid = {"prune_size": [0.33, 0.5], "k": [1, 2], "class_feat": ["album", "type"], "pos_class": [0]}
+grid = GridSearchCV(estimator=ripper_clf, param_grid=param_grid)
+grid.fit(X_train, y_train)
+clf = grid.best_estimator_
+print(report(grid.cv_results_, n_top=3))
