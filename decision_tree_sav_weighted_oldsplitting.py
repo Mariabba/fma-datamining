@@ -199,7 +199,8 @@ def build_model(
         min_samples_split=min_samples_split,
         min_samples_leaf=min_samples_leaf,
         # class_weight={0:1, 1:4, 2:3, 3:5}
-        class_weight="balanced",
+        #class_weight="balanced",
+        class_weight={0: 0.28, 1: 4.70, 2: 3.60, 3: 31.46},
     )
     clf.fit(X_train, y_train)
 
@@ -301,5 +302,6 @@ def build_model(
 tracks = load_data("data/tracks.csv")
 # tuning_param(tracks, "album", "type")
 # tuning_param_gridsearch(tracks, "album", "type")
-build_model(tracks, "album", "type", 100, 100, 8, "entropy")
+#build_model(tracks, "album", "type", 100, 100, 8, "entropy")
 # build_model(tracks, "album", "type", 2, 1, 20, "entropy")
+build_model(tracks, "album", "type", 10, 10, 9, "gini")
