@@ -1,30 +1,22 @@
-from keras import Sequential
-from keras.layers import Dense
-from sklearn.preprocessing import StandardScaler
-from sklearn.neural_network import MLPClassifier
-from sklearn.metrics import accuracy_score, f1_score, classification_report
-import pandas as pd
-
-import utils
-
-from sklearn.ensemble import RandomForestClassifier
+import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
-import matplotlib.pyplot as plt
-from sklearn.inspection import permutation_importance
-
+from rich import pretty, print
+from rich.console import Console
+from rich.table import Table
+from sklearn.ensemble import RandomForestClassifier
 from sklearn.metrics import (
     accuracy_score,
-    f1_score,
-    classification_report,
-    roc_curve,
     auc,
-    roc_auc_score,
+    classification_report,
+    f1_score,
     plot_confusion_matrix,
+    roc_auc_score,
+    roc_curve,
 )
-from sklearn.model_selection import train_test_split, RandomizedSearchCV
-from sklearn.preprocessing import LabelEncoder, LabelBinarizer, StandardScaler
+from sklearn.model_selection import RandomizedSearchCV, train_test_split
 from sklearn.neural_network import MLPClassifier
+from sklearn.preprocessing import LabelBinarizer, LabelEncoder, StandardScaler
 
 import utils
 
@@ -42,19 +34,29 @@ def draw_confusion_matrix(Clf, X, y):
     plt.show()
 
 
+pretty.install()
+console = Console()
+# outputs in table format
+table = Table(show_header=True, header_style="bold magenta")
+table.add_column("Method", style="green")
+# table.add_column("Coefficients")
+table.add_column("R²", justify="right")
+table.add_column("MSE", justify="right")
+table.add_column("MAE", justify="right")
+
 # DATASET
-df = utils.load_tracks(
-    "data/tracks.csv", dummies=True, buckets="discrete", fill=True, outliers=True
+X_train, y_train, X_test, y_test = utils.load_tracks_xyz(
+    buckets="discrete", extractclass=("album", "type"), splits=2
 )
 
-print(df["album", "type"].unique())
+
+print(y_train.unique())
 
 # feature to reshape
 label_encoders = dict()
 column2encode = [
     ("track", "language_code"),
     ("album", "listens"),
-    ("album", "type"),
     ("track", "license"),
     ("album", "comments"),
     ("album", "date_created"),
@@ -71,21 +73,21 @@ column2encode = [
 ]
 for col in column2encode:
     le = LabelEncoder()
-    df[col] = le.fit_transform(df[col])
+    X_train[col] = le.fit_transform(X_train[col])
+    X_test[col] = le.fit_transform(X_test[col])
     label_encoders[col] = le
-df.info()
+print(X_train.info())
+print(X_test.info())
+
+le = LabelEncoder()
+y_train[("album", "type")] = le.fit_transform(y_train[col])
+y_test[("album", "type")] = le.fit_transform(y_test[col])
 
 class_name = ("album", "type")
 
-attributes = [col for col in df.columns if col != class_name]
-X = df[attributes].values
-y = df[class_name]
+classification_report(y_true, y_pred)
 
-X_train, X_test, y_train, y_test = train_test_split(
-    X, y, test_size=0.2, random_state=100, stratify=y
-)
-
-"""DEEP NN-KERAS"""
+"""DEEP NN-KERAS
 
 
 def build_model():
@@ -102,3 +104,4 @@ def build_model():
 model1 = build_model()
 
 history1 = model1.fit(X_train, y_train, epochs=10, batch_size=10).history
+"""
