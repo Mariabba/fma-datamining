@@ -1,21 +1,14 @@
 import matplotlib.pyplot as plt
-import numpy as np
 import pandas as pd
 from rich import pretty, print
-from rich.console import Console
-from rich.progress import Progress, track, BarColumn, SpinnerColumn
-from rich.table import Table
+from rich.progress import Progress, BarColumn
 from sklearn.metrics import (
     accuracy_score,
-    auc,
-    classification_report,
     f1_score,
     plot_confusion_matrix,
-    roc_auc_score,
-    roc_curve,
 )
 from sklearn.neural_network import MLPClassifier
-from sklearn.preprocessing import LabelBinarizer, LabelEncoder, StandardScaler
+from sklearn.preprocessing import LabelEncoder
 
 import utils
 
@@ -50,10 +43,14 @@ def execute_and_report(learn_rate, acti, current_params):
     # Apply on the test set and evaluate the performance
     # print("Test set: \n")
     y_pred = clf.predict(test_x)
-    acc = accuracy_score(test_y, y_pred)
-    f1 = f1_score(test_y, y_pred, average="weighted")
-    if (acc > 0.85) and (f1 > 0.85):
-        reports[f"{acti}, {learn_rate}, {str(current_params.values())}"] = [acc, f1]
+    acc = accuracy_score(test_y, y_pred) * 100
+    f1 = f1_score(test_y, y_pred, average="weighted") * 100
+    if acc + f1 > 170:
+        return {
+            "Params": f"{acti}, {learn_rate}, {current_params['hidden_layer_sizes'][0]}",
+            "accuracy %": round(acc, 2),
+            "F1 weighted %": round(f1, 2),
+        }
 
     # draw_confusion_matrix(clf, test_x, test_y)
 
@@ -62,15 +59,6 @@ def execute_and_report(learn_rate, acti, current_params):
 
 
 pretty.install()
-console = Console()
-# outputs in table format
-table = Table(show_header=True, header_style="bold magenta")
-table.add_column("Method", style="green")
-# table.add_column("Coefficients")
-table.add_column("Accuracy", justify="right")
-table.add_column("Precision", justify="right")
-table.add_column("Recall", justify="right")
-table.add_column("F1", justify="right")
 
 # DATASET
 train_x, train_y, test_x, test_y = utils.load_tracks_xyz(
@@ -96,7 +84,7 @@ column2encode = [
     ("track", "interest"),
     ("track", "listens"),
 ]
-for col in track(column2encode):
+for col in column2encode:
     le = LabelEncoder()
     le.fit(test_x[col])
     train_x[col] = le.fit_transform(train_x[col])
@@ -112,20 +100,30 @@ class_name = ("album", "type")
 
 # Preparation
 count = 0
-reports = {}
+reports = pd.DataFrame(columns=["Params", "accuracy %", "F1 weighted %"])
 params = [
+    {"hidden_layer_sizes": (500,)},
+    {"hidden_layer_sizes": (450,)},
     {"hidden_layer_sizes": (400,)},
-    {"hidden_layer_sizes": (280,)},
-    {"hidden_layer_sizes": (170,)},
+    {"hidden_layer_sizes": (350,)},
+    {"hidden_layer_sizes": (300,)},
+    {"hidden_layer_sizes": (260,)},
+    {"hidden_layer_sizes": (220,)},
+    {"hidden_layer_sizes": (180,)},
+    {"hidden_layer_sizes": (150,)},
+    {"hidden_layer_sizes": (120,)},
     {"hidden_layer_sizes": (100,)},
+    {"hidden_layer_sizes": (80,)},
     {"hidden_layer_sizes": (65,)},
+    {"hidden_layer_sizes": (50,)},
     {"hidden_layer_sizes": (40,)},
+    {"hidden_layer_sizes": (30,)},
     {"hidden_layer_sizes": (20,)},
     {"hidden_layer_sizes": (10,)},
 ]
+testing_params = [{"hidden_layer_sizes": (10,)}]
 activations = ["identity", "logistic", "tanh", "relu"]
 learning_rate_inits = [0.01, 0.001, 0.02]
-count = 0
 
 
 # progress reporting init
@@ -136,23 +134,26 @@ progress = Progress(
     "{task.completed} of {task.total}",
 )
 
+# grid search
 with progress:
 
     task_layers = progress.add_task("[red]Hidden layer sizes…", total=len(params))
     task_learn = progress.add_task("[green]Learn rate…", total=len(learning_rate_inits))
     task_acti = progress.add_task("[cyan]Activation funcs…", total=len(activations))
 
-    # grid search
-    for i, current_params in enumerate(params):
+    for current_params in testing_params:
         progress.update(task_learn, completed=0)
         for learn_rate in learning_rate_inits:
             progress.update(task_acti, completed=0)
             for acti in activations:
-                execute_and_report(learn_rate, acti, current_params)
+                row = execute_and_report(learn_rate, acti, current_params)
+                if row:
+                    reports = reports.append(row, ignore_index=True)
                 count += 1
                 progress.advance(task_acti)
             progress.advance(task_learn)
         progress.advance(task_layers)
 
-print(reports)
+# results
+print(reports.sort_values(by=["accuracy %", "F1 weighted %"], ascending=False))
 print(f"I have built {count} neural networks")
