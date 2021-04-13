@@ -3,9 +3,8 @@ import numpy as np
 import pandas as pd
 from rich import pretty, print
 from rich.console import Console
+from rich.progress import Progress, track, BarColumn, SpinnerColumn
 from rich.table import Table
-from rich.progress import track
-from sklearn.inspection import permutation_importance
 from sklearn.metrics import (
     accuracy_score,
     auc,
@@ -15,7 +14,6 @@ from sklearn.metrics import (
     roc_auc_score,
     roc_curve,
 )
-from sklearn.model_selection import RandomizedSearchCV
 from sklearn.neural_network import MLPClassifier
 from sklearn.preprocessing import LabelBinarizer, LabelEncoder, StandardScaler
 
@@ -40,7 +38,6 @@ def execute_and_report(learn_rate, acti, current_params):
         activation=acti,
         learning_rate_init=learn_rate,
         random_state=5213890,
-        verbose=1,
         **current_params,
     )
     clf.fit(train_x, train_y)
@@ -53,10 +50,10 @@ def execute_and_report(learn_rate, acti, current_params):
     # Apply on the test set and evaluate the performance
     # print("Test set: \n")
     y_pred = clf.predict(test_x)
-    reports[f"{acti}, {learn_rate}, {str(current_params.values())}"] = [
-        f1_score(test_y, y_pred, average="weighted"),
-        accuracy_score(test_y, y_pred),
-    ]
+    acc = accuracy_score(test_y, y_pred)
+    f1 = f1_score(test_y, y_pred, average="weighted")
+    if (acc > 0.85) and (f1 > 0.85):
+        reports[f"{acti}, {learn_rate}, {str(current_params.values())}"] = [acc, f1]
 
     # draw_confusion_matrix(clf, test_x, test_y)
 
@@ -114,21 +111,48 @@ train_y = le.fit_transform(train_y)
 class_name = ("album", "type")
 
 # Preparation
+count = 0
 reports = {}
 params = [
-    # {"hidden_layer_sizes": (150,)},
-    # {"hidden_layer_sizes": (100,)},
-    # {"hidden_layer_sizes": (60,)},
-    # {"hidden_layer_sizes": (30,)},
+    {"hidden_layer_sizes": (400,)},
+    {"hidden_layer_sizes": (280,)},
+    {"hidden_layer_sizes": (170,)},
+    {"hidden_layer_sizes": (100,)},
+    {"hidden_layer_sizes": (65,)},
+    {"hidden_layer_sizes": (40,)},
+    {"hidden_layer_sizes": (20,)},
     {"hidden_layer_sizes": (10,)},
 ]
 activations = ["identity", "logistic", "tanh", "relu"]
 learning_rate_inits = [0.01, 0.001, 0.02]
+count = 0
 
-for i, current_params in enumerate(params):
-    for learn_rate in learning_rate_inits:
-        for acti in activations:
-            print(f"[magenta]Run number[/magenta] {i}")
-            execute_and_report(learn_rate, acti, current_params)
+
+# progress reporting init
+progress = Progress(
+    "[progress.description]{task.description}",
+    BarColumn(),
+    "[progress.percentage]{task.percentage:>3.0f}%",
+    "{task.completed} of {task.total}",
+)
+
+with progress:
+
+    task_layers = progress.add_task("[red]Hidden layer sizes…", total=len(params))
+    task_learn = progress.add_task("[green]Learn rate…", total=len(learning_rate_inits))
+    task_acti = progress.add_task("[cyan]Activation funcs…", total=len(activations))
+
+    # grid search
+    for i, current_params in enumerate(params):
+        progress.update(task_learn, completed=0)
+        for learn_rate in learning_rate_inits:
+            progress.update(task_acti, completed=0)
+            for acti in activations:
+                execute_and_report(learn_rate, acti, current_params)
+                count += 1
+                progress.advance(task_acti)
+            progress.advance(task_learn)
+        progress.advance(task_layers)
 
 print(reports)
+print(f"I have built {count} neural networks")
