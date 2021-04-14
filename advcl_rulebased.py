@@ -22,6 +22,7 @@ import wittgenstein as lw
 
 from sklearn.model_selection import train_test_split
 
+
 def draw_confusion_matrix(Clf, X, y):
     titles_options = [
         ("Confusion matrix, without normalization", None),
@@ -33,6 +34,7 @@ def draw_confusion_matrix(Clf, X, y):
         disp.ax_.set_title(title)
 
     plt.show()
+
 
 def report(results, n_top=3):
     for i in range(1, n_top + 1):
@@ -49,10 +51,10 @@ def report(results, n_top=3):
             print("")
 
 
-class_name = ('album', 'type')
+class_name = ("album", "type")
 
 df = utils.load_tracks(buckets="discrete")
-#df=df.head(1000)
+# df=df.head(1000)
 column2drop = [
     ("track", "license"),
     ("track", "language_code"),
@@ -60,11 +62,12 @@ column2drop = [
 df.drop(column2drop, axis=1, inplace=True)
 
 print(df.info())
-df['album', 'type'] = df['album', 'type'].replace(['Single Tracks', 'Live Performance', 'Radio Program'],
-                                                  ['NotAlbum', 'NotAlbum', 'NotAlbum'])
+df["album", "type"] = df["album", "type"].replace(
+    ["Single Tracks", "Live Performance", "Radio Program"],
+    ["NotAlbum", "NotAlbum", "NotAlbum"],
+)
 
-df['album', 'type'] = df['album', 'type'].replace(['Album', 'NotAlbum'],
-                                                  [True, False])
+df["album", "type"] = df["album", "type"].replace(["Album", "NotAlbum"], [True, False])
 
 """
 # feature to reshape
@@ -83,12 +86,14 @@ attributes = [col for col in df.columns if col != class_name]
 X = df[attributes].values
 y = df[class_name]
 
-dfX = pd.get_dummies(df[[c for c in df.columns if c != class_name]], prefix_sep='=')
+dfX = pd.get_dummies(df[[c for c in df.columns if c != class_name]], prefix_sep="=")
 dfY = df[class_name]
 df = pd.concat([dfX, dfY], axis=1)
 print(df.info())
 
-X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=100, stratify=y)
+X_train, X_test, y_train, y_test = train_test_split(
+    X, y, test_size=0.2, random_state=100, stratify=y
+)
 
 ripper_clf = lw.RIPPER()
 """
@@ -150,7 +155,12 @@ plt.show()
 """
 print("GRID SEARCH:")
 # grid search
-param_grid = {"prune_size": [0.33, 0.5], "k": [1, 2], "class_feat": ["album", "type"], "pos_class": [0]}
+param_grid = {
+    "prune_size": [0.33, 0.5],
+    "k": [1, 2],
+    "class_feat": ["album", "type"],
+    "pos_class": [0],
+}
 grid = GridSearchCV(estimator=ripper_clf, param_grid=param_grid)
 grid.fit(X_train, y_train)
 clf = grid.best_estimator_

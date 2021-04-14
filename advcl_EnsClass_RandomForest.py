@@ -180,6 +180,7 @@ result = permutation_importance(
     clf, X_test, y_test, n_repeats=10, random_state=42, n_jobs=2
 )
 
+
 sorted_idx = result.importances_mean.argsort()[-nbr_features:]
 
 fig, ax = plt.subplots()
@@ -214,3 +215,27 @@ print(
     ],
 )
 """
+
+""" feature 2"""
+for col, imp in zip(attributes, clf.feature_importances_):
+    print(col, imp)
+
+top_n = 10
+feat_imp = pd.DataFrame(columns=["columns", "importance"])
+for col, imp in zip(attributes, clf.feature_importances_):
+    feat_imp = feat_imp.append({"columns": col, "importance": imp}, ignore_index=True)
+print(feat_imp)
+
+feat_imp.sort_values(by="importance", ascending=False, inplace=True)
+feat_imp = feat_imp.iloc[:top_n]
+
+feat_imp.plot(
+    title="Top 10 features contribution",
+    x="columns",
+    fontsize=8.5,
+    rot=15,
+    y="importance",
+    kind="bar",
+    colormap="Pastel1",
+)
+plt.show()

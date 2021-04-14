@@ -59,10 +59,7 @@ from sklearn.neighbors import NearestNeighbors
 # DATASET
 df = utils.load_tracks(buckets="continuous", outliers=False)
 
-column2drop = [
-    ("track", "language_code"),
-    ("track", "license")
-]
+column2drop = [("track", "language_code"), ("track", "license")]
 
 df.drop(column2drop, axis=1, inplace=True)
 print(df.info())
@@ -86,7 +83,9 @@ plt.show()
 """
 X = df.drop(columns=[("album", "type")])
 y = df[("album", "type")]
-X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.3, random_state=100, stratify=y)
+X_train, X_test, y_train, y_test = train_test_split(
+    X, y, test_size=0.3, random_state=100, stratify=y
+)
 
 # instantiate model
 nbrs = NearestNeighbors(n_neighbors=5, p=1)
@@ -97,8 +96,8 @@ nbrs.fit(X)
 distances, indexes = nbrs.kneighbors(X)
 # plot mean of k-distances of each observation
 plt.ylabel("k-neaighbors distance")
-plt.plot(distances.mean(axis=1), color='black')
-plt.axhline(y=1.5, color='r', linestyle='-')
+plt.plot(distances.mean(axis=1), color="black")
+plt.axhline(y=1.5, color="r", linestyle="-")
 plt.show()
 
 # visually determine cutoff values > 10

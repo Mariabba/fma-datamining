@@ -32,6 +32,7 @@ def draw_confusion_matrix(Clf, X, y):
     plt.show()
 
 
+"""
 # DATASET COMPLETO
 df = utils.load_tracks(
     "data/tracks.csv", dummies=True, buckets="continuous", fill=True, outliers=True
@@ -43,13 +44,6 @@ column2drop = [
 
 df.drop(column2drop, axis=1, inplace=True)
 
-# CAMBIO ALBUM TYPE IN BINARIA
-print("prima", df["album", "type"].unique())
-df["album", "type"] = df["album", "type"].replace(
-    ["Single Tracks", "Live Performance", "Radio Program"],
-    ["NotAlbum", "NotAlbum", "NotAlbum"],
-)
-print("dopo", df["album", "type"].unique())
 
 # feature to reshape
 label_encoders = dict()
@@ -78,6 +72,15 @@ df.info()
 """
 # DATASET PICCOLINO
 df = utils.load_small_tracks(buckets="discrete")
+# CAMBIO ALBUM TYPE IN BINARIA
+print("prima", df["album", "type"].unique())
+df["album", "type"] = df["album", "type"].replace(
+    ["Single Tracks", "Live Performance", "Radio Program"],
+    ["NotAlbum", "NotAlbum", "NotAlbum"],
+)
+print("dopo", df["album", "type"].unique())
+
+
 label_encoders = dict()
 column2encode = [
     ("track", "duration"),
@@ -90,7 +93,8 @@ for col in column2encode:
     df[col] = le.fit_transform(df[col])
     label_encoders[col] = le
 df.info()
-"""
+
+
 class_name = ("album", "type")
 
 attributes = [col for col in df.columns if col != class_name]
@@ -102,11 +106,11 @@ X_train, X_test, y_train, y_test = train_test_split(
 )
 
 """LINEAR SVM """
-# Best: {'random_state': 42, 'max_iter': 5000, 'loss': 'squared_hinge', 'C': 100}
+# Best: {'random_state': 42, 'max_iter': 25000, 'loss': 'squared_hinge', 'C': 100}
 clf = LinearSVC(
     C=100,  # best param 0.01
-    random_state=42,
-    max_iter=5000,  # 3000 per completo
+    random_state=40,
+    max_iter=25000,  # 3000 per completo
     loss="squared_hinge",
 )
 clf.fit(X_train, y_train)
@@ -128,7 +132,28 @@ print(classification_report(y_test, y_pred))
 draw_confusion_matrix(clf, X_test, y_test)
 
 """ROC CURVE"""
+from sklearn.metrics import roc_curve, auc, roc_auc_score
 
+fpr, tpr, _ = roc_curve(y_test, y_pred)
+roc_auc = auc(fpr, tpr)
+print(roc_auc)
+
+roc_auc = roc_auc_score(y_test, y_pred, average=None)
+
+plt.figure(figsize=(8, 5))
+plt.plot(fpr, tpr, label="ROC curve (area = %0.2f)" % (roc_auc))
+
+plt.plot([0, 1], [0, 1], "k--")
+plt.xlim([0.0, 1.0])
+plt.ylim([0.0, 1.05])
+plt.title("Linear SVM Roc-Curve")
+plt.xlabel("False Positive Rate", fontsize=10)
+plt.ylabel("True Positive Rate", fontsize=10)
+plt.tick_params(axis="both", which="major", labelsize=12)
+plt.legend(loc="lower right", fontsize=7, frameon=False)
+plt.show()
+
+"""
 lb = LabelBinarizer()
 lb.fit(y_test)
 lb.classes_.tolist()
@@ -161,7 +186,7 @@ plt.ylabel("True Positive Rate", fontsize=10)
 plt.tick_params(axis="both", which="major", labelsize=12)
 plt.legend(loc="lower right", fontsize=7, frameon=False)
 plt.show()
-
+"""
 
 """RANDOM SEARCH PIU' VELOCE
 
