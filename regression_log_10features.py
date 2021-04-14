@@ -35,19 +35,12 @@ def draw_confusion_matrix(Clf, X, y):
 class_name = ("album", "type")
 
 
-df = utils.load_tracks("data/tracks.csv", outliers=True, buckets="continuous")
+df = utils.load_small_tracks(outliers=True, buckets="continuous")
+
 df["album", "type"] = df["album", "type"].replace(
     ["Single Tracks", "Live Performance", "Radio Program"],
     ["NotAlbum", "NotAlbum", "NotAlbum"],
 )
-
-column2drop = [
-    ("track", "language_code"),
-    ("track", "license"),
-]
-
-df.drop(column2drop, axis=1, inplace=True)
-
 
 # feature to reshape
 label_encoders = dict()
