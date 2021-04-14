@@ -29,7 +29,7 @@ def draw_confusion_matrix(Clf, X, y):
     ]
 
     for title, normalize in titles_options:
-        disp = plot_confusion_matrix(Clf, X, y, cmap="YlGn", normalize=normalize)
+        disp = plot_confusion_matrix(Clf, X, y, cmap="Reds", normalize=normalize)
         disp.ax_.set_title(title)
 
     plt.show()
