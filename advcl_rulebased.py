@@ -156,7 +156,7 @@ plt.show()
 print("GRID SEARCH:")
 # grid search
 param_grid = {
-    "prune_size": [0.33, 0.5],
+    "prune_size": [0.33, 0.5, 0.77],
     "k": [1, 2],
     "class_feat": ["album", "type"],
     "pos_class": [0],
