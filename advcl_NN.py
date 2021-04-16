@@ -2,11 +2,53 @@ import matplotlib.pyplot as plt
 import pandas as pd
 from rich import pretty, print
 from rich.progress import BarColumn, Progress
-from sklearn.metrics import accuracy_score, f1_score, plot_confusion_matrix
+from sklearn.metrics import (
+    accuracy_score,
+    auc,
+    f1_score,
+    plot_confusion_matrix,
+    roc_auc_score,
+    roc_curve,
+)
 from sklearn.neural_network import MLPClassifier
-from sklearn.preprocessing import LabelEncoder
+from sklearn.preprocessing import LabelBinarizer, LabelEncoder
 
 import utils
+
+
+def draw_roc(y_test, y_pred):
+    lb = LabelBinarizer()
+    lb.fit(y_test)
+    lb.classes_.tolist()
+
+    fpr = dict()
+    tpr = dict()
+    roc_auc = dict()
+    by_test = lb.transform(y_test)
+    by_pred = lb.transform(y_pred)
+    for i in range(4):
+        fpr[i], tpr[i], _ = roc_curve(by_test[:, i], by_pred[:, i])
+        roc_auc[i] = auc(fpr[i], tpr[i])
+
+        roc_auc = roc_auc_score(by_test, by_pred, average=None)
+
+    plt.figure(figsize=(8, 5))
+    for i in range(4):
+        plt.plot(
+            fpr[i],
+            tpr[i],
+            label="%s ROC curve (area = %0.2f)" % (lb.classes_.tolist()[i], roc_auc[i]),
+        )
+
+    plt.plot([0, 1], [0, 1], "k--")
+    plt.xlim([0.0, 1.0])
+    plt.ylim([0.0, 1.05])
+    plt.title("Single Hidden Layer Neural Network Roc-Curve")
+    plt.xlabel("False Positive Rate", fontsize=10)
+    plt.ylabel("True Positive Rate", fontsize=10)
+    plt.tick_params(axis="both", which="major", labelsize=12)
+    plt.legend(loc="lower right", fontsize=7, frameon=False)
+    plt.show()
 
 
 def draw_confusion_matrix(Clf, X, y):
@@ -14,9 +56,9 @@ def draw_confusion_matrix(Clf, X, y):
         ("Confusion matrix, without normalization", None),
         ("Neural network confusion matrix", "true"),
     ]
-
+    # colors: Wistia too yellow
     for title, normalize in titles_options:
-        disp = plot_confusion_matrix(Clf, X, y, cmap="Blues", normalize=normalize)
+        disp = plot_confusion_matrix(Clf, X, y, cmap="PuBuGn", normalize=normalize)
         disp.ax_.set_title(title)
 
     plt.show()
@@ -27,20 +69,32 @@ def execute_and_report(learn_rate, acti, current_params):
         activation=acti,
         learning_rate_init=learn_rate,
         random_state=5213890,
-        **current_params,
+        hidden_layer_sizes=current_params,
     )
     clf.fit(train_x, train_y)
+
+    # Apply on the training set
+    # print("Training set:")
+    # Y_pred = clf.predict(train_x)
+    # print(classification_report(train_y, Y_pred))
 
     # Apply on the test set and evaluate the performance
     y_pred = clf.predict(test_x)
     acc = accuracy_score(test_y, y_pred) * 100
     f1 = f1_score(test_y, y_pred, average="weighted") * 100
-    if acc + f1 > 173:
-        return {
-            "Params": f"{acti}, {learn_rate}, {current_params['hidden_layer_sizes'][0]}",
-            "accuracy %": round(acc, 2),
-            "F1 weighted %": round(f1, 2),
-        }
+
+    # draw draw
+    draw_confusion_matrix(clf, test_x, test_y)
+    draw_roc(test_y, y_pred)
+    # plt.plot(clf.loss_curve_)
+    # plt.show()
+
+    # report
+    return {
+        "Params": f"{acti}, {learn_rate}, {current_params}",
+        "accuracy %": round(acc, 2),
+        "F1 weighted %": round(f1, 2),
+    }
 
 
 pretty.install()
@@ -88,29 +142,20 @@ class_name = ("album", "type")
 count = 0
 reports = pd.DataFrame(columns=["Params", "accuracy %", "F1 weighted %"])
 params = [
-    {"hidden_layer_sizes": (500,)},
-    {"hidden_layer_sizes": (450,)},
-    {"hidden_layer_sizes": (400,)},
-    {"hidden_layer_sizes": (350,)},
-    {"hidden_layer_sizes": (300,)},
-    {"hidden_layer_sizes": (260,)},
-    {"hidden_layer_sizes": (220,)},
-    {"hidden_layer_sizes": (180,)},
-    {"hidden_layer_sizes": (150,)},
-    {"hidden_layer_sizes": (120,)},
-    {"hidden_layer_sizes": (100,)},
-    {"hidden_layer_sizes": (80,)},
-    {"hidden_layer_sizes": (65,)},
-    {"hidden_layer_sizes": (50,)},
-    {"hidden_layer_sizes": (40,)},
-    {"hidden_layer_sizes": (30,)},
-    {"hidden_layer_sizes": (20,)},
-    {"hidden_layer_sizes": (10,)},
+    {
+        "activations": "identity",
+        "learning_rate_inits": 0.001,
+        "hidden_layer_sizes": (350,),
+    },
+    {
+        "activations": "identity",
+        "learning_rate_inits": 0.02,
+        "hidden_layer_sizes": (40,),
+    },
 ]
-testing_params = [{"hidden_layer_sizes": (10,)}]
+testing_params = [params[-1]]
 activations = ["identity", "logistic", "tanh", "relu"]
 learning_rate_inits = [0.01, 0.001, 0.02]
-
 
 # progress reporting init
 progress = Progress(
@@ -120,24 +165,19 @@ progress = Progress(
     "{task.completed} of {task.total}",
 )
 
-# grid search
 with progress:
 
-    task_layers = progress.add_task("[red]Hidden layer sizes…", total=len(params))
-    task_learn = progress.add_task("[green]Learn rate…", total=len(learning_rate_inits))
-    task_acti = progress.add_task("[cyan]Activation funcs…", total=len(activations))
+    task_layers = progress.add_task("[red]Building…", total=len(params))
 
-    for current_params in params:
-        progress.update(task_learn, completed=0)
-        for learn_rate in learning_rate_inits:
-            progress.update(task_acti, completed=0)
-            for acti in activations:
-                row = execute_and_report(learn_rate, acti, current_params)
-                if row:
-                    reports = reports.append(row, ignore_index=True)
-                count += 1
-                progress.advance(task_acti)
-            progress.advance(task_learn)
+    for best_params in params:
+        learn_rate = best_params["learning_rate_inits"]
+        acti = best_params["activations"]
+        hidd = best_params["hidden_layer_sizes"]
+
+        row = execute_and_report(learn_rate, acti, hidd)
+        reports = reports.append(row, ignore_index=True)
+
+        count += 1
         progress.advance(task_layers)
 
 # results

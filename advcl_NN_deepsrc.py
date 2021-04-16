@@ -2,24 +2,11 @@ import matplotlib.pyplot as plt
 import pandas as pd
 from rich import pretty, print
 from rich.progress import BarColumn, Progress
-from sklearn.metrics import accuracy_score, f1_score, plot_confusion_matrix
+from sklearn.metrics import accuracy_score, f1_score
 from sklearn.neural_network import MLPClassifier
 from sklearn.preprocessing import LabelEncoder
 
 import utils
-
-
-def draw_confusion_matrix(Clf, X, y):
-    titles_options = [
-        ("Confusion matrix, without normalization", None),
-        ("Neural network confusion matrix", "true"),
-    ]
-
-    for title, normalize in titles_options:
-        disp = plot_confusion_matrix(Clf, X, y, cmap="Blues", normalize=normalize)
-        disp.ax_.set_title(title)
-
-    plt.show()
 
 
 def execute_and_report(learn_rate, acti, current_params):
@@ -88,27 +75,27 @@ class_name = ("album", "type")
 count = 0
 reports = pd.DataFrame(columns=["Params", "accuracy %", "F1 weighted %"])
 params = [
-    {"hidden_layer_sizes": (500,)},
-    {"hidden_layer_sizes": (450,)},
-    {"hidden_layer_sizes": (400,)},
-    {"hidden_layer_sizes": (350,)},
-    {"hidden_layer_sizes": (300,)},
-    {"hidden_layer_sizes": (260,)},
-    {"hidden_layer_sizes": (220,)},
-    {"hidden_layer_sizes": (180,)},
-    {"hidden_layer_sizes": (150,)},
-    {"hidden_layer_sizes": (120,)},
-    {"hidden_layer_sizes": (100,)},
-    {"hidden_layer_sizes": (80,)},
-    {"hidden_layer_sizes": (65,)},
-    {"hidden_layer_sizes": (50,)},
-    {"hidden_layer_sizes": (40,)},
-    {"hidden_layer_sizes": (30,)},
-    {"hidden_layer_sizes": (20,)},
-    {"hidden_layer_sizes": (10,)},
+    {"hidden_layer_sizes": (350, 350, 350)},
+    {"hidden_layer_sizes": (350, 350)},
+    {"hidden_layer_sizes": (350, 250, 150, 100, 50, 20)},
+    {"hidden_layer_sizes": (350, 200, 100, 50, 20)},
+    {"hidden_layer_sizes": (350, 200, 20)},
+    {"hidden_layer_sizes": (350, 100, 20)},
+    {"hidden_layer_sizes": (350, 20)},
+    {"hidden_layer_sizes": (40, 40, 40, 40, 40, 40)},
+    {"hidden_layer_sizes": (40, 40, 40, 40, 40)},
+    {"hidden_layer_sizes": (40, 40, 40, 40)},
+    {"hidden_layer_sizes": (40, 40, 40)},
+    {"hidden_layer_sizes": (40, 40)},
+    {"hidden_layer_sizes": (40, 33, 27, 20, 13, 8)},
+    {"hidden_layer_sizes": (40, 30, 20, 10, 5)},
+    {"hidden_layer_sizes": (40, 30, 20, 10)},
+    {"hidden_layer_sizes": (40, 20, 10)},
+    {"hidden_layer_sizes": (40, 20, 8)},
+    {"hidden_layer_sizes": (40, 20)},
 ]
 testing_params = [{"hidden_layer_sizes": (10,)}]
-activations = ["identity", "logistic", "tanh", "relu"]
+activations = ["identity", "relu"]
 learning_rate_inits = [0.01, 0.001, 0.02]
 
 
