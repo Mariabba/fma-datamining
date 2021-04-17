@@ -24,7 +24,7 @@ def execute_and_report(learn_rate, acti, current_params):
     f1 = f1_score(test_y, y_pred, average="weighted") * 100
     if acc + f1 > 173:
         return {
-            "Params": f"{acti}, {learn_rate}, {current_params['hidden_layer_sizes'][0]}",
+            "Params": f"{acti}, {learn_rate}, {current_params['hidden_layer_sizes']}",
             "accuracy %": round(acc, 2),
             "F1 weighted %": round(f1, 2),
         }

@@ -5,6 +5,7 @@ from rich.progress import BarColumn, Progress
 from sklearn.metrics import (
     accuracy_score,
     auc,
+    classification_report,
     f1_score,
     plot_confusion_matrix,
     roc_auc_score,
@@ -74,12 +75,14 @@ def execute_and_report(learn_rate, acti, current_params):
     clf.fit(train_x, train_y)
 
     # Apply on the training set
-    # print("Training set:")
-    # Y_pred = clf.predict(train_x)
-    # print(classification_report(train_y, Y_pred))
+    print("Training set:")
+    y_pred = clf.predict(train_x)
+    print(classification_report(train_y, y_pred))
 
     # Apply on the test set and evaluate the performance
     y_pred = clf.predict(test_x)
+    print("Test set:")
+    print(classification_report(test_y, y_pred))
     acc = accuracy_score(test_y, y_pred) * 100
     f1 = f1_score(test_y, y_pred, average="weighted") * 100
 
@@ -145,12 +148,14 @@ params = [
     {
         "activations": "identity",
         "learning_rate_inits": 0.001,
-        "hidden_layer_sizes": (350,),
+        "hidden_layer_sizes": (40, 40),
     },
     {
         "activations": "identity",
-        "learning_rate_inits": 0.02,
-        "hidden_layer_sizes": (40,),
+        "learning_rate_inits": 0.001,
+        "hidden_layer_sizes": (40, 20, 8),
+        # old single layer "learning_rate_inits": 0.02,
+        # old single layer "hidden_layer_sizes": (40,),
     },
 ]
 testing_params = [params[-1]]
@@ -167,7 +172,8 @@ progress = Progress(
 
 with progress:
 
-    task_layers = progress.add_task("[red]Building…", total=len(params))
+    # adjust len if needed
+    task_layers = progress.add_task("[red]Building…", total=len(params) * 2)
 
     for best_params in params:
         learn_rate = best_params["learning_rate_inits"]
@@ -179,6 +185,45 @@ with progress:
 
         count += 1
         progress.advance(task_layers)
+
+    # ------- switch up datasets: put in the 10-feature dataframe
+    train_x, train_y, test_x, test_y = utils.load_tracks_xyz(
+        buckets="discrete", extractclass=("album", "type"), splits=2, small=True
+    ).values()
+
+    # feature to reshape
+    label_encoders = dict()
+    column2encode = [
+        ("track", "duration"),
+        ("track", "interest"),
+        ("track", "listens"),
+    ]
+    for col in column2encode:
+        le = LabelEncoder()
+        le.fit(test_x[col])
+        train_x[col] = le.fit_transform(train_x[col])
+        test_x[col] = le.fit_transform(test_x[col])
+        label_encoders[col] = le
+
+    le = LabelEncoder()
+    le.fit(train_y)
+    test_y = le.fit_transform(test_y)
+    train_y = le.fit_transform(train_y)
+
+    class_name = ("album", "type")
+
+    # rerun neural networks
+    for best_params in params:
+        learn_rate = best_params["learning_rate_inits"]
+        acti = best_params["activations"]
+        hidd = best_params["hidden_layer_sizes"]
+
+        row = execute_and_report(learn_rate, acti, hidd)
+        reports = reports.append(row, ignore_index=True)
+
+        count += 1
+        progress.advance(task_layers)
+    # end switching up datasets -------
 
 # results
 print(reports.sort_values(by=["accuracy %", "F1 weighted %"], ascending=False))
