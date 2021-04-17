@@ -44,6 +44,7 @@ table.add_row(
     f"{mean_absolute_error(test_y.astype(float), y_pred):.3f}",
 )
 
+"""
 # Graphing
 train_graphing = train_x.join(train_y).astype(float)
 train_graphing.columns = train_graphing.columns.get_level_values(1)
@@ -60,7 +61,7 @@ g = sns.jointplot(
     scatter_kws={"s": 20},
 )
 plt.show()
-
+"""
 
 # Lasso
 reg = Lasso()
@@ -70,7 +71,7 @@ print("Intercept:\t", reg.intercept_)
 print("Coefficients:\t", reg.coef_[0])
 y_pred = reg.predict(test_x)
 table.add_row(
-    "Lasso",
+    "uniLasso",
     f"{r2_score(test_y.astype(float), y_pred):.3f}",
     f"{mean_squared_error(test_y.astype(float), y_pred):.3f}",
     f"{mean_absolute_error(test_y.astype(float), y_pred):.3f}",
@@ -85,7 +86,7 @@ print("Intercept:\t", reg.intercept_)
 print("Coefficients:\t", reg.coef_[0])
 y_pred = reg.predict(test_x)
 table.add_row(
-    "Ridge",
+    "uniRidge",
     f"{r2_score(test_y.astype(float), y_pred):.3f}",
     f"{mean_squared_error(test_y.astype(float), y_pred):.3f}",
     f"{mean_absolute_error(test_y.astype(float), y_pred):.3f}",
@@ -93,8 +94,8 @@ table.add_row(
 
 
 # Multivariate
-train_x, train_y, vali_x, vali_y, test_x, test_y = utils.load_tracks_xyz(
-    buckets="continuous", extractclass=("track", "favorites")
+train_x, train_y, test_x, test_y = utils.load_tracks_xyz(
+    buckets="continuous", extractclass=("track", "favorites"), splits=2
 ).values()
 
 label_encoders = dict()
@@ -133,6 +134,90 @@ table.add_row(
     f"{mean_squared_error(test_y, y_pred):.3f}",
     f"{mean_absolute_error(test_y, y_pred):.3f}",
 )
+
+# Lasso
+reg = Lasso()
+reg.fit(train_x, train_y)
+print("[magenta]Lasso[/magenta]")
+print("Intercept:\t", reg.intercept_)
+print("Coefficients:\t", reg.coef_)
+y_pred = reg.predict(test_x)
+table.add_row(
+    "multiLasso",
+    f"{r2_score(test_y.astype(float), y_pred):.3f}",
+    f"{mean_squared_error(test_y.astype(float), y_pred):.3f}",
+    f"{mean_absolute_error(test_y.astype(float), y_pred):.3f}",
+)
+
+
+# Ridge
+reg = Ridge()
+reg.fit(train_x, train_y)
+print("[magenta]Ridge[/magenta]")
+print("Intercept:\t", reg.intercept_)
+print("Coefficients:\t", reg.coef_)
+y_pred = reg.predict(test_x)
+table.add_row(
+    "multiRidge",
+    f"{r2_score(test_y.astype(float), y_pred):.3f}",
+    f"{mean_squared_error(test_y.astype(float), y_pred):.3f}",
+    f"{mean_absolute_error(test_y.astype(float), y_pred):.3f}",
+)
+
+"""
+# Multivariate INTERESTING RUN --- OR IS IT?
+train_x, train_y, test_x, test_y = utils.load_tracks_xyz(
+    buckets="continuous", extractclass=("track", "favorites"), splits=2
+).values()
+
+label_encoders = dict()
+column2encode = [
+    ("track", "language_code"),
+    ("album", "type"),
+    ("track", "license"),
+    ("album", "date_created"),
+    ("artist", "date_created"),
+    ("track", "date_created"),
+    ("track", "duration"),
+]
+for col in column2encode:
+    le = LabelEncoder()
+    train_x[col] = le.fit_transform(train_x[col])
+    test_x[col] = le.fit_transform(test_x[col])
+    label_encoders[col] = le
+
+le = LabelEncoder()
+train_y = le.fit_transform(train_y)
+test_y = le.fit_transform(test_y)
+label_encoders[("track", "favorites")] = le
+
+del train_x[("track", "listens")]
+del test_x[("track", "listens")]
+
+del train_x[("album", "comments")]
+del train_x[("artist", "comments")]
+del train_x[("track", "comments")]
+del test_x[("album", "comments")]
+del test_x[("artist", "comments")]
+del test_x[("track", "comments")]
+
+
+reg = LinearRegression()
+reg.fit(train_x, train_y)
+
+print("[magenta]Multivariate[/magenta]")
+print("Intercept: ", reg.intercept_)
+print("Coefficients: \n", reg.coef_)
+
+y_pred = reg.predict(test_x)
+
+table.add_row(
+    "Multivariate strrrange",
+    f"{r2_score(test_y, y_pred):.3f}",
+    f"{mean_squared_error(test_y, y_pred):.3f}",
+    f"{mean_absolute_error(test_y, y_pred):.3f}",
+)
+"""
 
 console.print(table)
 console.print("[red underline]MSE[/red underline]: Mean squared error")
