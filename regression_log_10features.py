@@ -19,6 +19,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 from sklearn.linear_model import LinearRegression, Ridge, Lasso
 
+
 def draw_confusion_matrix(Clf, X, y):
     titles_options = [
         ("Confusion matrix, without normalization", None),
@@ -54,6 +55,7 @@ for col in column2encode:
     df[col] = le.fit_transform(df[col])
     label_encoders[col] = le
 
+
 def normalize(feature):
     scaler = StandardScaler()
     df[feature] = scaler.fit_transform(df[[feature]])
@@ -72,23 +74,23 @@ y = df[class_name]
 X_train, X_test, y_train, y_test = train_test_split(
     X, y, test_size=0.2, random_state=100, stratify=y
 )
-clf = LogisticRegression(random_state=0, max_iter=1000, C=0.1, penalty='l2')
+clf = LogisticRegression(random_state=0, max_iter=1000, C=0.1, penalty="l2")
 clf.fit(X_train, y_train)
 
 # get importance
 importance = clf.coef_[0]
 
 
-#test
+# test
 top_n = 10
 feat_imp = pd.DataFrame(columns=["columns", "importance"])
 for col, imp in zip(attributes, importance):
-    feat_imp = feat_imp.append(
-        {"columns": col, "importance": imp}, ignore_index=True
-    )
+    feat_imp = feat_imp.append({"columns": col, "importance": imp}, ignore_index=True)
 print(feat_imp)
 
-feat_imp = feat_imp.reindex(feat_imp.importance.abs().sort_values(ascending=False).index)
+feat_imp = feat_imp.reindex(
+    feat_imp.importance.abs().sort_values(ascending=False).index
+)
 feat_imp = feat_imp.iloc[:top_n]
 
 feat_imp.plot(
@@ -100,12 +102,10 @@ feat_imp.plot(
     kind="bar",
     colormap="PiYG",
 )
-plt.axhline(y=0, color='b', linestyle='-')
+plt.axhline(y=0, color="b", linestyle="-")
 plt.show()
 
-#test
-
-
+# test
 
 
 """
@@ -150,14 +150,14 @@ print(roc_auc)
 roc_auc = roc_auc_score(y_test, y_pred, average=None)
 
 plt.figure(figsize=(8, 5))
-plt.plot(fpr, tpr, label='ROC curve (area = %0.2f)' % (roc_auc))
+plt.plot(fpr, tpr, label="ROC curve (area = %0.2f)" % (roc_auc))
 
-plt.plot([0, 1], [0, 1], 'k--')
+plt.plot([0, 1], [0, 1], "k--")
 plt.xlim([0.0, 1.0])
 plt.ylim([0.0, 1.05])
-plt.xlabel('False Positive Rate', fontsize=20)
-plt.ylabel('True Positive Rate', fontsize=20)
-plt.tick_params(axis='both', which='major', labelsize=22)
+plt.xlabel("False Positive Rate", fontsize=20)
+plt.ylabel("True Positive Rate", fontsize=20)
+plt.tick_params(axis="both", which="major", labelsize=22)
 plt.legend(loc="lower right", fontsize=14, frameon=False)
 plt.show()
 

@@ -50,31 +50,32 @@ def report(results, n_top=3):
             print("Parameters: {0}".format(results["params"][candidate]))
             print("")
 
+
 prediction_train = pd.read_csv("RuleBasedResults_train_10.csv")
 prediction_test = pd.read_csv("RuleBasedResults_test_10.csv")
 y_pred_train = []
 y_pred_test = []
 
 for index, row in prediction_train.iterrows():
-    if(row['SingleTracks_y_pred_train'] == True):
+    if row["SingleTracks_y_pred_train"] == True:
         y_pred_train.append("Single Tracks")
-    elif(row['LivePerformance_y_pred_train'] == True):
+    elif row["LivePerformance_y_pred_train"] == True:
         y_pred_train.append("Live Performance")
-    elif(row['RadioProgram_y_pred_train'] == True):
+    elif row["RadioProgram_y_pred_train"] == True:
         y_pred_train.append("Radio Program")
     else:
-        #default case
+        # default case
         y_pred_train.append("Album")
 
 for index, row in prediction_test.iterrows():
-    if(row['SingleTracks_y_pred_test'] == True):
+    if row["SingleTracks_y_pred_test"] == True:
         y_pred_test.append("Single Tracks")
-    elif(row['LivePerformance_y_pred_test'] == True):
+    elif row["LivePerformance_y_pred_test"] == True:
         y_pred_test.append("Live Performance")
-    elif(row['RadioProgram_y_pred_test'] == True):
+    elif row["RadioProgram_y_pred_test"] == True:
         y_pred_test.append("Radio Program")
     else:
-        #default case
+        # default case
         y_pred_test.append("Album")
 
 prediction_train["y_pred"] = y_pred_train
@@ -92,12 +93,12 @@ confusion_matrix(y_train, y_pred)
 # Apply the decision tree on the test set and evaluate the performance
 print("Apply the decision tree on the test set and evaluate the performance: \n")
 y_pred = prediction_test["y_pred"]
-y_test =  prediction_test["y_test"]
+y_test = prediction_test["y_test"]
 print("Accuracy %s" % accuracy_score(y_test, y_pred))
 print("F1-score %s" % f1_score(y_test, y_pred, average=None))
 print(classification_report(y_test, y_pred))
 confusion_matrix(y_test, y_pred)
-#draw_confusion_matrix(ripper_clf, X_test, y_test)
+# draw_confusion_matrix(ripper_clf, X_test, y_test)
 
 # ROC Curve
 from sklearn.preprocessing import LabelBinarizer
@@ -134,4 +135,3 @@ plt.ylabel("True Positive Rate", fontsize=20)
 plt.tick_params(axis="both", which="major", labelsize=22)
 plt.legend(loc="lower right", fontsize=14, frameon=False)
 plt.show()
-

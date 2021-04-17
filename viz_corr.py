@@ -3,12 +3,38 @@ from pathlib import Path
 import matplotlib.pyplot as plt
 import numpy as np
 import seaborn as sns
+from sklearn.preprocessing import LabelEncoder
 
 import utils
 
 sns.set_theme(style="white")
 
-tracks = utils.load("data/tracks.csv", dummies=True)
+tracks = utils.load_tracks(
+    "data/tracks.csv", dummies=True, buckets="discrete", fill=True, outliers=False
+)
+tracks.info()
+
+# Encoding for the correlation
+# feature to reshape
+label_encoders = dict()
+column2encode = [
+    ("album", "comments"),
+    ("album", "favorites"),
+    ("album", "listens"),
+    ("album", "type"),
+    ("artist", "comments"),
+    ("artist", "favorites"),
+    ("track", "comments"),
+    ("track", "favorites"),
+    ("track", "license"),
+    ("track", "listens"),
+    ("track", "language_code"),
+]
+for col in column2encode:
+    le = LabelEncoder()
+    tracks[col] = le.fit_transform(tracks[col])
+    label_encoders[col] = le
+tracks.info()
 
 # Compute the correlation matrix
 corr = tracks.corr()
@@ -37,5 +63,7 @@ sns.heatmap(
 )
 # plt.show()
 plt.title("Correlation Matrix")
+plt.xlabel("Class name")
+plt.ylabel("Class name")
 plt.xticks(fontsize=10)
 plt.savefig(Path("viz/correlation.png"), bbox_inches="tight")

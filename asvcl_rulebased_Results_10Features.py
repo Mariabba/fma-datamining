@@ -73,15 +73,18 @@ df_prediction_test = pd.DataFrame()
 df_prediction_train["y_train"] = y_train
 df_prediction_test["y_test"] = y_test
 
-def SingleTracks(X_train, X_test, y_train, y_test, df_prediction_train, df_prediction_test):
+
+def SingleTracks(
+    X_train, X_test, y_train, y_test, df_prediction_train, df_prediction_test
+):
     print("Prediction SingleTracks:")
-    y_train= y_train.replace(
-    ["Album", "Single Tracks", "Live Performance", "Radio Program"],
-    [1, 0, 1, 1],
+    y_train = y_train.replace(
+        ["Album", "Single Tracks", "Live Performance", "Radio Program"],
+        [1, 0, 1, 1],
     )
     y_test = y_test.replace(
-    ["Album", "Single Tracks", "Live Performance", "Radio Program"],
-    [1, 0, 1, 1],
+        ["Album", "Single Tracks", "Live Performance", "Radio Program"],
+        [1, 0, 1, 1],
     )
     ripper_clf_ST = lw.RIPPER(k=1, prune_size=0.33)
     ripper_clf_ST.fit(X_train, y_train, class_feat=("album", "type"), pos_class=0)
@@ -93,23 +96,26 @@ def SingleTracks(X_train, X_test, y_train, y_test, df_prediction_train, df_predi
     cond_count = ripper_clf_ST.ruleset_.count_conds()
     print(ripper_clf_ST.ruleset_.out_pretty())
     print(ripper_clf_ST.ruleset_)
-    print(f'precision: {precision} recall: {recall} conds: {cond_count}')
+    print(f"precision: {precision} recall: {recall} conds: {cond_count}")
     y_pred_train = ripper_clf_ST.predict(X_train)
     y_pred_test = ripper_clf_ST.predict(X_test)
 
-    df_prediction_train['SingleTracks_y_pred_train'] = y_pred_train
-    df_prediction_test['SingleTracks_y_pred_test'] = y_pred_test
+    df_prediction_train["SingleTracks_y_pred_train"] = y_pred_train
+    df_prediction_test["SingleTracks_y_pred_test"] = y_pred_test
     return df_prediction_train, df_prediction_test
 
-def LivePerformance(X_train, X_test, y_train, y_test, df_prediction_train, df_prediction_test):
+
+def LivePerformance(
+    X_train, X_test, y_train, y_test, df_prediction_train, df_prediction_test
+):
     print("Prediction LivePerformance:")
-    y_train= y_train.replace(
-    ["Album", "Single Tracks", "Live Performance", "Radio Program"],
-    [1, 1, 0, 1],
+    y_train = y_train.replace(
+        ["Album", "Single Tracks", "Live Performance", "Radio Program"],
+        [1, 1, 0, 1],
     )
     y_test = y_test.replace(
-    ["Album", "Single Tracks", "Live Performance", "Radio Program"],
-    [1, 1, 0, 1],
+        ["Album", "Single Tracks", "Live Performance", "Radio Program"],
+        [1, 1, 0, 1],
     )
     ripper_clf_LP = lw.RIPPER(k=1, prune_size=0.33)
     ripper_clf_LP.fit(X_train, y_train, class_feat=("album", "type"), pos_class=0)
@@ -121,23 +127,26 @@ def LivePerformance(X_train, X_test, y_train, y_test, df_prediction_train, df_pr
     cond_count = ripper_clf_LP.ruleset_.count_conds()
     print(ripper_clf_LP.ruleset_.out_pretty())
     print(ripper_clf_LP.ruleset_)
-    print(f'precision: {precision} recall: {recall} conds: {cond_count}')
+    print(f"precision: {precision} recall: {recall} conds: {cond_count}")
     y_pred_train = ripper_clf_LP.predict(X_train)
     y_pred_test = ripper_clf_LP.predict(X_test)
 
-    df_prediction_train['LivePerformance_y_pred_train'] = y_pred_train
-    df_prediction_test['LivePerformance_y_pred_test'] = y_pred_test
+    df_prediction_train["LivePerformance_y_pred_train"] = y_pred_train
+    df_prediction_test["LivePerformance_y_pred_test"] = y_pred_test
     return df_prediction_train, df_prediction_test
 
-def RadioProgram(X_train, X_test, y_train, y_test, df_prediction_train, df_prediction_test):
+
+def RadioProgram(
+    X_train, X_test, y_train, y_test, df_prediction_train, df_prediction_test
+):
     print("Prediction RadioProgram:")
-    y_train= y_train.replace(
-    ["Album", "Single Tracks", "Live Performance", "Radio Program"],
-    [1, 1, 1, 0],
+    y_train = y_train.replace(
+        ["Album", "Single Tracks", "Live Performance", "Radio Program"],
+        [1, 1, 1, 0],
     )
     y_test = y_test.replace(
-    ["Album", "Single Tracks", "Live Performance", "Radio Program"],
-    [1, 1, 1, 0],
+        ["Album", "Single Tracks", "Live Performance", "Radio Program"],
+        [1, 1, 1, 0],
     )
     ripper_clf_RP = lw.RIPPER(k=1, prune_size=0.33)
     ripper_clf_RP.fit(X_train, y_train, class_feat=("album", "type"), pos_class=0)
@@ -149,23 +158,24 @@ def RadioProgram(X_train, X_test, y_train, y_test, df_prediction_train, df_predi
     cond_count = ripper_clf_RP.ruleset_.count_conds()
     print(ripper_clf_RP.ruleset_.out_pretty())
     print(ripper_clf_RP.ruleset_)
-    print(f'precision: {precision} recall: {recall} conds: {cond_count}')
+    print(f"precision: {precision} recall: {recall} conds: {cond_count}")
     y_pred_train = ripper_clf_RP.predict(X_train)
     y_pred_test = ripper_clf_RP.predict(X_test)
 
-    df_prediction_train['RadioProgram_y_pred_train'] = y_pred_train
-    df_prediction_test['RadioProgram_y_pred_test'] = y_pred_test
+    df_prediction_train["RadioProgram_y_pred_train"] = y_pred_train
+    df_prediction_test["RadioProgram_y_pred_test"] = y_pred_test
     return df_prediction_train, df_prediction_test
+
 
 def Album(X_train, X_test, y_train, y_test, df_prediction_train, df_prediction_test):
     print("Prediction Album:")
-    y_train= y_train.replace(
-    ["Album", "Single Tracks", "Live Performance", "Radio Program"],
-    [0, 1, 1, 1],
+    y_train = y_train.replace(
+        ["Album", "Single Tracks", "Live Performance", "Radio Program"],
+        [0, 1, 1, 1],
     )
     y_test = y_test.replace(
-    ["Album", "Single Tracks", "Live Performance", "Radio Program"],
-    [0, 1, 1, 1],
+        ["Album", "Single Tracks", "Live Performance", "Radio Program"],
+        [0, 1, 1, 1],
     )
     ripper_clf_A = lw.RIPPER(k=1, prune_size=0.33)
     ripper_clf_A.fit(X_train, y_train, class_feat=("album", "type"), pos_class=0)
@@ -177,19 +187,27 @@ def Album(X_train, X_test, y_train, y_test, df_prediction_train, df_prediction_t
     cond_count = ripper_clf_A.ruleset_.count_conds()
     print(ripper_clf_A.ruleset_.out_pretty())
     print(ripper_clf_A.ruleset_)
-    print(f'precision: {precision} recall: {recall} conds: {cond_count}')
+    print(f"precision: {precision} recall: {recall} conds: {cond_count}")
     y_pred_train = ripper_clf_A.predict(X_train)
     y_pred_test = ripper_clf_A.predict(X_test)
 
-    df_prediction_train['Album_y_pred_train'] = y_pred_train
-    df_prediction_test['Album_y_pred_test'] = y_pred_test
+    df_prediction_train["Album_y_pred_train"] = y_pred_train
+    df_prediction_test["Album_y_pred_test"] = y_pred_test
     return df_prediction_train, df_prediction_test
 
 
-df_prediction_train, df_prediction_test = SingleTracks(X_train, X_test, y_train, y_test, df_prediction_train, df_prediction_test)
-df_prediction_train, df_prediction_test = LivePerformance(X_train, X_test, y_train, y_test, df_prediction_train, df_prediction_test)
-df_prediction_train, df_prediction_test = RadioProgram(X_train, X_test, y_train, y_test, df_prediction_train, df_prediction_test)
-df_prediction_train, df_prediction_test = Album(X_train, X_test, y_train, y_test, df_prediction_train, df_prediction_test)
+df_prediction_train, df_prediction_test = SingleTracks(
+    X_train, X_test, y_train, y_test, df_prediction_train, df_prediction_test
+)
+df_prediction_train, df_prediction_test = LivePerformance(
+    X_train, X_test, y_train, y_test, df_prediction_train, df_prediction_test
+)
+df_prediction_train, df_prediction_test = RadioProgram(
+    X_train, X_test, y_train, y_test, df_prediction_train, df_prediction_test
+)
+df_prediction_train, df_prediction_test = Album(
+    X_train, X_test, y_train, y_test, df_prediction_train, df_prediction_test
+)
 
 
 df_prediction_train.to_csv("RuleBasedResults_train_10.csv", index=False)
