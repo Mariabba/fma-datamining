@@ -222,7 +222,7 @@ def load(
     del df[("track", "genres_all")]
 
     df.attrs["df_name"] = filename
-    save_pickle(df, buckets, dummies, fill, outliers)
+    # save_pickle(df, buckets, dummies, fill, outliers)  deactivated to avoid conflicts
     return df
 
 
