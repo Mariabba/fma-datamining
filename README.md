@@ -22,6 +22,16 @@ N.B. When “solving the classification task”, remember, (i) to test, when nee
 
 **3-Select two continuous attributes, define a regression problem** and try to solve it using different techniques reporting various evaluation measures. Plot the two-dimensional dataset. Then generalize to multiple linear regression and observe how the performance varies.
 
+## Module 3 - Time Series Analysis
+
+**1-Select the feature(s) you prefer and use it (them) as a time series.** You can use the temporal information provided by the authors’ datasets, but you are also welcome in exploring the .mp3 files to build your own dataset of time series according to your purposes. You should prepare a dataset on which you can run time series clustering; motif/anomaly discovery and classification.
+**2-On the dataset created, compute clustering** based on Euclidean/Manhattan and DTW distances and compare the results. To perform the clustering you can choose among different distance functions and clustering algorithms. Remember that you can reduce the dimensionality through approximation. Analyze the clusters and highlight similarities and differences.
+**3-Analyze the dataset for finding motifs and/or anomalies.** Visualize and discuss them and their relationship with other features.
+**4-Solve the classification task on the time series dataset(s) and evaluate each result.** In particular, you should use shapelet-based classifiers. Analyze the shapelets retrieved and discuss if there are any similarities/differences with motifs and/or shapelets.
+
+
+
+
 
 # Usage
 ## utils.py
