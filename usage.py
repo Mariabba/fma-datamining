@@ -1,4 +1,5 @@
 import pandas as pd
+from matplotlib import pyplot as plt
 from rich import pretty, print
 
 import utils
@@ -6,12 +7,14 @@ import utils
 pretty.install()
 # genres = utils.load("data/genres.csv")
 # echonest = utils.load("data/echonest.csv")
-tracks = utils.load_tracks(buckets="continuous", dummies=True, fill=True, outliers=True)
+tracks = utils.load_tracks(
+    buckets="continuous", dummies=True, fill=True, outliers=False
+)
 # artists = utils.load("data/raw_artists.csv")
 
 print(tracks.info())
 
-exit()
+
 threshold = 0.9
 
 low_coverage = []
@@ -21,7 +24,17 @@ for col in tracks:
         low_coverage.append(col)
 
 print(low_coverage)
+print(tracks[("track", "duration")].describe())
 
+import seaborn as sns
+
+fig = plt.subplots(figsize=(100, 20))
+fig_dims = (1, 1)
+ax = plt.subplot2grid(fig_dims, (0, 0))
+sns.countplot(x=("track", "interest"), data=tracks, palette="hls")
+plt.title("Frequency of duration")
+plt.xticks(rotation=90)
+plt.show()
 # error checking
 # errors = utils.check_rules(tracks, "data/rules.txt")
 # print(errors)
