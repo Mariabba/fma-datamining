@@ -132,3 +132,4 @@ dmypy.json
 load.py
 .idea/
 data/tracks.csv
+data/music/

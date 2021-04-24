@@ -35,6 +35,15 @@ N.B. When “solving the classification task”, remember, (i) to test, when nee
 
 
 # Usage
+## music.py
+from music import MusicDB
+musi = MusicDB()
+musi.df.info()
+
+### musi.df
+A pd.DataFrame with as many features as in our check song (which for now is *data/music/000/000002.mp3*) and with as many rows as songs in the small dataset (8000).
+
+
 ## utils.py
 import utils
 

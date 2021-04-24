@@ -1,9 +1,14 @@
-import attr
-from numpy import blackman, mask_indices
-import pandas as pd
-import librosa
+import sys
+import warnings
 from pathlib import Path
-import matplotlib.pyplot as plt
+
+import attr
+import librosa
+import pandas as pd
+from rich.progress import track
+
+if not sys.warnoptions:
+    warnings.simplefilter("ignore")
 
 
 @attr.s
@@ -13,7 +18,7 @@ class MusicDB(object):
     @df.default
     def _dataframe_default(self):
         pick = self._dataframe_pickleload()
-        if pick:
+        if type(pick) is not bool:
             return pick
         # if not, populate
         return self._dataframe_populate()
@@ -28,32 +33,39 @@ class MusicDB(object):
         return pipi
 
     def _dataframe_populate(self):
-        # estabilish number of features
-        y, sr = librosa.load("data/music/000002.mp3", sr=None)
+        # estabilish number of features using the main song
+        y, sr = librosa.load("data/music/000/000002.mp3", sr=None)
         miao = librosa.resample(y, sr, 90)
-        miao = len(miao)
+        number_of_feat = len(miao)
 
         # make df
-        dfm = pd.DataFrame(columns=list(range(miao)))
+        print(f"Building a dataframe with {number_of_feat} features.")
+        dfm = pd.DataFrame(columns=list(range(number_of_feat)))
 
         # populate collection of paths of mp3s
-        p = Path("data/music").glob("**/*")
+        p = Path("data/music").glob("**/*.mp3")
         tracks = [x for x in p if x.is_file()]
+        print(f"Making a Dataframe of len {len(tracks)}.")
 
         # populate df
-        for track in tracks:
+        for song in track(tracks):
             # extract waveform and convert
-            y, _ = librosa.load(track, sr=None)
+            y, _ = librosa.load(str(song), sr=None)
             miao = librosa.resample(y, sr, 90)
 
             # fix the index
             miao = pd.Series(data=miao)
-            miao.name = int(track.stem)
+            miao.name = int(song.stem)
 
             # append to dfm
             dfm = dfm.append(miao)
 
-        # -> 🐱 remember to save df
+        dfm = dfm.sort_index()
+        # ensure the shape is the one of the main song
+        dfm = dfm.loc[:, : number_of_feat - 1]
+        print(f"There were {dfm.shape[0] * dfm.shape[1] - dfm.count().sum()} NaN.")
+        dfm = dfm.fillna(value=0)
+        dfm.to_pickle("data/picks/small.pkl")
         return dfm
 
 
