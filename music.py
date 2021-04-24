@@ -1,3 +1,4 @@
+import multiprocessing
 import sys
 import warnings
 from pathlib import Path
@@ -5,7 +6,7 @@ from pathlib import Path
 import attr
 import librosa
 import pandas as pd
-from rich.progress import track
+from rich.progress import BarColumn, Progress, TimeRemainingColumn
 
 if not sys.warnoptions:
     warnings.simplefilter("ignore")
@@ -47,18 +48,22 @@ class MusicDB(object):
         tracks = [x for x in p if x.is_file()]
         print(f"Making a Dataframe of len {len(tracks)}.")
 
+        # make progress reporting
+        progress = Progress(
+            "[progress.description]{task.description}",
+            BarColumn(),
+            "{task.completed} of {task.total}",
+            "[progress.percentage]{task.percentage:>3.0f}%",
+            TimeRemainingColumn(),
+        )
+
         # populate df
-        for song in track(tracks):
-            # extract waveform and convert
-            y, _ = librosa.load(str(song), sr=None)
-            miao = librosa.resample(y, sr, 90)
-
-            # fix the index
-            miao = pd.Series(data=miao)
-            miao.name = int(song.stem)
-
-            # append to dfm
-            dfm = dfm.append(miao)
+        with progress:
+            task_id = progress.add_task("[cyan]Extracting...", total=len(tracks))
+            with multiprocessing.Pool() as pool:
+                for row in pool.imap_unordered(self._do_one_song, tracks):
+                    dfm = dfm.append(row)
+                    progress.advance(task_id)
 
         dfm = dfm.sort_index()
         # ensure the shape is the one of the main song
@@ -67,6 +72,15 @@ class MusicDB(object):
         dfm = dfm.fillna(value=0)
         dfm.to_pickle("data/picks/small.pkl")
         return dfm
+
+    def _do_one_song(self, song):
+        # extract waveform and convert
+        y, sr = librosa.load(str(song), sr=None)
+        miao = librosa.resample(y, sr, 90)
+        # fix the index
+        miao = pd.Series(data=miao)
+        miao.name = int(song.stem)
+        return miao
 
 
 if __name__ == "__main__":

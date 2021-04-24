@@ -39,11 +39,11 @@ N.B. When “solving the classification task”, remember, (i) to test, when nee
 ```python
 from music import MusicDB
 musi = MusicDB()
-musi.df.info()
+print(musi.df.info())
 ```
 
-### musi.df
-A pd.DataFrame with as many features as in our check song (which for now is *data/music/000/000002.mp3*) and with as many rows as songs in the small dataset (8000).
+### MusicDB.df
+A **pandas.DataFrame** with the number of features determined by our *main song* (which for now is *data/music/000/000002.mp3*) and with as many rows as songs in the small dataset (8000).
 
 
 ## utils.py
