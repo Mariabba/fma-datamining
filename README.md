@@ -123,13 +123,14 @@ Same exact usage as `utils.load_tracks()`, but returns only the *10 features* + 
 # Filenaming guidelines
 | Module | Filename |
 |:--|:--|
-1 Starting classification | starting_***method***_***type***.py
+1 Starting classification | basic_***method***_***type***.py
 1 Anomaly detection | outliers_***method***_***type***.py
 1 Imbalanced learning | imbalance_***method***_***type***.py
 2 Advanced Classification | advcl_***method***_***type***.py
 2 Regression | regression_***method***_***type***.py
+3 Time Series | ts_***method***_***type***.py
 
-(_***type*** is optional for all files)
+(***_type*** is optional for all files)
 
 Example:
 - imbalance_KNN_over.py

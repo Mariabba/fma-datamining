@@ -34,7 +34,12 @@ class MusicDB(object):
         self.df = pd.DataFrame(columns=list(range(30)))
         self.df = self.df.append([["miao" for _ in range(30)]], ignore_index=True)
 
-        y, sr = librosa.load("data/000002.mp3", sr=None)
+        try:
+            y, sr = librosa.load("data/000002.mp3", sr=None)
+        except RuntimeError:  # this for Marianna b/c computer runs on hamsters
+            my_path = Path.cwd() / "data/000002.mp3"
+            y, sr = librosa.load(str(my_path), sr=None)
+
         miao = librosa.resample(y, sr, 90)
         print(y, sr)
         print(len(y))
