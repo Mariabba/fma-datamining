@@ -21,6 +21,7 @@ def load_tracks_xyz(
     fill=True,
     outliers=True,
     extractclass=None,
+    small=False,
     _good=True,
 ) -> dict:
     docstring = """
@@ -32,7 +33,12 @@ def load_tracks_xyz(
     If extractclass=column : returns a dict of [train_x, train_y, vali_x, vali_y, test_x, test_y]
     or if extractclass=column, splits = 2 : returns dict of [train_x, train_y, test_x, test_y]
     """
-    df = load(filepath, buckets, dummies, fill, outliers, _good)
+    if small:
+        df = load_small_tracks(
+            filepath, buckets, dummies, fill, outliers, _good, _xyz=True
+        )
+    else:
+        df = load(filepath, buckets, dummies, fill, outliers, _good)
 
     # split train, vali, test
     mask_train = df[("set", "split")] == "training"
@@ -76,8 +82,9 @@ def load_small_tracks(
     fill=True,
     outliers=True,
     _good=True,
+    _xyz=False,
 ) -> pd.DataFrame:
-    df = load_tracks(filepath, buckets, dummies, fill, outliers, _good)
+    df = load(filepath, buckets, dummies, fill, outliers, _good)
 
     columns_to_keep = [
         ("album", "type"),
@@ -91,9 +98,13 @@ def load_small_tracks(
         ("track", "duration"),  # continuous from here on out
         ("track", "listens"),
         ("track", "interest"),
+        ("set", "split"),
     ]
 
     df = df[columns_to_keep]
+
+    if not _xyz:
+        del df[("set", "split")]
     return df
 
 
@@ -113,10 +124,6 @@ def load_tracks(
     outliers=True|False default True
     """
 
-    # integrity check
-    if buckets not in ["basic", "continuous", "discrete"]:
-        raise ValueError(docstring)
-
     df = load(filepath, buckets, dummies, fill, outliers, _good)
     del df[("set", "split")]
 
@@ -134,6 +141,12 @@ def load(
     """
     private function
     """
+
+    # integrity check
+    if buckets not in ["basic", "continuous", "discrete"]:
+        raise ValueError(
+            "You passed a wrong 'buckets' parameter. Please refer to README.md for documentation."
+        )
 
     if not _good:
         print(
