@@ -42,6 +42,7 @@ class MusicDB(object):
         # make df
         print(f"Building a dataframe with {number_of_feat} features.")
         dfm = pd.DataFrame(columns=list(range(number_of_feat)))
+        num_errors = 0
 
         # populate collection of paths of mp3s
         p = Path("data/music").glob("**/*.mp3")
@@ -62,25 +63,32 @@ class MusicDB(object):
             task_id = progress.add_task("[cyan]Extracting...", total=len(tracks))
             with multiprocessing.Pool() as pool:
                 for row in pool.imap_unordered(self._do_one_song, tracks):
-                    dfm = dfm.append(row)
+                    if type(row) is not bool:
+                        dfm = dfm.append(row)
+                    else:
+                        num_errors += 1
                     progress.advance(task_id)
 
         dfm = dfm.sort_index()
         # ensure the shape is the one of the main song
         dfm = dfm.loc[:, : number_of_feat - 1]
         print(f"There were {dfm.shape[0] * dfm.shape[1] - dfm.count().sum()} NaN.")
+        print(f"There also were {num_errors} errors.")
         dfm = dfm.fillna(value=0)
         dfm.to_pickle("data/picks/small.pkl")
         return dfm
 
     def _do_one_song(self, song):
         # extract waveform and convert
-        y, sr = librosa.load(str(song), sr=None)
-        miao = librosa.resample(y, sr, 90)
-        # fix the index
-        miao = pd.Series(data=miao)
-        miao.name = int(song.stem)
-        return miao
+        try:
+            y, sr = librosa.load(str(song), sr=None)
+            miao = librosa.resample(y, sr, 120)
+            # fix the index
+            miao = pd.Series(data=miao)
+            miao.name = int(song.stem)
+            return miao
+        except:
+            return False
 
 
 if __name__ == "__main__":
