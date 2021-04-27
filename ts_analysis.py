@@ -1,4 +1,5 @@
 # pandas libraries
+import librosa
 import pandas as pd
 from pandas import DataFrame
 from pandas.testing import assert_frame_equal
@@ -8,8 +9,11 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 import numpy as np
 from music import MusicDB
+import IPython.display as ipd
 
 # Carico musi come dataframe 62 rows
+
+
 musi = MusicDB()
 musi.df.info()
 print(musi.df)
@@ -37,14 +41,13 @@ sns.set(rc={"figure.figsize": (11, 4)})
 plt.plot(musi.df, linewidth=0.5)
 plt.show()
 
-# sono pazza scusate
-from tslearn.clustering import TimeSeriesKMeans
+# Ascoltare le canzoni
 
-# from tslearn.generators import random_walks
-"""
-X = random_walks(n_ts=50, sz=32, d=1)
-X.shape
-np.squeeze(X).shape
-plt.plot(np.squeeze(X).T)
-plt.show()
-"""
+filename = musi.df[2]
+print("File: {}".format(filename))
+
+x, sr = librosa.load(filename, sr=None, mono=True)
+print("Duration: {:.2f}s, {} samples".format(x.shape[-1] / sr, x.size))
+
+start, end = 7, 17
+ipd.Audio(data=x[start * sr : end * sr], rate=sr)
