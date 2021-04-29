@@ -40,7 +40,7 @@ plt.show()
 sns.set(rc={"figure.figsize": (11, 4)})
 plt.plot(musi.df, linewidth=0.5)
 plt.show()
-
+"""
 # Ascoltare le canzoni
 
 filename = musi.df[2]
@@ -51,3 +51,23 @@ print("Duration: {:.2f}s, {} samples".format(x.shape[-1] / sr, x.size))
 
 start, end = 7, 17
 ipd.Audio(data=x[start * sr : end * sr], rate=sr)
+"""
+from tslearn.clustering import TimeSeriesKMeans
+from tslearn.generators import random_walks
+
+X = random_walks(n_ts=50, sz=32, d=1)
+print(X.shape)
+print(np.squeeze(X).shape)
+
+plt.plot(np.squeeze(X).T)
+plt.show()
+
+
+km = TimeSeriesKMeans(n_clusters=3, metric="euclidean", max_iter=5, random_state=0)
+km.fit(X)
+
+print(km.cluster_centers_.shape)
+
+
+plt.plot(np.squeeze(km.cluster_centers_).T)
+plt.show()
