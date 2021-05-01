@@ -115,6 +115,7 @@ def load_tracks(
     fill=True,
     outliers=True,
     _good=True,
+    givegenre=False,
 ) -> pd.DataFrame:
     docstring = """
     usage: load_tracks(string filepath default data/tracks.csv,
@@ -124,7 +125,7 @@ def load_tracks(
     outliers=True|False default True
     """
 
-    df = load(filepath, buckets, dummies, fill, outliers, _good)
+    df = load(filepath, buckets, dummies, fill, outliers, _good, givegenre)
     del df[("set", "split")]
 
     return df
@@ -137,6 +138,7 @@ def load(
     fill=False,
     outliers=False,
     _good=False,
+    givegenre=False,
 ) -> pd.DataFrame:
     """
     private function
@@ -156,7 +158,7 @@ def load(
          This will still work as usual anyways. :kiss: [/magenta]\n"""
         )
 
-    pipi = check_pickle(buckets, dummies, fill, outliers)
+    pipi = check_pickle(buckets, dummies, fill, outliers, givegenre)
     if pipi["status"]:  # must be boolean
         return pipi["df"]  # must be dataframe
 
@@ -231,11 +233,12 @@ def load(
 
     # delete columns that we used in some method
     del df[("track", "title")]
-    del df[("track", "genre_top")]
     del df[("track", "genres_all")]
+    if not givegenre:
+        del df[("track", "genre_top")]
 
     df.attrs["df_name"] = filename
-    # save_pickle(df, buckets, dummies, fill, outliers)  deactivated to avoid conflicts
+    save_pickle(df, buckets, dummies, fill, outliers, givegenre)
     return df
 
 
@@ -561,9 +564,9 @@ def treat_outliers(df: pd.DataFrame) -> pd.DataFrame:
     return df[df_outliers["0"] == 0]
 
 
-def check_pickle(buckets, dummies, fill, outliers):
+def check_pickle(buckets, dummies, fill, outliers, givegenre):
     pipi = {"status": False, "df": None}
-    path_to_pickle = make_pick_encoding(buckets, dummies, fill, outliers)
+    path_to_pickle = make_pick_encoding(buckets, dummies, fill, outliers, givegenre)
 
     try:
         pipi["df"] = pd.read_pickle(path_to_pickle)
@@ -574,12 +577,12 @@ def check_pickle(buckets, dummies, fill, outliers):
     return pipi
 
 
-def save_pickle(df, buckets, dummies, fill, outliers):
-    path_to_pickle = make_pick_encoding(buckets, dummies, fill, outliers)
+def save_pickle(df, buckets, dummies, fill, outliers, givegenre):
+    path_to_pickle = make_pick_encoding(buckets, dummies, fill, outliers, givegenre)
     df.to_pickle(path_to_pickle)
 
 
-def make_pick_encoding(buckets, dummies, fill, outliers) -> Path:
+def make_pick_encoding(buckets, dummies, fill, outliers, givegenre) -> Path:
     """
     Remember that I put tracks hardcoded in here. If necessary other csv than tracks, must change it with
     filename logic like in load()
@@ -589,6 +592,7 @@ def make_pick_encoding(buckets, dummies, fill, outliers) -> Path:
     encoded += "1" if dummies else "0"
     encoded += "1" if fill else "0"
     encoded += "1" if outliers else "0"
+    encoded += "1" if givegenre else "0"
     encoded = "data/picks/tracks" + encoded + ".pkl"
     path_to_pickle = Path(encoded)
 

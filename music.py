@@ -8,6 +8,8 @@ import librosa
 import pandas as pd
 from rich.progress import BarColumn, Progress, TimeRemainingColumn
 
+import utils
+
 if not sys.warnoptions:
     warnings.simplefilter("ignore")
 
@@ -15,6 +17,15 @@ if not sys.warnoptions:
 @attr.s
 class MusicDB(object):
     df = attr.ib()
+    feat = attr.ib()
+
+    @feat.default
+    def _feat_default(self):
+        our_feat = utils.load_tracks(givegenre=True, outliers=False, fill=False)
+        miao = our_feat[[("track", "genre_top")]]
+        miao = miao.loc[self.df.index]
+        miao.columns = ["genre"]
+        return miao
 
     @df.default
     def _dataframe_default(self):
