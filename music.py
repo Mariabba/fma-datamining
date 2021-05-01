@@ -25,6 +25,7 @@ class MusicDB(object):
         miao = our_feat[[("track", "genre_top")]]
         miao = miao.loc[self.df.index]
         miao.columns = ["genre"]
+        miao["enc_genre"] = miao["genre"].astype("category").cat.codes
         return miao
 
     @df.default
