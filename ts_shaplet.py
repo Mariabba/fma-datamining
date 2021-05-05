@@ -70,7 +70,7 @@ shp_clf = ShapeletModel(
     n_shapelets_per_size=shapelet_sizes,
     optimizer="sgd",
     weight_regularizer=0.01,
-    max_iter=1,
+    max_iter=50,
     verbose=1,
 )
 
@@ -108,7 +108,7 @@ for i, sz in enumerate(shapelet_sizes.keys()):
     plt.title("%d shapelets of size %d" % (shapelet_sizes[sz], sz))
     for shp in shp_clf.shapelets_:
         if ts_size(shp) == sz:
-            plt.plot(shp.ravel(), label=" Shaplet")
+            plt.plot(shp.ravel(), label=" Shaplet ")
     plt.xlim([0, max(shapelet_sizes.keys()) - 1])
 
 plt.tight_layout()
@@ -129,7 +129,6 @@ sel_shapelets = np.asarray(
         shp_clf.shapelets_[7],
     ],
 )
-
 
 fig, axs = plt.subplots(4, 2, figsize=(10, 12))
 
