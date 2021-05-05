@@ -56,55 +56,6 @@ print(musi.df.info())
 X = musi.df
 y = musi.feat["enc_genre"]  # classe targed ovvero genere con l'encoding
 
-"""Creazione shaplet
-# versione 1
-n_ts, ts_sz = X.shape
-n_classes = len(set(y))
-
-# Set the number of shapelets per size as done in the original paper
-shapelet_sizes = grabocka_params_to_shapelet_size_dict(
-    n_ts=n_ts, ts_sz=ts_sz, n_classes=n_classes, l=0.1, r=1
-)
-
-print("n_ts", n_ts)
-print("ts_sz", ts_sz)
-print("n_classes", n_classes)
-print("shapelet_sizes", shapelet_sizes)
-
-
-# Define the model using parameters provided by the authors (except that we use
-# fewer iterations here)
-shp_clf = ShapeletModel(
-    n_shapelets_per_size=shapelet_sizes,
-    optimizer="sgd",
-    weight_regularizer=0.01,
-    max_iter=60,
-    verbose=1,
-)
-
-shp_clf.fit(X, y)
-
-predicted_labels = shp_clf.predict(X)
-print("Correct classification rate:", accuracy_score(y, predicted_labels))
-
-predicted_locations = shp_clf.locate(X)
-
-ts_id = 0
-plt.figure()
-n_shapelets = sum(shapelet_sizes.values())
-plt.title(
-    "Example locations of shapelet matches "
-    "(%d shapelets extracted)".format(n_shapelets)
-)
-
-plt.plot(X[ts_id].ravel())
-for idx_shp, shp in enumerate(shp_clf.shapelets_):
-    t0 = predicted_locations[ts_id, idx_shp]
-    plt.plot(np.arange(t0, t0 + len(shp)), shp, linewidth=2)
-
-plt.show()
-"""
-
 
 def draw_confusion_matrix(Clf, X, y):
     titles_options = [
@@ -119,7 +70,7 @@ def draw_confusion_matrix(Clf, X, y):
     plt.show()
 
 
-""""CLASSIFICAZIONE 1 SHAPLET CLASSIFIER"""
+""""CLASSIFICAZIONE 1- SHAPLET CLASSIFIER"""
 
 scaler = TimeSeriesScalerMeanVariance()
 X = scaler.fit_transform(X).reshape(X.shape[0], X.shape[1])
@@ -203,7 +154,7 @@ plt.tick_params(axis="both", which="major", labelsize=12)
 plt.legend(loc="lower right", fontsize=7, frameon=False)
 plt.show()
 
-""" Provo a inserire il knn"""
+""" SHAPLET BASED KNN """
 
 X_train2 = shp_clf.transform(X_train)
 print("train shape:", X_train2.shape)
@@ -261,7 +212,9 @@ plt.tick_params(axis="both", which="major", labelsize=12)
 plt.legend(loc="lower right", fontsize=7, frameon=False)
 plt.show()
 
-"""
+"""GRID SEARCH SHAPLET BASED KNN
+
+
 print("STA FACENDO LA GRIDSEARCH")
 param_list = {
     "n_neighbors": list(np.arange(1, 20)),
