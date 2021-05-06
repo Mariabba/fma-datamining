@@ -55,9 +55,10 @@ n_ts, ts_sz = X.shape
 n_classes = len(set(y))
 
 # Set the number of shapelets per size as done in the original paper
-shapelet_sizes = grabocka_params_to_shapelet_size_dict(
-    n_ts=n_ts, ts_sz=ts_sz, n_classes=n_classes, l=0.1, r=1
-)
+# shapelet_sizes = grabocka_params_to_shapelet_size_dict(
+#    n_ts=n_ts, ts_sz=ts_sz, n_classes=n_classes, l=0.1, r=1
+# )
+shapelet_sizes = {250: 24}
 
 print("n_ts", n_ts)
 print("ts_sz", ts_sz)
@@ -108,11 +109,10 @@ for i, sz in enumerate(shapelet_sizes.keys()):
     plt.title("%d shapelets of size %d" % (shapelet_sizes[sz], sz))
     for shp in shp_clf.shapelets_:
         if ts_size(shp) == sz:
-            plt.plot(shp.ravel(), label=" Shaplet ")
+            plt.plot(shp.ravel())
     plt.xlim([0, max(shapelet_sizes.keys()) - 1])
 
 plt.tight_layout()
-plt.legend()
 plt.show()
 
 """plot singoli shaplet"""
@@ -127,11 +127,25 @@ sel_shapelets = np.asarray(
         shp_clf.shapelets_[5],
         shp_clf.shapelets_[6],
         shp_clf.shapelets_[7],
+        shp_clf.shapelets_[8],
+        shp_clf.shapelets_[9],
+        shp_clf.shapelets_[10],
+        shp_clf.shapelets_[11],
+        shp_clf.shapelets_[12],
+        shp_clf.shapelets_[13],
+        shp_clf.shapelets_[14],
+        shp_clf.shapelets_[15],
+        shp_clf.shapelets_[16],
+        shp_clf.shapelets_[17],
+        shp_clf.shapelets_[18],
+        shp_clf.shapelets_[19],
+        shp_clf.shapelets_[20],
+        shp_clf.shapelets_[21],
+        shp_clf.shapelets_[22],
+        shp_clf.shapelets_[23],
     ],
 )
-
 fig, axs = plt.subplots(4, 2, figsize=(10, 12))
-
 axs[0, 0].plot(sel_shapelets[0], color="blue")
 axs[0, 0].set_title("shaplet 0")
 
@@ -155,6 +169,60 @@ axs[3, 0].set_title("shaplet 6")
 
 axs[3, 1].plot(sel_shapelets[7], color="gray")
 axs[3, 1].set_title("shaplet 7")
+fig.tight_layout()
+plt.show()
 
+fig, axs = plt.subplots(4, 2, figsize=(10, 12))
+axs[0, 0].plot(sel_shapelets[8], color="blue")
+axs[0, 0].set_title("shaplet 8")
+
+axs[0, 1].plot(sel_shapelets[9], color="orange")
+axs[0, 1].set_title("shaplet 9")
+
+axs[1, 0].plot(sel_shapelets[10], color="green")
+axs[1, 0].set_title("shaplet 10")
+
+axs[1, 1].plot(sel_shapelets[11], color="red")
+axs[1, 1].set_title("shaplet 11")
+
+axs[2, 0].plot(sel_shapelets[12], color="purple")
+axs[2, 0].set_title("shaplet 12")
+
+axs[2, 1].plot(sel_shapelets[13], color="brown")
+axs[2, 1].set_title("shaplet 13")
+
+axs[3, 0].plot(sel_shapelets[14], color="pink")
+axs[3, 0].set_title("shaplet 14")
+
+axs[3, 1].plot(sel_shapelets[15], color="gray")
+axs[3, 1].set_title("shaplet 15")
+fig.tight_layout()
+plt.show()
+
+
+fig, axs = plt.subplots(4, 2, figsize=(10, 12))
+axs[0, 0].plot(sel_shapelets[16], color="blue")
+axs[0, 0].set_title("shaplet 16")
+
+axs[0, 1].plot(sel_shapelets[17], color="orange")
+axs[0, 1].set_title("shaplet 17")
+
+axs[1, 0].plot(sel_shapelets[18], color="green")
+axs[1, 0].set_title("shaplet 18")
+
+axs[1, 1].plot(sel_shapelets[19], color="red")
+axs[1, 1].set_title("shaplet 19")
+
+axs[2, 0].plot(sel_shapelets[20], color="purple")
+axs[2, 0].set_title("shaplet 20")
+
+axs[2, 1].plot(sel_shapelets[21], color="brown")
+axs[2, 1].set_title("shaplet 21")
+
+axs[3, 0].plot(sel_shapelets[22], color="pink")
+axs[3, 0].set_title("shaplet 22")
+
+axs[3, 1].plot(sel_shapelets[23], color="gray")
+axs[3, 1].set_title("shaplet 23")
 fig.tight_layout()
 plt.show()

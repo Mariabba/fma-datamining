@@ -7,6 +7,7 @@ import IPython.display as ipd
 import matplotlib.pyplot as plt
 import seaborn as sns
 import numpy as np
+from sklearn.ensemble import RandomForestClassifier
 from sklearn.neighbors import KNeighborsClassifier
 from sklearn.preprocessing import LabelBinarizer
 from tslearn.clustering import TimeSeriesKMeans, silhouette_score
@@ -45,7 +46,7 @@ FILE 1  -CLASSIFICAZIONE A 8 CLASSI-GENERE CON GLI SHAPELET
 In questo file vi è la creazione degli shpalet con 2 tipologie di classifcazione:
 
 1- shaplet base 
-2- shaplet Distance Based Class-KNN
+2- shaplet Distance Based Class RANDOM FOREST
 
 """
 
@@ -84,7 +85,7 @@ n_classes = len(set(y))
 
 # Set the number of shapelets per size as done in the original paper
 shapelet_sizes = grabocka_params_to_shapelet_size_dict(
-    n_ts=n_ts, ts_sz=ts_sz, n_classes=n_classes, l=0.1, r=1
+    n_ts=n_ts, ts_sz=ts_sz, n_classes=n_classes, l=0.01, r=1
 )
 
 print("n_ts", n_ts)
@@ -154,30 +155,41 @@ plt.tick_params(axis="both", which="major", labelsize=12)
 plt.legend(loc="lower right", fontsize=7, frameon=False)
 plt.show()
 
-""" SHAPLET BASED KNN """
+""" SHAPLET BASED Random Forest"""
 
 X_train2 = shp_clf.transform(X_train)
 print("train shape:", X_train2.shape)
 X_test2 = shp_clf.transform(X_test)
-knn = KNeighborsClassifier(n_neighbors=17, weights="distance", p=2)
-# Best parametri grid search{'n_neighbors': 17, 'p': 2, 'weights': 'distance'}
-knn.fit(X_train2, y_train)
+# Best: {'random_state': 2, 'min_samples_split': 3, 'min_samples_leaf': 20,
+# 'max_features': 'log2', 'max_depth': 5, 'criterion': 'gini', 'class_weight': None}
+clf_rf = RandomForestClassifier(
+    n_estimators=100,
+    criterion="gini",
+    max_depth=5,
+    min_samples_split=3,
+    min_samples_leaf=20,
+    max_features="log2",
+    class_weight=None,
+    random_state=2,
+)
+
+clf_rf.fit(X_train2, y_train)
 
 # Apply on the training set
 print("Apply  on the training set-KNN: \n")
-Y_pred = knn.predict(X_train2)
-print("Accuracy  %s" % accuracy_score(y_train, Y_pred))
-print("F1-score %s" % f1_score(y_train, Y_pred, average=None))
-print(classification_report(y_train, Y_pred))
+Y_pred2 = clf_rf.predict(X_train2)
+print("Accuracy  %s" % accuracy_score(y_train, Y_pred2))
+print("F1-score %s" % f1_score(y_train, Y_pred2, average=None))
+print(classification_report(y_train, Y_pred2))
 
 # Apply on the test set and evaluate the performance
 print("Apply on the test set and evaluate the performance-KNN: \n")
-y_pred = knn.predict(X_test2)
-print("Accuracy %s" % accuracy_score(y_test, y_pred))
-print("F1-score  %s" % f1_score(y_test, y_pred, average=None))
-print(classification_report(y_test, y_pred))
+y_pred2 = clf_rf.predict(X_test2)
+print("Accuracy %s" % accuracy_score(y_test, y_pred2))
+print("F1-score  %s" % f1_score(y_test, y_pred2, average=None))
+print(classification_report(y_test, y_pred2))
 
-draw_confusion_matrix(knn, X_test2, y_test)
+draw_confusion_matrix(clf_rf, X_test2, y_test)
 """ROC CURVE"""
 lb = LabelBinarizer()
 lb.fit(y_test)
@@ -187,7 +199,7 @@ fpr = dict()
 tpr = dict()
 roc_auc = dict()
 by_test = lb.transform(y_test)
-by_pred = lb.transform(y_pred)
+by_pred = lb.transform(y_pred2)
 for i in range(8):
     fpr[i], tpr[i], _ = roc_curve(by_test[:, i], by_pred[:, i])
     roc_auc[i] = auc(fpr[i], tpr[i])
@@ -205,33 +217,38 @@ for i in range(8):
 plt.plot([0, 1], [0, 1], "k--")
 plt.xlim([0.0, 1.0])
 plt.ylim([0.0, 1.05])
-plt.title("ShapletModel with KNN Roc-Curve")
+plt.title("ShapletModel with Random Forest Roc-Curve")
 plt.xlabel("False Positive Rate", fontsize=10)
 plt.ylabel("True Positive Rate", fontsize=10)
 plt.tick_params(axis="both", which="major", labelsize=12)
 plt.legend(loc="lower right", fontsize=7, frameon=False)
 plt.show()
 
-"""GRID SEARCH SHAPLET BASED KNN
+"""GRID SEARCH SHAPLET BASED Random Forest
 
 
 print("STA FACENDO LA GRIDSEARCH")
 param_list = {
-    "n_neighbors": list(np.arange(1, 20)),
-    "weights": ["uniform", "distance"],
-    "p": [1, 2],
+    "criterion": ["gini", "entropy"],
+    "max_depth": [None] + list(np.arange(2, 20)),
+    "min_samples_split": [2, 3, 5, 7, 10, 20, 30, 50, 100],
+    "min_samples_leaf": [1, 3, 5, 10, 20, 30, 50, 100],
+    "max_features": ["auto", "sqrt", "log2"],
+    "class_weight": [None, "balanced", "balanced_subsample"],
+    "random_state": [0, 2, 5, 10],
 }
-# grid search
-clf = KNeighborsClassifier()
-grid_search = GridSearchCV(clf, param_grid=param_list)
-grid_search.fit(X_train2, y_train)
+random_search = RandomizedSearchCV(
+    clf_rf, param_distributions=param_list, n_iter=20, cv=5
+)
+random_search.fit(X_train2, y_train)
+clf = random_search.best_estimator_
 
-# results of the grid search
-print("\033[1m" "Results of the grid search" "\033[0m")
-print()
-print("Best parameters: %s" % grid_search.best_params_)
-print("Best estimator: %s" % grid_search.best_estimator_)
-print()
-print("Best k ('n_neighbors'): %s" % grid_search.best_params_["n_neighbors"])
-print()
+y_pred = clf.predict(X_test2)
+# Print The value of best Hyperparameters
+print(
+    "Best:",
+    random_search.cv_results_["params"][
+        random_search.cv_results_["rank_test_score"][0]
+    ],
+)
 """
