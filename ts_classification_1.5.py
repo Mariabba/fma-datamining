@@ -83,10 +83,16 @@ X_train, X_test, y_train, y_test = train_test_split(
 n_ts, ts_sz = X_train.shape
 n_classes = len(set(y))
 
+"""setting number of shaplet"""
 # Set the number of shapelets per size as done in the original paper
-shapelet_sizes = grabocka_params_to_shapelet_size_dict(
-    n_ts=n_ts, ts_sz=ts_sz, n_classes=n_classes, l=0.01, r=1
-)
+# shapelet_sizes = grabocka_params_to_shapelet_size_dict(
+#   n_ts=n_ts, ts_sz=ts_sz, n_classes=n_classes, l=0.1, r=1
+# )
+# risultati grabocka
+# n_ts= da 7997 a 6397
+# ts_size =1966
+# deciso di creare invece di 8 shaplet da 269, 24 shaplet da 250
+shapelet_sizes = {250: 24}
 
 print("n_ts", n_ts)
 print("ts_sz", ts_sz)
@@ -162,14 +168,19 @@ print("train shape:", X_train2.shape)
 X_test2 = shp_clf.transform(X_test)
 # Best: {'random_state': 2, 'min_samples_split': 3, 'min_samples_leaf': 20,
 # 'max_features': 'log2', 'max_depth': 5, 'criterion': 'gini', 'class_weight': None}
+
+# Best VERA: {'random_state': 2, 'min_samples_split': 3, 'min_samples_leaf': 50,
+# 'max_features': 'log2', 'max_depth': 14, 'criterion': 'gini',
+# 'class_weight': 'balanced_subsample'}
+
 clf_rf = RandomForestClassifier(
     n_estimators=100,
     criterion="gini",
-    max_depth=5,
+    max_depth=14,
     min_samples_split=3,
-    min_samples_leaf=20,
+    min_samples_leaf=50,
     max_features="log2",
-    class_weight=None,
+    class_weight="balanced_subsample",
     random_state=2,
 )
 
@@ -226,8 +237,8 @@ plt.show()
 
 """GRID SEARCH SHAPLET BASED Random Forest
 
-
-print("STA FACENDO LA GRIDSEARCH")
+clf = RandomForestClassifier()
+print("STA FACENDO LA RandomSEARCH")
 param_list = {
     "criterion": ["gini", "entropy"],
     "max_depth": [None] + list(np.arange(2, 20)),
@@ -237,13 +248,9 @@ param_list = {
     "class_weight": [None, "balanced", "balanced_subsample"],
     "random_state": [0, 2, 5, 10],
 }
-random_search = RandomizedSearchCV(
-    clf_rf, param_distributions=param_list, n_iter=20, cv=5
-)
+random_search = RandomizedSearchCV(clf, param_distributions=param_list, n_iter=20, cv=5)
 random_search.fit(X_train2, y_train)
-clf = random_search.best_estimator_
 
-y_pred = clf.predict(X_test2)
 # Print The value of best Hyperparameters
 print(
     "Best:",

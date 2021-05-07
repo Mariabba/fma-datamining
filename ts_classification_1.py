@@ -82,10 +82,16 @@ X_train, X_test, y_train, y_test = train_test_split(
 n_ts, ts_sz = X_train.shape
 n_classes = len(set(y))
 
+"""setting number of shaplet"""
 # Set the number of shapelets per size as done in the original paper
-shapelet_sizes = grabocka_params_to_shapelet_size_dict(
-    n_ts=n_ts, ts_sz=ts_sz, n_classes=n_classes, l=0.1, r=1
-)
+# shapelet_sizes = grabocka_params_to_shapelet_size_dict(
+#   n_ts=n_ts, ts_sz=ts_sz, n_classes=n_classes, l=0.1, r=1
+# )
+# risultati grabocka
+# n_ts= da 7997 a 6397
+# ts_size =1966
+# deciso di creare invece di 8 shaplet da 269, 24 shaplet da 250
+shapelet_sizes = {250: 24}
 
 print("n_ts", n_ts)
 print("ts_sz", ts_sz)
@@ -120,47 +126,14 @@ print(classification_report(y_test, y_pred))
 
 draw_confusion_matrix(shp_clf, X_test, y_test)
 
-"""ROC CURVE"""
-lb = LabelBinarizer()
-lb.fit(y_test)
-lb.classes_.tolist()
-
-fpr = dict()
-tpr = dict()
-roc_auc = dict()
-by_test = lb.transform(y_test)
-by_pred = lb.transform(y_pred)
-for i in range(8):
-    fpr[i], tpr[i], _ = roc_curve(by_test[:, i], by_pred[:, i])
-    roc_auc[i] = auc(fpr[i], tpr[i])
-
-    roc_auc = roc_auc_score(by_test, by_pred, average=None)
-
-plt.figure(figsize=(8, 5))
-for i in range(8):
-    plt.plot(
-        fpr[i],
-        tpr[i],
-        label="%s ROC curve (area = %0.2f)" % (lb.classes_.tolist()[i], roc_auc[i]),
-    )
-
-plt.plot([0, 1], [0, 1], "k--")
-plt.xlim([0.0, 1.0])
-plt.ylim([0.0, 1.05])
-plt.title("ShapletModel Roc-Curve")
-plt.xlabel("False Positive Rate", fontsize=10)
-plt.ylabel("True Positive Rate", fontsize=10)
-plt.tick_params(axis="both", which="major", labelsize=12)
-plt.legend(loc="lower right", fontsize=7, frameon=False)
-plt.show()
 
 """ SHAPLET BASED KNN """
-
+print("KNN- Shaplet Based")
 X_train2 = shp_clf.transform(X_train)
 print("train shape:", X_train2.shape)
 X_test2 = shp_clf.transform(X_test)
 knn = KNeighborsClassifier(n_neighbors=17, weights="distance", p=2)
-# Best parametri grid search{'n_neighbors': 17, 'p': 2, 'weights': 'distance'}
+# Best VERI : {'weights': 'distance', 'p': 2, 'n_neighbors': 17}
 knn.fit(X_train2, y_train)
 
 # Apply on the training set
@@ -234,4 +207,25 @@ print("Best estimator: %s" % grid_search.best_estimator_)
 print()
 print("Best k ('n_neighbors'): %s" % grid_search.best_params_["n_neighbors"])
 print()
+"""
+
+"""Random SEARCH KNN
+
+clf = KNeighborsClassifier()
+print("STA FACENDO LA RandomSEARCH")
+param_list = {
+    "n_neighbors": list(np.arange(1, 20)),
+    "weights": ["uniform", "distance"],
+    "p": [1, 2],
+}
+random_search = RandomizedSearchCV(clf, param_distributions=param_list, n_iter=20, cv=5)
+random_search.fit(X_train2, y_train)
+
+# Print The value of best Hyperparameters
+print(
+    "Best:",
+    random_search.cv_results_["params"][
+        random_search.cv_results_["rank_test_score"][0]
+    ],
+)
 """

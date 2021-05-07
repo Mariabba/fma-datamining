@@ -8,39 +8,17 @@ import matplotlib.pyplot as plt
 from matplotlib import cm
 import seaborn as sns
 import numpy as np
-from sklearn.neighbors import KNeighborsClassifier
-from sklearn.preprocessing import LabelBinarizer
-from tslearn.clustering import TimeSeriesKMeans, silhouette_score
-from tslearn.generators import random_walks
-from tslearn.preprocessing import TimeSeriesScalerMeanVariance
-from sklearn.model_selection import (
-    train_test_split,
-    cross_val_score,
-    RandomizedSearchCV,
-    GridSearchCV,
-)
+
 from sklearn.metrics import (
     accuracy_score,
     f1_score,
     classification_report,
     plot_confusion_matrix,
 )
-from sklearn.metrics import roc_curve, auc, roc_auc_score
+
 from tslearn.utils import ts_size
-
 from music import MusicDB
-import scipy.stats as stats
-from random import sample
-from tslearn.preprocessing import TimeSeriesScalerMinMax
-from tslearn.preprocessing import TimeSeriesScalerMeanVariance
-
-# librerie x shaplet
-from keras.optimizers import Adagrad
 from tslearn.shapelets import ShapeletModel
-from tslearn.shapelets import grabocka_params_to_shapelet_size_dict
-
-from pyts.classification import LearningShapelets
-from pyts.utils import windowed_view
 
 # Carico il dataframe
 musi = MusicDB()
@@ -81,11 +59,14 @@ predicted_labels = shp_clf.predict(X)
 print("Correct classification rate:", accuracy_score(y, predicted_labels))
 
 predicted_locations = shp_clf.locate(X)
+ts_id = 0
+n_shapelets = sum(shapelet_sizes.values())
 
 """plot shaplet e dataset"""
-ts_id = 0
-plt.figure()
-n_shapelets = sum(shapelet_sizes.values())
+
+sns.set(
+    rc={"figure.figsize": (20, 6)},
+)
 plt.title(
     "Example locations of shapelet matches "
     "(%d shapelets extracted)".format(n_shapelets)
@@ -94,16 +75,16 @@ plt.title(
 plt.plot(X[ts_id].ravel(), label="Time Series Dataset")
 for idx_shp, shp in enumerate(shp_clf.shapelets_):
     t0 = predicted_locations[ts_id, idx_shp]
-    plt.plot(np.arange(t0, t0 + len(shp)), shp, linewidth=2)
+    plt.plot(np.arange(t0, t0 + len(shp)), shp, linewidth=0.5)
 plt.legend()
 plt.show()
 
-"""plot tslearn solo shaplet"""
+# plot tslearn solo shaplet
 
 # Make predictions and calculate accuracy score
 
 # Plot the different discovered shapelets
-plt.figure()
+sns.set(rc={"figure.figsize": (20, 6)})
 for i, sz in enumerate(shapelet_sizes.keys()):
     plt.subplot(len(shapelet_sizes), 1, i + 1)
     plt.title("%d shapelets of size %d" % (shapelet_sizes[sz], sz))
@@ -115,7 +96,7 @@ for i, sz in enumerate(shapelet_sizes.keys()):
 plt.tight_layout()
 plt.show()
 
-"""plot singoli shaplet"""
+# plot singoli shaplet
 
 sel_shapelets = np.asarray(
     [
@@ -145,6 +126,7 @@ sel_shapelets = np.asarray(
         shp_clf.shapelets_[23],
     ],
 )
+sns.set()
 fig, axs = plt.subplots(4, 2, figsize=(10, 12))
 axs[0, 0].plot(sel_shapelets[0], color="blue")
 axs[0, 0].set_title("shaplet 0")
@@ -172,6 +154,7 @@ axs[3, 1].set_title("shaplet 7")
 fig.tight_layout()
 plt.show()
 
+sns.set()
 fig, axs = plt.subplots(4, 2, figsize=(10, 12))
 axs[0, 0].plot(sel_shapelets[8], color="blue")
 axs[0, 0].set_title("shaplet 8")
@@ -199,7 +182,7 @@ axs[3, 1].set_title("shaplet 15")
 fig.tight_layout()
 plt.show()
 
-
+sns.set()
 fig, axs = plt.subplots(4, 2, figsize=(10, 12))
 axs[0, 0].plot(sel_shapelets[16], color="blue")
 axs[0, 0].set_title("shaplet 16")
