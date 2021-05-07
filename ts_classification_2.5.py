@@ -7,7 +7,7 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 import numpy as np
 from sklearn.ensemble import RandomForestClassifier
-from sklearn.preprocessing import LabelBinarizer
+from sklearn.preprocessing import LabelBinarizer, LabelEncoder
 from sklearn.model_selection import (
     train_test_split,
     cross_val_score,
@@ -37,8 +37,17 @@ In questo file vi sono 2 tipologie di classifcazione base per le TS:
 musi = MusicDB()
 print(musi.df.info())
 
+print(musi.feat["genre"].unique())
+label_encoders = dict()
+column2encode = [("genre")]
+for col in column2encode:
+    le = LabelEncoder()
+    musi.feat[col] = le.fit_transform(musi.feat[col])
+    label_encoders[col] = le
+print(musi.feat["genre"].unique())
+
 X = musi.df
-y = musi.feat["enc_genre"]
+y = musi.feat["genre"]
 
 
 scaler = TimeSeriesScalerMeanVariance()
