@@ -7,6 +7,7 @@ import attr
 import librosa
 import pandas as pd
 from rich.progress import BarColumn, Progress, TimeRemainingColumn
+from sklearn.preprocessing import LabelEncoder
 
 import utils
 
@@ -25,7 +26,14 @@ class MusicDB(object):
         miao = our_feat[[("track", "genre_top")]]
         miao = miao.loc[self.df.index]
         miao.columns = ["genre"]
-        miao["enc_genre"] = miao["genre"].astype("category").cat.codes
+
+        le = LabelEncoder()
+        label_encoders = dict()
+        column2encode = [("genre")]
+        for col in column2encode:
+            le = LabelEncoder()
+            miao["enc_genre"] = le.fit_transform(miao[col])
+            label_encoders[col] = le
         return miao
 
     @df.default

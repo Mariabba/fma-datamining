@@ -45,20 +45,7 @@ In questo file vi è la creazione degli shpalet con 3 tipologie di classifcazion
 musi = MusicDB()
 print(musi.df.info())
 
-print(musi.feat["genre"].unique())
-label_encoders = dict()
-column2encode = [("genre")]
-for col in column2encode:
-    le = LabelEncoder()
-    musi.feat[col] = le.fit_transform(musi.feat[col])
-    label_encoders[col] = le
-print("pre:", musi.feat["genre"].unique())
-
-print
-musi.feat["genre"] = musi.feat["genre"].replace(
-    [0, 4, 2, 3, 5, 6, 7], [0, 0, 0, 0, 0, 0, 0]
-)
-print("dopo", musi.feat["genre"].unique())
+print(musi.feat["enc_genre"].unique())
 
 
 X = musi.df
