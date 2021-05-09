@@ -37,18 +37,11 @@ In questo file vi sono 2 tipologie di classifcazione base per le TS:
 musi = MusicDB()
 print(musi.df.info())
 
-print(musi.feat["genre"].unique())
-label_encoders = dict()
-column2encode = [("genre")]
-for col in column2encode:
-    le = LabelEncoder()
-    musi.feat[col] = le.fit_transform(musi.feat[col])
-    label_encoders[col] = le
-print(musi.feat["genre"].unique())
+
+print(musi.feat["enc_genre"].unique())
 
 X = musi.df
-y = musi.feat["genre"]
-
+y = musi.feat["enc_genre"]
 
 scaler = TimeSeriesScalerMeanVariance()
 X = scaler.fit_transform(X).reshape(X.shape[0], X.shape[1])

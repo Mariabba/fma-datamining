@@ -49,7 +49,7 @@ print(musi.feat["enc_genre"].unique())
 
 
 X = musi.df
-y = musi.feat["genre"]  # classe targed ovvero genere con l'encoding
+y = musi.feat["enc_genre"]  # classe targed ovvero genere con l'encoding
 
 
 scaler = TimeSeriesScalerMeanVariance()
