@@ -1,16 +1,15 @@
 import multiprocessing
 
-import pandas as pd
 import numpy as np
+import pandas as pd
 from rich import print
-from rich.progress import Progress, BarColumn, TimeRemainingColumn
-from scipy.spatial.distance import cdist
-from tslearn.metrics import dtw_path
-from tslearn.piecewise import SymbolicAggregateApproximation
-from tslearn.preprocessing import TimeSeriesScalerMeanVariance
+from rich.progress import BarColumn, Progress, TimeRemainingColumn
+from sklearn.metrics import accuracy_score
 from sklearn.model_selection import train_test_split
 from sklearn.neighbors import KNeighborsClassifier
-from sklearn.metrics import accuracy_score
+from tslearn.piecewise import SymbolicAggregateApproximation
+from tslearn.preprocessing import TimeSeriesScalerMeanVariance
+
 from music import MusicDB
 
 
@@ -37,44 +36,34 @@ def do_sax_knn(params):
         segments,
         symbols,
         k,
-        accuracy_score(y_test, y_pred),
-        accuracy_score(y_test, y_pred_manh),
+        round(accuracy_score(y_test, y_pred), 4),
+        round(accuracy_score(y_test, y_pred_manh), 4),
     )
 
 
 if __name__ == "__main__":
-    musi = MusicDB()
-
-    path, dist = dtw_path(musi.df.iloc[0], musi.df.iloc[1])
-
-    cost_matrix = cdist(
-        musi.df.iloc[0].values[:100].reshape(-1, 1),
-        musi.df.iloc[1].values[:100].reshape(-1, 1),
-    )
-
     # KNN with SAX, grid search, multiprocessing
     segments = 1000
     symbols = 100
     k = 30
 
-    x = musi.df
+    musi = MusicDB()
     # Rescale - but why?
     scaler = TimeSeriesScalerMeanVariance()  # Rescale time series
-    X = scaler.fit_transform(x)
-    X = pd.DataFrame(X.reshape(musi.df.values.shape[0], musi.df.values.shape[1]))
-    X.index = musi.df.index
+    x = scaler.fit_transform(musi.df)
+    x = pd.DataFrame(x.reshape(musi.df.values.shape[0], musi.df.values.shape[1]))
+    x.index = musi.df.index
     y = musi.feat["enc_genre"]
 
     # make results
     pl_results = []
-    num_errors = 0
 
     # build param collection
     param_collection = []
     for seg in range(5, segments, 25):
         for symb in range(5, symbols, 5):
             for ki in range(3, k, 1):
-                param_collection.append((X, y, seg, symb, ki))
+                param_collection.append((x, y, seg, symb, ki))
 
     # make progress reporting
     progress = Progress(
@@ -85,33 +74,20 @@ if __name__ == "__main__":
         TimeRemainingColumn(),
     )
 
-    # populate df
+    # populate results
     with progress:
         task_id = progress.add_task("[cyan]KMeans…", total=len(param_collection))
         with multiprocessing.Pool() as pool:
-            for (
-                pl_segments,
-                pl_symbols,
-                pl_k,
-                pl_eucl,
-                pl_manh,
-            ) in pool.imap_unordered(do_sax_knn, param_collection):
-                if type(pl_eucl) is not bool:
-                    resuuuu = (
-                        pl_segments,
-                        pl_symbols,
-                        pl_k,
-                        round(pl_eucl, 4),
-                        round(pl_manh, 4),
-                    )
-                    pl_results.append(resuuuu)
-                else:
-                    num_errors += 1
+            for one_result in pool.imap_unordered(do_sax_knn, param_collection):
+                pl_results.append(one_result)
                 progress.advance(task_id)
 
+    # make df
     dfm = pd.DataFrame(
         pl_results, columns=["segments", "symbols", "k", "f1 euclidean", "f1 manhattan"]
     )
+
+    # output results
     dfm = dfm.sort_values(by="f1 euclidean", ascending=False)
     print(dfm.iloc[:20, :])
     dfm = dfm.sort_values(by="f1 manhattan", ascending=False)
