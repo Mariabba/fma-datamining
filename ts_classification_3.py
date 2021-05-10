@@ -13,6 +13,7 @@ from sklearn.neighbors import KNeighborsClassifier
 from sklearn.preprocessing import LabelEncoder, LabelBinarizer
 from tslearn.clustering import TimeSeriesKMeans, silhouette_score
 from tslearn.generators import random_walks
+from tslearn.piecewise import SymbolicAggregateApproximation
 from tslearn.preprocessing import TimeSeriesScalerMeanVariance
 from sklearn.model_selection import train_test_split, cross_val_score
 from sklearn.metrics import (
@@ -32,13 +33,7 @@ from tslearn.preprocessing import TimeSeriesScalerMinMax
 from tslearn.preprocessing import TimeSeriesScalerMeanVariance
 
 """
-FILE 3  CLASSIFICAZIONE BINARIA GENERE CON GLI SHAPELET (SCEGLIERE LA CLASSE TARGET)
-
-In questo file vi è la creazione degli shpalet con 3 tipologie di classifcazione:
-
-1- shaplet base 
-2- shaplet Distance Based Class-KNN
-3- shaplet with Random Forest
+FILE 3-  CLASSIFICAZIONE CON APPROSSIMAZIONE CON SAX
 """
 
 # Carico il dataframe
@@ -47,8 +42,13 @@ print(musi.df.info())
 
 print(musi.feat["enc_genre"].unique())
 
+# approssimazione con sax
+n_sax_symbols = 50
+sax = SymbolicAggregateApproximation(n_segments=20, alphabet_size_avg=n_sax_symbols)
+ts_sax_df = sax.fit_transform(musi.df)
+sax_dataset_inv = sax.inverse_transform(ts_sax_df)
 
-X = musi.df
+X = ts_sax_df
 y = musi.feat["enc_genre"]  # classe targed ovvero genere con l'encoding
 
 
@@ -59,25 +59,8 @@ X_train, X_test, y_train, y_test = train_test_split(
     X, y, test_size=0.2, random_state=100, stratify=y
 )
 
-
-def draw_confusion_matrix(Clf, X, y):
-    titles_options = [
-        ("Confusion matrix, without normalization", None),
-        ("Time Series Classifier KNN Confusion matrix", "true"),
-    ]
-
-    for title, normalize in titles_options:
-        disp = plot_confusion_matrix(Clf, X, y, cmap="Reds", normalize=normalize)
-        disp.ax_.set_title(title)
-
-    plt.show()
-
-
-print(("\033[1m" "Making Undersampling" "\033[0m"))
-
-
 # Classification
-clf = KNeighborsClassifier(n_neighbors=5, p=1)
+clf = KNeighborsClassifier(n_neighbors=5, p=1, weights="distance")
 clf.fit(X_train, y_train)
 
 
@@ -94,27 +77,3 @@ y_pred = clf.predict(X_test)
 print("Accuracy %s" % accuracy_score(y_test, y_pred))
 print("F1-score  %s" % f1_score(y_test, y_pred, average=None))
 print(classification_report(y_test, y_pred))
-
-draw_confusion_matrix(clf, X_test, y_test)
-
-"""ROC CURVE"""
-from sklearn.metrics import roc_curve, auc, roc_auc_score
-
-fpr, tpr, _ = roc_curve(y_test, y_pred)
-roc_auc = auc(fpr, tpr)
-print(roc_auc)
-
-roc_auc = roc_auc_score(y_test, y_pred, average=None)
-
-plt.figure(figsize=(8, 5))
-plt.plot(fpr, tpr, label="ROC curve (area = %0.2f)" % (roc_auc))
-
-plt.plot([0, 1], [0, 1], "k--")
-plt.xlim([0.0, 1.0])
-plt.ylim([0.0, 1.05])
-plt.title("Linear SVM Roc-Curve")
-plt.xlabel("False Positive Rate", fontsize=10)
-plt.ylabel("True Positive Rate", fontsize=10)
-plt.tick_params(axis="both", which="major", labelsize=12)
-plt.legend(loc="lower right", fontsize=7, frameon=False)
-plt.show()
