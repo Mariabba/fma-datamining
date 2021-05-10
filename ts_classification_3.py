@@ -42,25 +42,33 @@ print(musi.df.info())
 
 print(musi.feat["enc_genre"].unique())
 
-# approssimazione con sax
-n_sax_symbols = 50
-sax = SymbolicAggregateApproximation(n_segments=20, alphabet_size_avg=n_sax_symbols)
-ts_sax_df = sax.fit_transform(musi.df)
-sax_dataset_inv = sax.inverse_transform(ts_sax_df)
 
-X = ts_sax_df
+X_no = musi.df
 y = musi.feat["enc_genre"]  # classe targed ovvero genere con l'encoding
 
-
+# normalizzazione con mean variance
 scaler = TimeSeriesScalerMeanVariance()
-X = scaler.fit_transform(X).reshape(X.shape[0], X.shape[1])
+X_no = pd.DataFrame(
+    scaler.fit_transform(musi.df.values).reshape(
+        musi.df.values.shape[0], musi.df.values.shape[1]
+    )
+)
+X_no.index = musi.df.index
 
+# approssimazione con sax
+
+sax = SymbolicAggregateApproximation(n_segments=305, alphabet_size_avg=20)
+X1 = sax.fit_transform(X_no)
+print(X1.shape)
+X = np.squeeze(X1)
+print(X.shape)
+
+# Classification
 X_train, X_test, y_train, y_test = train_test_split(
     X, y, test_size=0.2, random_state=100, stratify=y
 )
 
-# Classification
-clf = KNeighborsClassifier(n_neighbors=5, p=1, weights="distance")
+clf = KNeighborsClassifier(n_neighbors=3, p=1, weights="distance")
 clf.fit(X_train, y_train)
 
 
