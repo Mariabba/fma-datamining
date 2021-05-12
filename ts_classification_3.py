@@ -1,44 +1,26 @@
+"""CLASSIFICAZIONE CON SAX E SHAPLET KNN"""
+
 """libraries"""
-import pandas as pd
-from imblearn.over_sampling import SMOTE
-from imblearn.under_sampling import RandomUnderSampler
-from pandas import DataFrame
-from pandas.testing import assert_frame_equal
-import IPython.display as ipd
-import matplotlib.pyplot as plt
-import seaborn as sns
 import numpy as np
-from sklearn.ensemble import RandomForestClassifier
-from sklearn.neighbors import KNeighborsClassifier
-from sklearn.preprocessing import LabelEncoder, LabelBinarizer
-from tslearn.clustering import TimeSeriesKMeans, silhouette_score
-from tslearn.generators import random_walks
-from tslearn.piecewise import SymbolicAggregateApproximation
-from tslearn.preprocessing import TimeSeriesScalerMeanVariance
-from sklearn.model_selection import (
-    train_test_split,
-    cross_val_score,
-    RandomizedSearchCV,
-    GridSearchCV,
-)
+import pandas as pd
 from sklearn.metrics import (
     accuracy_score,
     f1_score,
     classification_report,
-    plot_confusion_matrix,
 )
-from sklearn.metrics import roc_curve, auc, roc_auc_score
-from music import MusicDB
-import scipy.stats as stats
-from collections import Counter
-
-from tslearn.shapelets import ShapeletModel
-from tslearn.shapelets import grabocka_params_to_shapelet_size_dict
-from tslearn.preprocessing import TimeSeriesScalerMinMax
+from sklearn.model_selection import (
+    train_test_split,
+    GridSearchCV,
+)
+from sklearn.neighbors import KNeighborsClassifier
+from tslearn.piecewise import SymbolicAggregateApproximation
 from tslearn.preprocessing import TimeSeriesScalerMeanVariance
+from tslearn.shapelets import ShapeletModel
+
+from music import MusicDB
 
 """
-FILE 3-  CLASSIFICAZIONE CON APPROSSIMAZIONE CON SAX
+FILE 3-  CLASSIFICAZIONE CON APPROSSIMAZIONE CON SAX E SHAPLET KNN
 """
 
 # Carico il dataframe
@@ -62,7 +44,7 @@ X_no.index = musi.df.index
 
 # approssimazione con sax
 
-sax = SymbolicAggregateApproximation(n_segments=155, alphabet_size_avg=10)
+sax = SymbolicAggregateApproximation(n_segments=130, alphabet_size_avg=20)
 X1 = sax.fit_transform(X_no)
 print(X1.shape)
 X = np.squeeze(X1)
@@ -108,8 +90,8 @@ print("KNN- Shaplet Based")
 X_train2 = shp_clf.transform(X_train)
 print("train shape:", X_train2.shape)
 X_test2 = shp_clf.transform(X_test)
-knn = KNeighborsClassifier(n_neighbors=15, weights="uniform", p=1)
-# Best parameters: {'n_neighbors': 19, 'p': 2, 'weights': 'uniform'}
+knn = KNeighborsClassifier(n_neighbors=19, weights="distance", p=1)
+# Best parameters: {'n_neighbors': 19, p=1, weights='distance'}
 knn.fit(X_train2, y_train)
 
 # Apply on the training set
@@ -126,7 +108,7 @@ print("Accuracy %s" % accuracy_score(y_test, y_pred))
 print("F1-score  %s" % f1_score(y_test, y_pred, average=None))
 print(classification_report(y_test, y_pred))
 
-"""
+"""GRID SEARCH
 print("STA FACENDO LA GRIDSEARCH")
 param_list = {
     "n_neighbors": list(np.arange(1, 20)),
@@ -135,7 +117,7 @@ param_list = {
 }
 # grid search
 clf = KNeighborsClassifier()
-grid_search = GridSearchCV(clf, param_grid=param_list)
+grid_search = GridSearchCV(clf, param_grid=param_list, scoring="accuracy")
 grid_search.fit(X_train2, y_train)
 
 # results of the grid search
