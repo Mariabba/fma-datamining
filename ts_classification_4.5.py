@@ -12,6 +12,7 @@ from sklearn.model_selection import (
     train_test_split,
     RandomizedSearchCV,
     GridSearchCV,
+    cross_val_score,
 )
 from tslearn.piecewise import SymbolicAggregateApproximation
 from tslearn.preprocessing import TimeSeriesScalerMeanVariance
@@ -55,25 +56,17 @@ X_train, X_test, y_train, y_test = train_test_split(
 
 
 """Random Forest sulle TS"""
-# Best PRIMA VOLTA: {'random_state': 5, 'min_samples_split': 50, 'min_samples_leaf': 5,
-# 'max_features': 'log2', 'max_depth': 13, 'criterion': 'gini',
-# 'class_weight': 'balanced'}
-
-# Best a 50
-# Best Hyperparameters: {'random_state': 5, 'min_samples_split': 100,
-# 'min_samples_leaf': 1, 'max_features': 'log2', 'max_depth': 17,
-# 'criterion': 'gini', 'class_weight': 'balanced'}
-
 
 clf = RandomForestClassifier(
     n_estimators=100,
     criterion="gini",
-    max_depth=13,
-    min_samples_split=5,
-    min_samples_leaf=1,
-    max_features="log2",
+    max_depth=None,
+    min_samples_split=10,
+    min_samples_leaf=10,
+    max_features="auto",
+    min_weight_fraction_leaf=0.0,
     class_weight="balanced_subsample",
-    random_state=5,
+    random_state=0,
 )
 clf.fit(X_train, y_train)
 
@@ -92,28 +85,45 @@ print("Accuracy %s" % accuracy_score(y_test, y_pred))
 print("F1-score  %s" % f1_score(y_test, y_pred, average=None))
 print(classification_report(y_test, y_pred))
 
-# todo ricorda mari, manca solo questa
+
 """Random SEARCH Random Forest
 
-clf = RandomForestClassifier()
+clf2 = RandomForestClassifier()
 print("STA FACENDO LA RandomSEARCH")
 param_list = {
-    "criterion": ["gini", "entropy"],
-    "max_depth": [None] + list(np.arange(2, 20)),
-    "min_samples_split": [2, 3, 5, 7, 10, 20, 30, 50, 100],
-    "min_samples_leaf": [1, 3, 5, 10, 20, 30, 50, 100],
-    "max_features": ["auto", "sqrt", "log2"],
-    "class_weight": [None, "balanced", "balanced_subsample"],
+    # "criterion": ["gini"],
+    "max_depth": [None] + list(np.arange(40, 55)),
+    # "min_samples_split": [6],
+    "min_samples_leaf": list(np.arange(20, 25)),
+    # "max_features": ["auto"],
+    # "class_weight": ["balanced_subsample"],
 }
-grid_search = GridSearchCV(clf, param_grid=param_list, scoring="accuracy", cv=5)
-grid_search.fit(X_train, y_train)
+random_search = RandomizedSearchCV(
+    clf2, param_distributions=param_list, scoring="accuracy", n_iter=20, cv=5
+)
+res = random_search.fit(X_train, y_train)
 
-# results of the grid search
-print("\033[1m" "Results of the grid search" "\033[0m")
-print()
-print("Best parameters: %s" % grid_search.best_params_)
-print("Best estimator: %s" % grid_search.best_score_)
-print()
-print("Best k ('n_neighbors'): %s" % grid_search.best_params_["n_neighbors"])
-print()
+# Print The value of best Hyperparameters
+print("Best Score: %s" % res.best_score_)
+print("Best Hyperparameters: %s" % res.best_params_)
+
+print("STA FACENDO LA RandomSEARCH")
+clf = RandomForestClassifier()
+scores = cross_val_score(clf, X, y, cv=5)
+
+param_list = {
+    "min_samples_split": [5, 10, 15, 17, 20],
+    "min_samples_leaf": [5, 10, 15, 17, 20],
+}
+
+grid_search = GridSearchCV(clf, param_grid=param_list, cv=5)
+grid_search.fit(X_train, y_train)
+clf = grid_search.best_estimator_
+
+y_pred = clf.predict(X_test)
+
+print("Accuracy %s" % accuracy_score(y_test, y_pred))
+print("F1-score %s" % f1_score(y_test, y_pred, average=None))
+print(classification_report(y_test, y_pred))
+print(grid_search.best_params_)
 """
