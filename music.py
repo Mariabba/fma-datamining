@@ -8,6 +8,8 @@ import librosa
 import pandas as pd
 from rich.progress import BarColumn, Progress, TimeRemainingColumn
 from sklearn.preprocessing import LabelEncoder
+from tslearn.piecewise import SymbolicAggregateApproximation
+from tslearn.preprocessing import TimeSeriesScalerMeanVariance
 
 import utils
 
@@ -19,6 +21,7 @@ if not sys.warnoptions:
 class MusicDB(object):
     df = attr.ib()
     feat = attr.ib()
+    sax = attr.ib()
 
     # start of private methods
     @feat.default
@@ -44,6 +47,21 @@ class MusicDB(object):
             return pick
         # if not, populate
         return self._dataframe_populate()
+
+    @sax.default
+    def _saxdf_default(self):
+        segments = 130
+        scaler = TimeSeriesScalerMeanVariance()
+        musi_scaled = pd.DataFrame(
+            scaler.fit_transform(self.df.values).reshape(
+                self.df.values.shape[0], self.df.values.shape[1]
+            )
+        )
+        musi_scaled.index = self.df.index
+        sax = SymbolicAggregateApproximation(n_segments=segments, alphabet_size_avg=20)
+        ts_sax = sax.fit_transform(musi_scaled)
+        miaoooooo = pd.DataFrame(ts_sax.reshape(self.df.values.shape[0], segments))
+        return miaoooooo
 
     def _dataframe_pickleload(self):
         path_to_pickle = Path("data/picks/small.pkl")

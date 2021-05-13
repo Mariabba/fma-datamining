@@ -79,7 +79,7 @@ if __name__ == "__main__":
 
     # populate results
     with progress:
-        task_id = progress.add_task("[cyan]KMeans…", total=len(param_collection))
+        task_id = progress.add_task("[cyan]KNN…", total=len(param_collection))
         with multiprocessing.Pool() as pool:
             for one_result in pool.imap_unordered(do_sax_knn, param_collection):
                 pl_results.append(one_result)
@@ -90,11 +90,10 @@ if __name__ == "__main__":
 
     # make df
     dfm = pd.DataFrame(
-        pl_results, columns=["segments", "symbols", "k", "f1 euclidean", "f1 manhattan"]
+        pl_results,
+        columns=["segments", "symbols", "k", "acc euclidean", "acc manhattan"],
     )
 
     # output results
-    dfm = dfm.sort_values(by="f1 euclidean", ascending=False)
-    print(dfm.iloc[:20, :])
-    dfm = dfm.sort_values(by="f1 manhattan", ascending=False)
-    print(dfm.iloc[:20, :])
+    print(dfm.sort_values(by="acc euclidean", ascending=False).iloc[:20, :])
+    print(dfm.sort_values(by="acc manhattan", ascending=False).iloc[:20, :])

@@ -1,5 +1,4 @@
 import multiprocessing
-import sys
 
 import matplotlib as mpl
 import matplotlib.pyplot as plt
@@ -7,14 +6,9 @@ import numpy as np
 import pandas as pd
 import seaborn as sbn
 from rich import print
-from rich.progress import Progress, BarColumn, TimeRemainingColumn
-from scipy.spatial.distance import cdist
+from rich.progress import BarColumn, Progress, TimeRemainingColumn
 from tslearn.clustering import TimeSeriesKMeans, silhouette_score
-from tslearn.metrics import dtw_path
-from tslearn.piecewise import (
-    PiecewiseAggregateApproximation,
-    SymbolicAggregateApproximation,
-)
+from tslearn.piecewise import SymbolicAggregateApproximation
 from tslearn.preprocessing import TimeSeriesScalerMeanVariance
 
 from music import MusicDB
@@ -26,26 +20,26 @@ savefig_options = dict(format="png", dpi=300, bbox_inches="tight")
 def do_sax_kmeans(params):
     plots = False
     # unpack
-    df, segments, symbols, k = params
+    df, k = params
 
     # Make sax
-    sax = SymbolicAggregateApproximation(n_segments=segments, alphabet_size_avg=symbols)
+    sax = SymbolicAggregateApproximation(n_segments=130, alphabet_size_avg=20)
     ts_sax = sax.fit_transform(df)
     sax_dataset_inv = sax.inverse_transform(ts_sax)
-
-    if plots:
-        plt.plot(df[0].ravel(), "b-", alpha=0.4)
-        plt.plot(sax_dataset_inv[0].ravel(), "b-")
-        plt.title("SAX, %d symbols" % symbols)
-        plt.show()
 
     km = TimeSeriesKMeans(
         n_clusters=k, metric="euclidean", max_iter=50, random_state=5138
     )
     km.fit(ts_sax)
-    # print(silhouette_score(df, km.labels_))  # this takes ages
-    km_d = TimeSeriesKMeans(n_clusters=k, metric="dtw", max_iter=50, random_state=5138)
-    km_d.fit(ts_sax)
+    km = TimeSeriesKMeans(
+        n_clusters=k, metric="euclidean", max_iter=50, random_state=5138
+    )
+    km.fit(ts_sax)
+
+    km_dtw = TimeSeriesKMeans(
+        n_clusters=k, metric="dtw", max_iter=50, random_state=5138
+    )
+    km_dtw.fit(ts_sax)
 
     if plots:
         # centroids
@@ -55,27 +49,19 @@ def do_sax_kmeans(params):
         for i in range(k):
             plt.plot(np.mean(df[np.where(km.labels_ == i)[0]], axis=0))
         plt.show()
-    return segments, symbols, k, km.inertia_, km_d.inertia_
+    return (
+        k,
+        round(silhouette_score(df, km.labels_), 4),  # OR km.inertia_
+        round(silhouette_score(df, km_dtw.labels_), 4),  # OR km_drw.inertia_
+    )
 
 
 if __name__ == "__main__":
     """
     On the dataset created, compute clustering based on Euclidean/Manhattan and DTW distances and compare the results. To perform the clustering you can choose among different distance functions and clustering algorithms. Remember that you can reduce the dimensionality through approximation. Analyze the clusters and highlight similarities and differences.
     """
-    try:
-        method_chosen = int(sys.argv[1])
-    except IndexError:
-        raise SystemExit("Remember to supply a parameter.")
-
     musi = MusicDB()
-
-    path, dist = dtw_path(musi.df.iloc[0], musi.df.iloc[1])
-
-    cost_matrix = cdist(
-        musi.df.iloc[0].values[:100].reshape(-1, 1),
-        musi.df.iloc[1].values[:100].reshape(-1, 1),
-    )
-
+    """
     if method_chosen == 1:
         # pathing
         fig, ax = plt.subplots(figsize=(12, 8))
@@ -126,69 +112,49 @@ if __name__ == "__main__":
         for i in range(n_clusters):
             plt.plot(np.mean(x[np.where(km.labels_ == i)[0]], axis=0))
         plt.show()
+    """
 
-    elif method_chosen == 4:
-        # Kmeans with SAX, grid search, multiprocessing
-        segments = 50
-        symbols = 25
-        k = 10
-        # percent_rows_to_use = 100
+    # Kmeans with SAX, grid search, multiprocessing
+    k = 11
+    x = musi.df
+    # Rescale - but why?
+    scaler = TimeSeriesScalerMeanVariance(mu=0.0, std=1.0)  # Rescale time series
+    ts = scaler.fit_transform(x)
 
-        # rows_to_use = round(len(musi.df) * percent_rows_to_use / 100)
-        x = musi.df  # .iloc[:rows_to_use, :]
-        # Rescale - but why?
-        scaler = TimeSeriesScalerMeanVariance(mu=0.0, std=1.0)  # Rescale time series
-        ts = scaler.fit_transform(x)
+    # build param collection
+    param_collection = []
+    for ki in range(3, k, 1):
+        param_collection.append((x, ki))
 
-        # make results
-        pl_results = []
-        num_errors = 0
+    # make results
+    pl_results = []
+    event_steps = [int(len(param_collection) * i / 100) for i in range(100)]
+    event_steps.append(1)
+    event_steps = set(event_steps)
 
-        # build param collection
-        param_collection = []
-        for seg in range(5, segments, 5):
-            for symb in range(5, symbols, 5):
-                for ki in range(4, k, 1):
-                    param_collection.append((x, seg, symb, ki))
+    # make progress reporting
+    progress = Progress(
+        "[progress.description]{task.description}",
+        BarColumn(),
+        "{task.completed} of {task.total}",
+        "[progress.percentage]{task.percentage:>3.0f}%",
+        TimeRemainingColumn(),
+    )
 
-        # make progress reporting
-        progress = Progress(
-            "[progress.description]{task.description}",
-            BarColumn(),
-            "{task.completed} of {task.total}",
-            "[progress.percentage]{task.percentage:>3.0f}%",
-            TimeRemainingColumn(),
-        )
+    # populate results
+    with progress:
+        task_id = progress.add_task("[cyan]KMeans…", total=len(param_collection))
+        with multiprocessing.Pool() as pool:
+            for one_result in pool.imap_unordered(do_sax_kmeans, param_collection):
+                pl_results.append(one_result)
+                progress.advance(task_id)
+                if int(progress._tasks[task_id].completed) in event_steps:
+                    with open("data/tokens/progress.txt", "w") as f:
+                        f.write(str(progress._tasks[task_id].completed))
 
-        # populate df
-        with progress:
-            task_id = progress.add_task("[cyan]KMeans…", total=len(param_collection))
-            with multiprocessing.Pool() as pool:
-                for (
-                    pl_segments,
-                    pl_symbols,
-                    pl_k,
-                    pl_sse,
-                    pl_eps,
-                ) in pool.imap_unordered(do_sax_kmeans, param_collection):
-                    if type(pl_eps) is not bool:
-                        pl_results.append(
-                            (
-                                pl_segments,
-                                pl_symbols,
-                                pl_k,
-                                round(pl_sse, 4),
-                                round(pl_eps, 4),
-                            )
-                        )
-                    else:
-                        num_errors += 1
-                    progress.advance(task_id)
+    # make df
+    dfm = pd.DataFrame(pl_results, columns=["k", "sse euclidean", "sse dtw"])
 
-        dfm = pd.DataFrame(
-            pl_results, columns=["segments", "symbols", "k", "sse euclidean", "sse dtw"]
-        )
-        dfm = dfm.sort_values(by="sse euclidean")
-        print(dfm.iloc[:20, :])
-        dfm = dfm.sort_values(by="sse dtw")
-        print(dfm.iloc[:20, :])
+    # output results
+    print(dfm.sort_values(by="sse euclidean").iloc[:20, :])
+    print(dfm.sort_values(by="sse dtw").iloc[:20, :])
