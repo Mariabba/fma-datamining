@@ -20,6 +20,7 @@ class MusicDB(object):
     df = attr.ib()
     feat = attr.ib()
 
+    # start of private methods
     @feat.default
     def _feat_default(self):
         our_feat = utils.load_tracks(givegenre=True, outliers=False, fill=False)
@@ -44,7 +45,6 @@ class MusicDB(object):
         # if not, populate
         return self._dataframe_populate()
 
-    # start of private methods
     def _dataframe_pickleload(self):
         path_to_pickle = Path("data/picks/small.pkl")
         try:
