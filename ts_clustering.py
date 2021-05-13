@@ -31,10 +31,6 @@ def do_sax_kmeans(params):
         n_clusters=k, metric="euclidean", max_iter=50, random_state=5138
     )
     km.fit(ts_sax)
-    km = TimeSeriesKMeans(
-        n_clusters=k, metric="euclidean", max_iter=50, random_state=5138
-    )
-    km.fit(ts_sax)
 
     km_dtw = TimeSeriesKMeans(
         n_clusters=k, metric="dtw", max_iter=50, random_state=5138
