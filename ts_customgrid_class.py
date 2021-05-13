@@ -55,15 +55,18 @@ if __name__ == "__main__":
     x.index = musi.df.index
     y = musi.feat["enc_genre"]
 
-    # make results
-    pl_results = []
-
     # build param collection
     param_collection = []
     for seg in range(5, segments, 25):
         for symb in range(5, symbols, 5):
-            for ki in range(3, k, 1):
+            for ki in range(3, k, 2):
                 param_collection.append((x, y, seg, symb, ki))
+
+    # make results
+    pl_results = []
+    event_steps = [int(len(param_collection) * i / 1000) for i in range(1000)]
+    event_steps.append(1)
+    event_steps = set(event_steps)
 
     # make progress reporting
     progress = Progress(
@@ -81,6 +84,9 @@ if __name__ == "__main__":
             for one_result in pool.imap_unordered(do_sax_knn, param_collection):
                 pl_results.append(one_result)
                 progress.advance(task_id)
+                if int(progress._tasks[task_id].completed) in event_steps:
+                    with open("data/tokens/progress.txt", "w") as f:
+                        f.write(str(progress._tasks[task_id].completed))
 
     # make df
     dfm = pd.DataFrame(
