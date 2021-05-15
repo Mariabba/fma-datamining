@@ -70,17 +70,6 @@ if __name__ == "__main__":
     param_collection = [(x, 8)]
     #param_collection.append((x, 4)) to do
 
-    # make results
-    pl_results = []
-
-    # make progress reporting
-    progress = Progress(
-        "[progress.description]{task.description}",
-        BarColumn(),
-        "{task.completed} of {task.total}",
-        "[progress.percentage]{task.percentage:>3.0f}%",
-        TimeRemainingColumn(),
-    )
     """
     # populate results
     for one_result in param_collection:
