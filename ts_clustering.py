@@ -18,7 +18,7 @@ savefig_options = dict(format="png", dpi=300, bbox_inches="tight")
 
 
 def do_sax_kmeans(params):
-    plots = False
+    plots = True
     # unpack
     df, k = params
 
@@ -27,27 +27,28 @@ def do_sax_kmeans(params):
     ts_sax = sax.fit_transform(df)
     sax_dataset_inv = sax.inverse_transform(ts_sax)
 
-    km = TimeSeriesKMeans(
+    km_dtw = TimeSeriesKMeans(
         n_clusters=k, metric="euclidean", max_iter=50, random_state=5138
     )
-    km.fit(ts_sax)
+    km_dtw.fit(ts_sax)
 
+    """
     km_dtw = TimeSeriesKMeans(
         n_clusters=k, metric="dtw", max_iter=50, random_state=5138
     )
     km_dtw.fit(ts_sax)
-
+    """
     if plots:
         # centroids
-        plt.plot(km.cluster_centers_.reshape(ts_sax.shape[1], k))
+        plt.plot(km_dtw.cluster_centers_.reshape(ts_sax.shape[1], k))
         plt.show()
         # WHAT THE f IS THIS
-        for i in range(k):
-            plt.plot(np.mean(df[np.where(km.labels_ == i)[0]], axis=0))
-        plt.show()
+        #for i in range(k):
+        #    plt.plot(np.mean(df[np.where(km_dtw.labels_ == i)[0]], axis=0))
+        #plt.show()
     return (
-        k,
-        round(km.inertia_, 4),
+        km_dtw.cluster_centers_,
+        km_dtw.labels_,
         round(km_dtw.inertia_, 4),
     )
 
@@ -80,18 +81,29 @@ if __name__ == "__main__":
         "[progress.percentage]{task.percentage:>3.0f}%",
         TimeRemainingColumn(),
     )
-
+    """
     # populate results
-    with progress:
-        task_id = progress.add_task("[cyan]KMeans…", total=len(param_collection))
-        #with multiprocessing.Pool() as pool:
-        for one_result in param_collection:
-            pl_results.append(do_sax_kmeans(one_result))
-            progress.advance(task_id)
+    for one_result in param_collection:
+        pl_results.append(do_sax_kmeans(one_result))
+    """
 
-    # make df
-    dfm = pd.DataFrame(pl_results, columns=["k", "sse euclidean", "sse dtw"])
+    centroids, labels, inertia = do_sax_kmeans((x,8))
 
-    # output results
-    print(dfm.sort_values(by="sse euclidean").iloc[:20, :])
-    print(dfm.sort_values(by="sse dtw").iloc[:20, :])
+
+    musi.feat["ClusterLabel"] = labels
+    musi.feat = musi.feat.drop(['enc_genre'], axis=1)
+
+    plt.plot(np.squeeze(centroids).T)
+    plt.show()
+    df_centroids = pd.DataFrame()
+    df_centroids = df_centroids.append(pd.Series(centroids[0,:,0]), ignore_index=True)
+    df_centroids = df_centroids.append(pd.Series(centroids[1,:,0]), ignore_index=True)
+    df_centroids = df_centroids.append(pd.Series(centroids[2,:,0]), ignore_index=True)
+    df_centroids = df_centroids.append(pd.Series(centroids[3,:,0]), ignore_index=True)
+    df_centroids = df_centroids.append(pd.Series(centroids[4,:,0]), ignore_index=True)
+    df_centroids = df_centroids.append(pd.Series(centroids[5,:,0]), ignore_index=True)
+    df_centroids = df_centroids.append(pd.Series(centroids[6,:,0]), ignore_index=True)
+    df_centroids = df_centroids.append(pd.Series(centroids[7,:,0]), ignore_index=True)
+
+    print(df_centroids)
+    print(musi.feat)

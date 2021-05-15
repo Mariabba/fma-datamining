@@ -22,6 +22,10 @@ from sklearn.preprocessing import StandardScaler
 from matrixprofile import *
 import seaborn as sns
 
+sns.set(
+    rc={"figure.figsize": (10, 6)},
+)
+sns.set_theme(style="whitegrid")
 
 def motifsanalysis(ts, w):
     # build matrix profile
@@ -70,9 +74,6 @@ rock_mean.plot()
 plt.title("Rock Mean")
 plt.show()
 
-sns.set_theme(style="whitegrid")
-sns.lineplot(data=rock_mean, palette="tab10", linewidth=2.5).set_title("Rock Mean")
-plt.show()
 
 #noise smooting
 w = 50
