@@ -18,8 +18,6 @@ savefig_options = dict(format="png", dpi=300, bbox_inches="tight")
 
 
 def do_sax_kmeans(params):
-    plots = True
-    # unpack
     df, k = params
 
     # Make sax
@@ -38,14 +36,7 @@ def do_sax_kmeans(params):
     )
     km_dtw.fit(ts_sax)
     """
-    if plots:
-        # centroids
-        plt.plot(km_dtw.cluster_centers_.reshape(ts_sax.shape[1], k))
-        plt.show()
-        # WHAT THE f IS THIS
-        #for i in range(k):
-        #    plt.plot(np.mean(df[np.where(km_dtw.labels_ == i)[0]], axis=0))
-        #plt.show()
+
     return (
         km_dtw.cluster_centers_,
         km_dtw.labels_,
@@ -66,9 +57,7 @@ if __name__ == "__main__":
     scaler = TimeSeriesScalerMeanVariance(mu=0.0, std=1.0)  # Rescale time series
     ts = scaler.fit_transform(x)
 
-    # build param collection
-    param_collection = [(x, 8)]
-    #param_collection.append((x, 4)) to do
+    # param_collection.append((x, 4)) to do
 
     """
     # populate results
@@ -76,8 +65,7 @@ if __name__ == "__main__":
         pl_results.append(do_sax_kmeans(one_result))
     """
 
-    centroids, labels, inertia = do_sax_kmeans((x,8))
-
+    centroids, labels, inertia = do_sax_kmeans((ts, 8))
 
     musi.feat["ClusterLabel"] = labels
     musi.feat = musi.feat.drop(['enc_genre'], axis=1)
@@ -85,14 +73,18 @@ if __name__ == "__main__":
     plt.plot(np.squeeze(centroids).T)
     plt.show()
     df_centroids = pd.DataFrame()
-    df_centroids = df_centroids.append(pd.Series(centroids[0,:,0]), ignore_index=True)
-    df_centroids = df_centroids.append(pd.Series(centroids[1,:,0]), ignore_index=True)
-    df_centroids = df_centroids.append(pd.Series(centroids[2,:,0]), ignore_index=True)
-    df_centroids = df_centroids.append(pd.Series(centroids[3,:,0]), ignore_index=True)
-    df_centroids = df_centroids.append(pd.Series(centroids[4,:,0]), ignore_index=True)
-    df_centroids = df_centroids.append(pd.Series(centroids[5,:,0]), ignore_index=True)
-    df_centroids = df_centroids.append(pd.Series(centroids[6,:,0]), ignore_index=True)
-    df_centroids = df_centroids.append(pd.Series(centroids[7,:,0]), ignore_index=True)
+    df_centroids = df_centroids.append(pd.Series(centroids[0, :, 0]), ignore_index=True)
+    df_centroids = df_centroids.append(pd.Series(centroids[1, :, 0]), ignore_index=True)
+    df_centroids = df_centroids.append(pd.Series(centroids[2, :, 0]), ignore_index=True)
+    df_centroids = df_centroids.append(pd.Series(centroids[3, :, 0]), ignore_index=True)
+    df_centroids = df_centroids.append(pd.Series(centroids[4, :, 0]), ignore_index=True)
+    df_centroids = df_centroids.append(pd.Series(centroids[5, :, 0]), ignore_index=True)
+    df_centroids = df_centroids.append(pd.Series(centroids[6, :, 0]), ignore_index=True)
+    df_centroids = df_centroids.append(pd.Series(centroids[7, :, 0]), ignore_index=True)
 
     print(df_centroids)
     print(musi.feat)
+
+    musi.feat = musi.feat.groupby(["genre", "ClusterLabel"], as_index=False).size()
+    musi.feat = musi.feat[musi.feat["size"] != 0]
+    print(musi.feat.sort_values(by=['ClusterLabel']))
