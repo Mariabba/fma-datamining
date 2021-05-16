@@ -52,7 +52,7 @@ def motifsanalysis(ts, w):
 if __name__ == "__main__":
 
     #read dataset
-    centroids = pd.read_csv("centroidiclusters.csv")
+    centroids = pd.read_csv("centroidiclusters_dtw.csv")
 
     print(centroids.info())
     print(centroids)
@@ -60,14 +60,42 @@ if __name__ == "__main__":
     plt.title("Centroids")
     plt.show()
 
-    centroids = ((centroids.T - centroids.T.mean()) / centroids.T.std()).rolling(window=10).mean()
-    centroids.plot()
-    plt.title("Centroids")
-    plt.show()
-    for n in range(8):
-        plt.plot(centroids.loc[n])
-        plt.show()
+    sns.set()
+    fig, axs = plt.subplots(4, 2, figsize=(10, 12))
+    axs[0, 0].plot(centroids.iloc[0], color="blue")
+    axs[0, 0].set_title("Cluster 0")
+    axs[0, 0].set(xticklabels=[])
 
+    axs[0, 1].plot(centroids.iloc[1], color="orange")
+    axs[0, 1].set_title("Cluster 1")
+    axs[0, 1].set(xticklabels=[])
+
+    axs[1, 0].plot(centroids.iloc[2], color="green")
+    axs[1, 0].set_title("Cluster 2")
+    axs[1, 0].set(xticklabels=[])
+
+    axs[1, 1].plot(centroids.iloc[3], color="red")
+    axs[1, 1].set_title("Cluster 3")
+    axs[1, 1].set(xticklabels=[])
+
+    axs[2, 0].plot(centroids.iloc[4], color="purple")
+    axs[2, 0].set_title("Cluster 4")
+    axs[2, 0].set(xticklabels=[])
+
+    axs[2, 1].plot(centroids.iloc[5], color="brown")
+    axs[2, 1].set_title("Cluster 5")
+    axs[2, 1].set(xticklabels=[])
+
+    axs[3, 0].plot(centroids.iloc[6], color="pink")
+    axs[3, 0].set_title("Cluster 6")
+    axs[3, 0].set(xticklabels=[])
+
+    axs[3, 1].plot(centroids.iloc[7], color="gray")
+    axs[3, 1].set_title("Cluster 7")
+    axs[3, 1].set(xticklabels=[])
+
+    fig.tight_layout()
+    plt.show()
     """
     #scaled dataset
     scaler = TimeSeriesScalerMeanVariance()
