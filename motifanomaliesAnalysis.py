@@ -23,7 +23,7 @@ from matrixprofile import *
 import seaborn as sns
 
 sns.set(
-    rc={"figure.figsize": (10, 6)},
+    rc={"figure.figsize": (18, 6)},
 )
 sns.set_theme(style="whitegrid")
 
@@ -49,37 +49,49 @@ def motifsanalysis(ts, w):
 
     plt.show()
 
+if __name__ == "__main__":
 
-#read dataset
-musi = MusicDB()
+    #read dataset
+    centroids = pd.read_csv("centroidiclusters.csv")
 
-print("{1} features for {0} tracks".format(*musi.df.shape))
-print(musi.feat)
+    print(centroids.info())
+    print(centroids)
+    centroids.T.plot()
+    plt.title("Centroids")
+    plt.show()
 
-print(musi.df.info())
+    centroids = ((centroids.T - centroids.T.mean()) / centroids.T.std()).rolling(window=10).mean()
+    centroids.plot()
+    plt.title("Centroids")
+    plt.show()
+    for n in range(8):
+        plt.plot(centroids.loc[n])
+        plt.show()
 
-#scaled dataset
-scaler = TimeSeriesScalerMeanVariance()
-musi_scaled = pd.DataFrame(scaler.fit_transform(musi.df.values).reshape(musi.df.values.shape[0], musi.df.values.shape[1]))
-musi_scaled.index = musi.df.index
-print(musi_scaled.info())
-print(musi_scaled.head(20))
-
-
-#build mean time series rock
-rock = musi_scaled.loc[musi.feat["genre"] == "Rock"]
-rock_mean = rock.mean(axis=0)
-print(rock_mean)
-rock_mean.plot()
-plt.title("Rock Mean")
-plt.show()
+    """
+    #scaled dataset
+    scaler = TimeSeriesScalerMeanVariance()
+    musi_scaled = pd.DataFrame(scaler.fit_transform(musi.df.values).reshape(musi.df.values.shape[0], musi.df.values.shape[1]))
+    musi_scaled.index = musi.df.index
+    print(musi_scaled.info())
+    print(musi_scaled.head(20))
 
 
-#noise smooting
-w = 50
-rock_mean = ((rock_mean - rock_mean.mean())/rock_mean.std()).rolling(window=w).mean()
-plt.plot(rock_mean)
-plt.title("Rock Mean Noise Smooted")
-plt.show()
-motifsanalysis(rock_mean, 50)
+    #build mean time series rock
+    rock = musi_scaled.loc[musi.feat["genre"] == "Rock"]
+    rock_mean = rock.mean(axis=0)
+    print(rock_mean)
+    rock_mean.plot()
+    plt.title("Rock Mean")
+    plt.show()
+
+
+    #noise smooting
+    w = 50
+    rock_mean = ((rock_mean - rock_mean.mean())/rock_mean.std()).rolling(window=w).mean()
+    plt.plot(rock_mean)
+    plt.title("Rock Mean Noise Smooted")
+    plt.show()
+    motifsanalysis(rock_mean, 50)
+    """
 
