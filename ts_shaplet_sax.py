@@ -234,3 +234,11 @@ fig.tight_layout()
 plt.show()
 
 print("Numero di shaplet :", shp_clf.shapelets_)
+
+"""
+df_shaplet = pd.DataFrame()
+for n in range(24):
+    df_shaplet = df_shaplet.append(pd.Series(np.squeeze(shp_clf.shapelets_[n])), ignore_index=True)
+
+df_shaplet.to_csv("musicshaplet.csv", index= False)
+"""
