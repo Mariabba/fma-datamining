@@ -41,3 +41,10 @@ tracks3 = tracks[tracks.index.isin(cluster3.index)]
 tracks4 = tracks[tracks.index.isin(cluster4.index)]
 tracks6 = tracks[tracks.index.isin(cluster6.index)]
 
+#let's plot our motif
+motifs = pd.read_csv("musicmotif.csv")
+print(motifs)
+motifs = motifs.drop(columns=["StartPoint", "MinMPDistance", "CentroidName" ])
+for n in range(3):
+    motifs.iloc[n].plot()
+    plt.show()
