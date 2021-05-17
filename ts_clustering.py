@@ -25,17 +25,18 @@ def do_sax_kmeans(params):
     ts_sax = sax.fit_transform(df)
     sax_dataset_inv = sax.inverse_transform(ts_sax)
 
-
+    """
     km_dtw = TimeSeriesKMeans(
         n_clusters=k, metric="euclidean", max_iter=50, random_state=5138
     )
     km_dtw.fit(ts_sax)
     """
+
     km_dtw = TimeSeriesKMeans(
         n_clusters=k, metric="dtw", max_iter=50, random_state=5138
     )
     km_dtw.fit(ts_sax)
-    """
+
     return (
         km_dtw.cluster_centers_,
         km_dtw.labels_,
@@ -85,10 +86,12 @@ if __name__ == "__main__":
     print(musi.feat)
 
 
+
+    df_centroids.to_csv("centroidiclusters_dtw.csv", index = False)
+    musi.feat.to_csv("musicluster_dtw_index.csv")
+
     musi.feat = musi.feat.groupby(["genre", "ClusterLabel"], as_index=False).size()
     musi.feat = musi.feat[musi.feat["size"] != 0]
     musi.feat = musi.feat.sort_values(by=['ClusterLabel'])
 
-
-    df_centroids.to_csv("centroidiclusters.csv", index = False)
-    musi.feat.to_csv("musicluster.csv", index = False)
+    musi.feat.to_csv("musicluster_dtw.csv")
