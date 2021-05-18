@@ -27,38 +27,13 @@ from tslearn.metrics import dtw, dtw_path, cdist_dtw, subsequence_cost_matrix
 clusters = pd.read_csv("musicluster_dtw_index.csv", index_col="Unnamed: 0")
 cluster0 = clusters[clusters["ClusterLabel"] == 0 ]
 cluster1 = clusters[clusters["ClusterLabel"] == 1 ]
+cluster2 = clusters[clusters["ClusterLabel"] == 2 ]
 cluster3 = clusters[clusters["ClusterLabel"] == 3 ]
 cluster4 = clusters[clusters["ClusterLabel"] == 4 ]
+cluster5 = clusters[clusters["ClusterLabel"] == 5 ]
 cluster6 = clusters[clusters["ClusterLabel"] == 6 ]
+cluster7 = clusters[clusters["ClusterLabel"] == 7 ]
 
-
-tracks = utils.load_tracks(
-    "data/tracks.csv", outliers=False, fill=False)
-print(tracks.info())
-
-tracks0 = tracks[tracks.index.isin(cluster0.index)]
-tracks1 = tracks[tracks.index.isin(cluster1.index)]
-tracks3 = tracks[tracks.index.isin(cluster3.index)]
-tracks4 = tracks[tracks.index.isin(cluster4.index)]
-tracks6 = tracks[tracks.index.isin(cluster6.index)]
-
-print(tracks["track", "favorites"].hist())
-plt.show()
-
-print(tracks0["track", "favorites"].hist())
-plt.show()
-
-print(tracks1["track", "favorites"].hist())
-plt.show()
-
-print(tracks3["track", "favorites"].hist())
-plt.show()
-
-print(tracks4["track", "favorites"].hist()) #track, comments #track, favorites
-plt.show()
-
-print(tracks6["track", "favorites"].hist()) #album,comments
-plt.show()
 
 #let's plot our motif
 motifs = pd.read_csv("musicmotif.csv")
@@ -112,27 +87,127 @@ axs[4, 1].set(xticklabels=[])
 fig.tight_layout()
 plt.show()
 
+"""
+#distance dtw between motifs
 for i in range(10):
     for y in range(10):
         if i != y:
-            print("Distance between ", i, "and ", y)
             dist = dtw(motifs.iloc[i], motifs.iloc[y])
-            print(dist)
+            if dist < 4:
+                print("Distance between ", i, "and ", y)
+                print(dist)
     print("Finished")
+"""
 
 """
-plot two figure
+Distance between  4 and  7
+3.000682959869468
+Distance between  0 and  8
+3.1748638275716208
+Distance between  0 and  5
+3.4931194805559893
+
+"""
+
+sns.set(
+    rc={"figure.figsize": (10, 4)},
+)
+#plot 4/7
+plt.title("DTW: 3.001")
 plt.subplot(1, 2, 1) # row 1, col 2 index 1
-plt.plot(motifs.iloc[7])
-plt.title("My first plot!")
-plt.xlabel('X-axis ')
-plt.ylabel('Y-axis ')
+plt.plot(motifs.iloc[4], color="purple")
+plt.title("Motif from centroid 4 ")
+plt.xticks([])
 
 plt.subplot(1, 2, 2) # index 2
-plt.plot(motifs.iloc[5])
-plt.title("My second plot!")
-plt.xlabel('X-axis ')
-plt.ylabel('Y-axis ')
+plt.plot(motifs.iloc[7], color="pink")
+plt.title("Motif from centroid 6")
+plt.xticks([])
+
 
 plt.show()
-"""
+
+#plot 0/8
+plt.title("DTW: 3.175")
+plt.subplot(1, 2, 1) # row 1, col 2 index 1
+plt.plot(motifs.iloc[0], color="orange")
+plt.title("Motif from centroid 1 ")
+plt.xticks([])
+
+plt.subplot(1, 2, 2) # index 2
+plt.plot(motifs.iloc[8], color="brown")
+plt.title("Motif from centroid 5")
+plt.xticks([])
+
+
+plt.show()
+
+#plot 0/5
+plt.title("DTW: 3.493")
+plt.subplot(1, 2, 1) # row 1, col 2 index 1
+plt.plot(motifs.iloc[0], color="orange")
+plt.title("Motif from centroid 1 ")
+plt.xticks([])
+
+plt.subplot(1, 2, 2) # index 2
+plt.plot(motifs.iloc[5], color="pink")
+plt.title("Motif from centroid 6")
+plt.xticks([])
+
+
+plt.show()
+
+#let's find somethig interesting between:
+# 4 and 6, 1 and 5, 1 and 6
+#remember that cluster 5 has the higher MinMPDistance
+
+tracks = utils.load_tracks(
+    "data/tracks.csv", outliers=False, fill=False)
+print(tracks.info())
+
+tracks0 = tracks[tracks.index.isin(cluster0.index)]
+tracks1 = tracks[tracks.index.isin(cluster1.index)]
+tracks2 = tracks[tracks.index.isin(cluster2.index)]
+tracks3 = tracks[tracks.index.isin(cluster3.index)]
+tracks4 = tracks[tracks.index.isin(cluster4.index)]
+tracks5 = tracks[tracks.index.isin(cluster5.index)]
+tracks6 = tracks[tracks.index.isin(cluster6.index)]
+tracks7 = tracks[tracks.index.isin(cluster7.index)]
+
+print("All dataset")
+print(tracks["track", "favorites"].describe())
+plt.show()
+
+statistics = pd.DataFrame()
+row0 = []
+row0 = np.append(row0, round(tracks0["track", "comments"].mean(), 2))
+row0 = np.append(row0, round(tracks0["track", "date_created"].mean(), 2))
+row0 = np.append(row0, round(tracks0["track", "favorites"].mean(), 2))
+row0 = np.append(row0, round(tracks0["track", "interest"].mean(), 2))
+row0 = np.append(row0, round(tracks0["track", "listens"].mean(), 2))
+
+statistics = statistics.append(pd.Series(row0), ignore_index=True)
+
+row1 = []
+row1 = np.append(row1, round(tracks1["track", "comments"].mean(), 2))
+row1 = np.append(row1, round(tracks1["track", "date_created"].mean(), 2))
+row1 = np.append(row1, round(tracks1["track", "favorites"].mean(), 2))
+row1 = np.append(row1, round(tracks1["track", "interest"].mean(), 2))
+row1 = np.append(row1, round(tracks1["track", "listens"].mean(), 2))
+
+statistics = statistics.append(pd.Series(row1), ignore_index=True)
+
+row2 = []
+row2 = np.append(row2, round(tracks2["track", "comments"].mean(), 2))
+row1 = np.append(row1, round(tracks1["track", "date_created"].mean(), 2))
+row1 = np.append(row1, round(tracks1["track", "favorites"].mean(), 2))
+row1 = np.append(row1, round(tracks1["track", "interest"].mean(), 2))
+row1 = np.append(row1, round(tracks1["track", "listens"].mean(), 2))
+
+statistics = statistics.append(pd.Series(row1), ignore_index=True)
+
+
+
+
+statistics = statistics.rename(columns={0:"comments", 1:"date_created", 2:"favorites", 3:"interest", 4:"listens"})
+print(statistics)
