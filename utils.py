@@ -4,7 +4,7 @@ from pathlib import Path
 import numpy as np
 import pandas as pd
 
-#from langdetect import detect
+# from langdetect import detect
 from sklearn.preprocessing import MultiLabelBinarizer
 
 try:
