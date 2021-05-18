@@ -33,3 +33,4 @@ y = musi.feat["enc_genre"]
 print(musi.feat["genre"].unique())
 
 print(y.unique())
+print(musi.feat.info())

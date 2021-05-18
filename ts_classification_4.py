@@ -1,4 +1,6 @@
 """CLASSIFICAZIONE CON SAX E KNN"""
+from matplotlib import pyplot as plt
+from sklearn.preprocessing import LabelBinarizer
 
 """libraries"""
 import numpy as np
@@ -7,6 +9,10 @@ from sklearn.metrics import (
     accuracy_score,
     f1_score,
     classification_report,
+    roc_auc_score,
+    auc,
+    roc_curve,
+    plot_confusion_matrix,
 )
 from sklearn.model_selection import (
     train_test_split,
@@ -21,6 +27,20 @@ from music import MusicDB
 """
 FILE 3-  CLASSIFICAZIONE CON APPROSSIMAZIONE CON SAX KNN
 """
+
+
+def draw_confusion_matrix(Clf, X, y):
+    titles_options = [
+        ("Confusion matrix, without normalization", None),
+        ("KNN-TimeSeries-Sax Confusion matrix", "true"),
+    ]
+
+    for title, normalize in titles_options:
+        disp = plot_confusion_matrix(Clf, X, y, cmap="OrRd", normalize=normalize)
+        disp.ax_.set_title(title)
+
+    plt.show()
+
 
 # Carico il dataframe
 musi = MusicDB()
@@ -59,12 +79,11 @@ knn = KNeighborsClassifier(n_neighbors=21, weights="distance", p=1)
 knn.fit(X_train, y_train)
 # Best parameters:
 
-# Apply on the training set
-print("Apply  on the training set: \n")
-Y_pred = knn.predict(X_train)
-print("Accuracy  %s" % accuracy_score(y_train, Y_pred))
-print("F1-score %s" % f1_score(y_train, Y_pred, average=None))
-print(classification_report(y_train, Y_pred))
+# knn con dtw
+from pyts.classification import KNeighborsClassifier
+
+# knn = KNeighborsClassifier(metric="dtw_sakoechiba", n_neighbors=21, weights="distance")
+# knn.fit(X_train, y_train)
 
 # Apply on the test set and evaluate the performance
 print("Apply on the test set and evaluate the performance: \n")
@@ -72,6 +91,8 @@ y_pred = knn.predict(X_test)
 print("Accuracy %s" % accuracy_score(y_test, y_pred))
 print("F1-score  %s" % f1_score(y_test, y_pred, average=None))
 print(classification_report(y_test, y_pred))
+
+draw_confusion_matrix(knn, X_test, y_test)
 
 """Grid Search KNN
 
@@ -95,3 +116,36 @@ print()
 print("Best k ('n_neighbors'): %s" % grid_search.best_params_["n_neighbors"])
 print()
 """
+"""ROC CURVE"""
+lb = LabelBinarizer()
+lb.fit(y_test)
+lb.classes_.tolist()
+
+fpr = dict()
+tpr = dict()
+roc_auc = dict()
+by_test = lb.transform(y_test)
+by_pred = lb.transform(y_pred)
+for i in range(8):
+    fpr[i], tpr[i], _ = roc_curve(by_test[:, i], by_pred[:, i])
+    roc_auc[i] = auc(fpr[i], tpr[i])
+
+    roc_auc = roc_auc_score(by_test, by_pred, average=None)
+
+plt.figure(figsize=(8, 5))
+for i in range(8):
+    plt.plot(
+        fpr[i],
+        tpr[i],
+        label="%s ROC curve (area = %0.2f)" % (lb.classes_.tolist()[i], roc_auc[i]),
+    )
+
+plt.plot([0, 1], [0, 1], "k--")
+plt.xlim([0.0, 1.0])
+plt.ylim([0.0, 1.05])
+plt.title("KNN-TimeSeries-Sax Roc-Curve")
+plt.xlabel("False Positive Rate", fontsize=10)
+plt.ylabel("True Positive Rate", fontsize=10)
+plt.tick_params(axis="both", which="major", labelsize=12)
+plt.legend(loc="lower right", fontsize=7, frameon=False)
+plt.show()

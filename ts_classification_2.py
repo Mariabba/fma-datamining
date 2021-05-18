@@ -1,17 +1,7 @@
+"""CLASSIFICAZIONE KNN DATASET COMPLETO"""
+
 """libraries"""
-import pandas as pd
-from pandas import DataFrame
-from pandas.testing import assert_frame_equal
-import IPython.display as ipd
 import matplotlib.pyplot as plt
-import seaborn as sns
-import numpy as np
-from sklearn.neighbors import KNeighborsClassifier
-from sklearn.preprocessing import LabelBinarizer, LabelEncoder
-from tslearn.clustering import TimeSeriesKMeans, silhouette_score
-from tslearn.generators import random_walks
-from tslearn.preprocessing import TimeSeriesScalerMeanVariance
-from sklearn.model_selection import train_test_split, cross_val_score, GridSearchCV
 from sklearn.metrics import (
     accuracy_score,
     f1_score,
@@ -19,22 +9,13 @@ from sklearn.metrics import (
     plot_confusion_matrix,
 )
 from sklearn.metrics import roc_curve, auc, roc_auc_score
-from music import MusicDB
-import scipy.stats as stats
-
-from tslearn.shapelets import ShapeletModel
-from tslearn.shapelets import grabocka_params_to_shapelet_size_dict
-from tslearn.preprocessing import TimeSeriesScalerMinMax
+from sklearn.model_selection import train_test_split
+from sklearn.neighbors import KNeighborsClassifier
+from sklearn.preprocessing import LabelBinarizer
 from tslearn.preprocessing import TimeSeriesScalerMeanVariance
 
-"""
-FILE 2  -CLASSIFICAZIONE A 8 CLASSI-GENERE BASE
+from music import MusicDB
 
-In questo file vi sono 2 tipologie di classifcazione base per le TS:
-
-2- Distance Based Class-KNN
-3- Random Forest
-"""
 
 musi = MusicDB()
 print(musi.df.info())
@@ -56,11 +37,11 @@ X_train, X_test, y_train, y_test = train_test_split(
 def draw_confusion_matrix(Clf, X, y):
     titles_options = [
         ("Confusion matrix, without normalization", None),
-        ("Time Series Classifier KNN Confusion matrix", "true"),
+        ("KNN-TimeSeries Confusion matrix", "true"),
     ]
 
     for title, normalize in titles_options:
-        disp = plot_confusion_matrix(Clf, X, y, cmap="PuBuGn", normalize=normalize)
+        disp = plot_confusion_matrix(Clf, X, y, cmap="OrRd", normalize=normalize)
         disp.ax_.set_title(title)
 
     plt.show()
@@ -70,13 +51,6 @@ def draw_confusion_matrix(Clf, X, y):
 clf = KNeighborsClassifier(n_neighbors=29, weights="distance", p=2)
 clf.fit(X_train, y_train)
 # Best parameters: {'n_neighbors': 29, 'p': 2, 'weights': 'distance'}
-
-# Apply on the training set
-print("Apply  on the training set: \n")
-Y_pred = clf.predict(X_train)
-print("Accuracy  %s" % accuracy_score(y_train, Y_pred))
-print("F1-score %s" % f1_score(y_train, Y_pred, average=None))
-print(classification_report(y_train, Y_pred))
 
 # Apply on the test set and evaluate the performance
 print("Apply on the test set and evaluate the performance: \n")
@@ -114,7 +88,7 @@ for i in range(8):
 plt.plot([0, 1], [0, 1], "k--")
 plt.xlim([0.0, 1.0])
 plt.ylim([0.0, 1.05])
-plt.title("Time Series Classifier KNN Roc-Curve")
+plt.title("KNN-TimeSeries Roc-Curve")
 plt.xlabel("False Positive Rate", fontsize=10)
 plt.ylabel("True Positive Rate", fontsize=10)
 plt.tick_params(axis="both", which="major", labelsize=12)
