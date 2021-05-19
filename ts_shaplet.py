@@ -1,3 +1,4 @@
+"""SHAPLET RETRIVE WITH ALL DATASET"""
 """libraries"""
 
 import pandas as pd
@@ -65,14 +66,14 @@ n_shapelets = sum(shapelet_sizes.values())
 """plot shaplet e dataset"""
 
 sns.set(
-    rc={"figure.figsize": (20, 6)},
+    rc={"figure.figsize": (25, 7)},
 )
 plt.title(
     "Example locations of shapelet matches "
-    "(%d shapelets extracted)".format(n_shapelets)
+    "(24 shapelets extracted)".format(n_shapelets)
 )
 
-plt.plot(X[ts_id].ravel(), label="Time Series Dataset")
+plt.plot(X[ts_id].ravel(), label="Time Series")
 for idx_shp, shp in enumerate(shp_clf.shapelets_):
     t0 = predicted_locations[ts_id, idx_shp]
     plt.plot(np.arange(t0, t0 + len(shp)), shp, linewidth=0.5)
@@ -84,7 +85,7 @@ plt.show()
 # Make predictions and calculate accuracy score
 
 # Plot the different discovered shapelets
-sns.set(rc={"figure.figsize": (20, 6)})
+sns.set(rc={"figure.figsize": (25, 7)})
 for i, sz in enumerate(shapelet_sizes.keys()):
     plt.subplot(len(shapelet_sizes), 1, i + 1)
     plt.title("%d shapelets of size %d" % (shapelet_sizes[sz], sz))
