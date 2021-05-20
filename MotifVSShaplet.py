@@ -25,21 +25,21 @@ import utils
 from tslearn.metrics import dtw, dtw_path, cdist_dtw, subsequence_cost_matrix
 
 clusters = pd.read_csv("musicluster_dtw_index.csv", index_col="Unnamed: 0")
-cluster0 = clusters[clusters["ClusterLabel"] == 0 ]
-cluster1 = clusters[clusters["ClusterLabel"] == 1 ]
-cluster2 = clusters[clusters["ClusterLabel"] == 2 ]
-cluster3 = clusters[clusters["ClusterLabel"] == 3 ]
-cluster4 = clusters[clusters["ClusterLabel"] == 4 ]
-cluster5 = clusters[clusters["ClusterLabel"] == 5 ]
-cluster6 = clusters[clusters["ClusterLabel"] == 6 ]
-cluster7 = clusters[clusters["ClusterLabel"] == 7 ]
+cluster0 = clusters[clusters["ClusterLabel"] == 0]
+cluster1 = clusters[clusters["ClusterLabel"] == 1]
+cluster2 = clusters[clusters["ClusterLabel"] == 2]
+cluster3 = clusters[clusters["ClusterLabel"] == 3]
+cluster4 = clusters[clusters["ClusterLabel"] == 4]
+cluster5 = clusters[clusters["ClusterLabel"] == 5]
+cluster6 = clusters[clusters["ClusterLabel"] == 6]
+cluster7 = clusters[clusters["ClusterLabel"] == 7]
 
 
-#let's plot our motif
+# let's plot our motif
 motifs = pd.read_csv("musicmotif.csv")
 print(motifs)
 
-motifs = motifs.drop(columns=["StartPoint", "MinMPDistance", "CentroidName" ])
+motifs = motifs.drop(columns=["StartPoint", "MinMPDistance", "CentroidName"])
 
 sns.set()
 fig, axs = plt.subplots(5, 2, figsize=(10, 12))
@@ -112,14 +112,14 @@ Distance between  0 and  5
 sns.set(
     rc={"figure.figsize": (10, 4)},
 )
-#plot 4/7
+# plot 4/7
 plt.title("DTW: 3.001")
-plt.subplot(1, 2, 1) # row 1, col 2 index 1
+plt.subplot(1, 2, 1)  # row 1, col 2 index 1
 plt.plot(motifs.iloc[4], color="purple")
 plt.title("Motif from centroid 4 ")
 plt.xticks([])
 
-plt.subplot(1, 2, 2) # index 2
+plt.subplot(1, 2, 2)  # index 2
 plt.plot(motifs.iloc[7], color="pink")
 plt.title("Motif from centroid 6")
 plt.xticks([])
@@ -127,14 +127,14 @@ plt.xticks([])
 
 plt.show()
 
-#plot 0/8
+# plot 0/8
 plt.title("DTW: 3.175")
-plt.subplot(1, 2, 1) # row 1, col 2 index 1
+plt.subplot(1, 2, 1)  # row 1, col 2 index 1
 plt.plot(motifs.iloc[0], color="orange")
 plt.title("Motif from centroid 1 ")
 plt.xticks([])
 
-plt.subplot(1, 2, 2) # index 2
+plt.subplot(1, 2, 2)  # index 2
 plt.plot(motifs.iloc[8], color="brown")
 plt.title("Motif from centroid 5")
 plt.xticks([])
@@ -142,14 +142,14 @@ plt.xticks([])
 
 plt.show()
 
-#plot 0/5
+# plot 0/5
 plt.title("DTW: 3.493")
-plt.subplot(1, 2, 1) # row 1, col 2 index 1
+plt.subplot(1, 2, 1)  # row 1, col 2 index 1
 plt.plot(motifs.iloc[0], color="orange")
 plt.title("Motif from centroid 1 ")
 plt.xticks([])
 
-plt.subplot(1, 2, 2) # index 2
+plt.subplot(1, 2, 2)  # index 2
 plt.plot(motifs.iloc[5], color="pink")
 plt.title("Motif from centroid 6")
 plt.xticks([])
@@ -157,12 +157,11 @@ plt.xticks([])
 
 plt.show()
 
-#let's find somethig interesting between:
+# let's find somethig interesting between:
 # 4 and 6, 1 and 5, 1 and 6
-#remember that cluster 5 has the higher MinMPDistance
+# remember that cluster 5 has the higher MinMPDistance
 
-tracks = utils.load_tracks(
-    "data/tracks.csv", outliers=False, fill=False)
+tracks = utils.load_tracks("data/tracks.csv", outliers=False, fill=False)
 print(tracks.info())
 
 tracks0 = tracks[tracks.index.isin(cluster0.index)]
@@ -252,25 +251,33 @@ row7 = np.append(row7, round(tracks7["track", "listens"].mean(), 2))
 
 statistics = statistics.append(pd.Series(row7), ignore_index=True)
 
-statistics = statistics.rename(columns={0:"comments", 1:"date_created", 2:"favorites", 3:"interest", 4:"listens"})
+statistics = statistics.rename(
+    columns={
+        0: "comments",
+        1: "date_created",
+        2: "favorites",
+        3: "interest",
+        4: "listens",
+    }
+)
 print(statistics)
 
-statistics["comments"].plot(kind='bar')
+statistics["comments"].plot(kind="bar")
 plt.title("Comments")
 plt.show()
 
-statistics["date_created"].plot(kind='bar')
+statistics["date_created"].plot(kind="bar")
 plt.title("Date Created")
 plt.show()
 
-statistics["favorites"].plot(kind='bar')
+statistics["favorites"].plot(kind="bar")
 plt.title("Favorites")
 plt.show()
 
-statistics["interest"].plot(kind='bar')
+statistics["interest"].plot(kind="bar")
 plt.title("Interest")
 plt.show()
 
-statistics["listens"].plot(kind='bar')
+statistics["listens"].plot(kind="bar")
 plt.title("Listens")
 plt.show()
