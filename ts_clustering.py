@@ -10,7 +10,7 @@ from rich.progress import BarColumn, Progress, TimeRemainingColumn
 from tslearn.clustering import TimeSeriesKMeans, silhouette_score
 from tslearn.piecewise import SymbolicAggregateApproximation
 from tslearn.preprocessing import TimeSeriesScalerMeanVariance
-
+import seaborn as sns
 from music import MusicDB
 
 mpl.rcParams["figure.dpi"] = 300
@@ -24,17 +24,19 @@ def do_sax_kmeans(params):
     sax = SymbolicAggregateApproximation(n_segments=130, alphabet_size_avg=20)
     ts_sax = sax.fit_transform(df)
     sax_dataset_inv = sax.inverse_transform(ts_sax)
-
+    """
     km_dtw = TimeSeriesKMeans(
         n_clusters=k, metric="euclidean", max_iter=50, random_state=5138
     )
     km_dtw.fit(ts_sax)
     """
+
     km_dtw = TimeSeriesKMeans(
         n_clusters=k, metric="dtw", max_iter=50, random_state=5138
     )
     km_dtw.fit(ts_sax)
-    """
+
+
     return (
         km_dtw.cluster_centers_,
         km_dtw.labels_,
@@ -43,6 +45,8 @@ def do_sax_kmeans(params):
 
 
 if __name__ == "__main__":
+    sns.set()
+
     """
     On the dataset created, compute clustering based on Euclidean/Manhattan and DTW distances and compare the results. To perform the clustering you can choose among different distance functions and clustering algorithms. Remember that you can reduce the dimensionality through approximation. Analyze the clusters and highlight similarities and differences.
     """
@@ -86,6 +90,35 @@ if __name__ == "__main__":
     musi.feat = musi.feat.groupby(["genre", "ClusterLabel"], as_index=False).size()
     musi.feat = musi.feat[musi.feat["size"] != 0]
     musi.feat = musi.feat.sort_values(by=["ClusterLabel"])
+
+
+    musi.feat.index = musi.feat["genre"]
+
+    cluster1 = musi.feat[musi.feat["ClusterLabel"] == 1].sort_values(by=["size"])
+    cluster1["size"].plot(kind='bar', x="genre")
+    plt.title("Tracks genre distribution - cluster 1")
+    plt.xticks(rotation=18)
+    plt.show()
+
+    cluster4 = musi.feat[musi.feat["ClusterLabel"] == 4].sort_values(by=["size"])
+    cluster4["size"].plot(kind='bar', x="genre")
+    plt.title("Tracks genre distribution - cluster 4")
+    plt.xticks(rotation=18)
+    plt.show()
+
+    cluster5 = musi.feat[musi.feat["ClusterLabel"] == 5].sort_values(by=["size"])
+    cluster5["size"].plot(kind='bar', x="genre")
+    plt.title("Tracks genre distribution - cluster 5")
+    plt.xticks(rotation=18)
+    plt.show()
+
+    cluster6 = musi.feat[musi.feat["ClusterLabel"] == 6].sort_values(by=["size"])
+    cluster6["size"].plot(kind='bar', x="genre")
+    plt.title("Tracks genre distribution - cluster 6")
+    plt.xticks(rotation=18)
+    plt.show()
+
+    print(musi.feat)
 
     df_centroids.to_csv("centroidiclusters.csv", index=False)
     musi.feat.to_csv("musicluster.csv", index=False)

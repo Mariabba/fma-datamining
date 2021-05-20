@@ -28,6 +28,45 @@ sns.set(
 )
 sns.set_theme(style="whitegrid")
 
+def motifsanalysis2(ts, w, centroid_name):
+    ts.plot()
+    plt.title(centroid_name)
+    plt.show()
+    # build matrix profile
+    mp, mpi = matrixProfile.stomp(ts.values, w)
+    # print(min(mp))
+    # print(max(mp))
+    # print(np.where( mp==max(mp)))
+    # print(mp)
+    # print(mpi)
+
+    x_coordinates = [np.where(mp == max(mp)), np.where(mp == min(mp))]
+    y_coordinates = [max(mp), min(mp)]
+    plt.title("Matrix Profile Centroid" + centroid_name)
+    plt.plot(mp)
+    # plt.scatter(x_coordinates, y_coordinates, c="Black")
+    # plt.axhline(max(mp), color="Red", linestyle ="--", markersize=2)
+    # plt.axhline(min(mp), color="Red", linestyle ="--", markersize=2)
+
+    plt.show()
+
+    # motif discovery
+    mo, mod = motifs.motifs(ts.values, (mp, mpi), max_motifs=1, ex_zone=0, radius=2, n_neighbors=2)
+
+    print(mo)
+    print(mod)
+
+    flag = True
+    plt.plot(ts.values)
+    colors = ["r", "g", "k", "b", "y"][: len(mo)]
+    for m, d, c in zip(mo, mod, colors):
+        for i in m:
+            m_shape = ts.values[i : i + w]
+            plt.plot(range(i, i + w), m_shape, color=c, lw=3)
+            plt.title(centroid_name + " with Top-Motif")
+
+    plt.show()
+
 
 def motifsanalysis(ts, w, centroid_name, motif_df):
     ts.plot()
@@ -176,7 +215,14 @@ if __name__ == "__main__":
     plt.xticks(rotation=20)
     plt.show()
 
-    motif_df.head(10).to_csv("musicmotif.csv", index=False)
+    motifsanalysis2(
+        centroids.iloc[2], 30, centroid_name="Centroid 2")
+
+    motifsanalysis2(
+        centroids.iloc[7], 30, centroid_name="Centroid 7")
+
+
+    #motif_df.head(10).to_csv("musicmotif.csv", index=False)
     """
     #scaled dataset
     scaler = TimeSeriesScalerMeanVariance()
