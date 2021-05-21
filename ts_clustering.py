@@ -36,7 +36,6 @@ def do_sax_kmeans(params):
     )
     km_dtw.fit(ts_sax)
 
-
     return (
         km_dtw.cluster_centers_,
         km_dtw.labels_,
@@ -91,29 +90,28 @@ if __name__ == "__main__":
     musi.feat = musi.feat[musi.feat["size"] != 0]
     musi.feat = musi.feat.sort_values(by=["ClusterLabel"])
 
-
     musi.feat.index = musi.feat["genre"]
 
     cluster1 = musi.feat[musi.feat["ClusterLabel"] == 1].sort_values(by=["size"])
-    cluster1["size"].plot(kind='bar', x="genre")
+    cluster1["size"].plot(kind="bar", x="genre")
     plt.title("Tracks genre distribution - cluster 1")
     plt.xticks(rotation=18)
     plt.show()
 
     cluster4 = musi.feat[musi.feat["ClusterLabel"] == 4].sort_values(by=["size"])
-    cluster4["size"].plot(kind='bar', x="genre")
+    cluster4["size"].plot(kind="bar", x="genre")
     plt.title("Tracks genre distribution - cluster 4")
     plt.xticks(rotation=18)
     plt.show()
 
     cluster5 = musi.feat[musi.feat["ClusterLabel"] == 5].sort_values(by=["size"])
-    cluster5["size"].plot(kind='bar', x="genre")
+    cluster5["size"].plot(kind="bar", x="genre")
     plt.title("Tracks genre distribution - cluster 5")
     plt.xticks(rotation=18)
     plt.show()
 
     cluster6 = musi.feat[musi.feat["ClusterLabel"] == 6].sort_values(by=["size"])
-    cluster6["size"].plot(kind='bar', x="genre")
+    cluster6["size"].plot(kind="bar", x="genre")
     plt.title("Tracks genre distribution - cluster 6")
     plt.xticks(rotation=18)
     plt.show()
