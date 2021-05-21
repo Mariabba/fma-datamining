@@ -47,8 +47,8 @@ def do_sax_kmeans(params):
         plt.show()
     return (
         k,
-        round(silhouette_score(df, km.labels_), 4),  # OR km.inertia_
-        round(silhouette_score(df, km_dtw.labels_), 4),  # OR km_drw.inertia_
+        round(km.inertia_, 4),  # OR km.inertia_ silhouette_score(df, km.labels_)
+        round(km_dtw.inertia_, 4),  # OR km_drw.inertia_
     )
 
 
