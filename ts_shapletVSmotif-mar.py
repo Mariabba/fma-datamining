@@ -214,7 +214,7 @@ fig.tight_layout()
 plt.show()
 
 sns.set()
-fig, axs = plt.subplots(2, 2, figsize=(6, 4))
+fig, axs = plt.subplots(2, 2, figsize=(9, 3.5))
 axs[0, 0].plot(motif_df.iloc[8, :], color="m")
 axs[0, 0].set_title("motif 8")
 
