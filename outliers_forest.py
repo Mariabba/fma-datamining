@@ -5,7 +5,7 @@ from sklearn.model_selection import train_test_split
 
 import utils
 
-df = utils.load_tracks(buckets="continuous")
+df = utils.load_tracks(buckets="continuous", outliers=False)
 
 del df[("track", "language_code")]
 del df[("track", "license")]
