@@ -9,9 +9,7 @@ from sklearn.preprocessing import LabelEncoder
 
 import utils
 
-df = utils.load_tracks(
-    "data/tracks.csv", dummies=True, buckets="basic", fill=True, outliers=False
-)
+df = utils.load_tracks(dummies=True, buckets="basic", fill=True, outliers=False)
 df.info()
 
 column2drop = [
@@ -67,7 +65,7 @@ plt.xticks(rotation=30)
 plt.xlabel("")
 plt.show()
 
-# TRying to print better abod
+# Trying to print better abod
 x_outliers, x_inliers = get_outliers_inliers(X_train, y_train)
 
 n_inliers = len(x_inliers)
@@ -89,4 +87,4 @@ print(type(outliers))
 
 miao = pd.Series(outliers)
 print(miao)
-miao.to_csv("strange_results/abod1072.csv")
+miao.to_csv("strange_results/new/abod1072.csv")
