@@ -1,13 +1,10 @@
-import matplotlib
 import matplotlib.pyplot as plt
 import numpy as np
-import outlier as outlier
 import pandas as pd
 from pyod.models.abod import ABOD
 from pyod.utils.data import get_outliers_inliers
-from scipy.stats import stats
 
-from sklearn.model_selection import GridSearchCV, train_test_split
+from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import LabelEncoder
 
 import utils
