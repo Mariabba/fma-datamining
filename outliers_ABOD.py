@@ -9,7 +9,7 @@ from sklearn.preprocessing import LabelEncoder
 
 import utils
 
-df = utils.load_tracks(dummies=True, buckets="basic", fill=True, outliers=False)
+df = utils.load_tracks(dummies=True, buckets="continuous", fill=True, outliers=False)
 df.info()
 
 column2drop = [
@@ -87,4 +87,4 @@ print(type(outliers))
 
 miao = pd.Series(outliers)
 print(miao)
-miao.to_csv("strange_results/new/abod1072.csv")
+miao.to_csv("strange_results_new/abod1072.csv")

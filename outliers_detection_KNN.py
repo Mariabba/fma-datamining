@@ -110,6 +110,7 @@ print(outlier_values.describe())
 print(outlier_values.value_counts())
 print(outlier_values.info())
 
+
 """
 # train kNN detector
 clf_name = 'KNN'
