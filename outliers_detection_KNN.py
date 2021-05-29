@@ -92,7 +92,7 @@ nbrs = NearestNeighbors(n_neighbors=5, p=1)
 # fit model
 nbrs.fit(X)
 
-# distances and indexes of k-neaighbors from model outputs
+# distances and indexes of k-neighbors from model outputs
 distances, indexes = nbrs.kneighbors(X)
 # plot mean of k-distances of each observation
 plt.ylabel("k-neaighbors distance")
@@ -102,14 +102,18 @@ plt.show()
 
 # visually determine cutoff values > 10
 outlier_index = np.where(distances.mean(axis=1) > 3.8)
-print(outlier_index)
 
 # filter outlier values
-outlier_values = df.iloc[outlier_index]
-print(outlier_values.describe())
-print(outlier_values.value_counts())
-print(outlier_values.info())
+#outlier_values = df.iloc[outlier_index]
+#print(outlier_values.describe())
+#print(outlier_values.value_counts())
+#print(outlier_values.info())
 
+outlier_values = df.iloc[outlier_index]
+
+df['Outlier'] = df.index.isin(outlier_values.index)
+knn_outliers = df['Outlier']
+knn_outliers.to_csv('strange_results_new/KNN.csv')
 
 """
 # train kNN detector
