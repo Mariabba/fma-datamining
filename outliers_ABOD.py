@@ -12,19 +12,20 @@ import utils
 df = utils.load_tracks(dummies=True, buckets="continuous", fill=True, outliers=False)
 df.info()
 
-column2drop = [("track", "language_code"),
-               ("track", "license"),
-               ("artist", "wikipedia_page"),
-               ("track", "composer"),
-               ("track", "information"),
-               ("track", "lyricist"),
-               ("track", "publisher"),
-               ("album", "engineer"),
-               ("album", "information"),
-               ("artist", "bio"),
-               ("album", "producer"),
-               ("artist", "website")
-               ]
+column2drop = [
+    ("track", "language_code"),
+    ("track", "license"),
+    ("artist", "wikipedia_page"),
+    ("track", "composer"),
+    ("track", "information"),
+    ("track", "lyricist"),
+    ("track", "publisher"),
+    ("album", "engineer"),
+    ("album", "information"),
+    ("artist", "bio"),
+    ("album", "producer"),
+    ("artist", "website"),
+]
 
 df.drop(column2drop, axis=1, inplace=True)
 
@@ -92,6 +93,6 @@ plt.show()
 print(outliers)
 print(type(outliers))
 
-miao = pd.Series(outliers)
+miao = pd.Series(outliers, index=df.index)
 print(miao)
-miao.to_csv("strange_results_new/abod1072.csv")
+miao.to_csv("strange_results_new/abod.csv")
