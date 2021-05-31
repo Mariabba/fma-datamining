@@ -19,21 +19,24 @@ from statsmodels.compat import pandas
 import utils
 
 df = utils.load_tracks(buckets="continuous", outliers=False)
-#df = df.head(100)
-print(df.info())
 
-column2drop = [("track", "language_code"), ("track", "license")]
+column2drop = [("track", "language_code"),
+               ("track", "license"),
+               ("artist", "wikipedia_page"),
+               ("track", "composer"),
+               ("track", "information"),
+               ("track", "lyricist"),
+               ("track", "publisher"),
+               ("album", "engineer"),
+               ("album", "information"),
+               ("artist", "bio"),
+               ("album", "producer"),
+               ("artist", "website")
+               ]
 
 df.drop(column2drop, axis=1, inplace=True)
 
-def normalize(feature):
-    scaler = StandardScaler()
-    df[feature] = scaler.fit_transform(df[[feature]])
-
-
-colum2encode = [col for col in df.columns if col != ("album", "type")]
-for col in colum2encode:
-    normalize(col)
+print(df.info())
 
 """
 # FACCIO  IL PLOTTING BOXPLOT del Df completo

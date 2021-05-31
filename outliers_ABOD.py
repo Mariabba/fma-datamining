@@ -12,17 +12,24 @@ import utils
 df = utils.load_tracks(dummies=True, buckets="continuous", fill=True, outliers=False)
 df.info()
 
-column2drop = [
-    ("track", "genre_top"),
-    ("track", "genres_all"),
-    ("track", "language_code"),
-    ("track", "license"),
-]
+column2drop = [("track", "language_code"),
+               ("track", "license"),
+               ("artist", "wikipedia_page"),
+               ("track", "composer"),
+               ("track", "information"),
+               ("track", "lyricist"),
+               ("track", "publisher"),
+               ("album", "engineer"),
+               ("album", "information"),
+               ("artist", "bio"),
+               ("album", "producer"),
+               ("artist", "website")
+               ]
+
 df.drop(column2drop, axis=1, inplace=True)
 
 # Riformatto le date
 
-df["artist", "date_created"] = df["artist", "date_created"].astype("Int64")
 # encoding
 label_encoders = dict()
 column2encode = []
