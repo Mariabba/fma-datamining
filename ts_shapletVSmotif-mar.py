@@ -7,6 +7,8 @@ from music import MusicDB
 
 from tslearn.metrics import dtw
 
+from scipy.spatial.distance import euclidean
+
 musi = MusicDB()
 print(musi.df.info())
 
