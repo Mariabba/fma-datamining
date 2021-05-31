@@ -74,9 +74,8 @@ print("Estimated number of clusters: %d" % n_clusters_)
 print("Estimated number of noise points: %d" % n_noise_)
 
 print(df.loc[(labels == -1)])
-miao = df.loc[(labels == -1)]
-miao = miao["album", "comments"]
-miao.to_csv("strange_results_new/4000dbscan.csv")
+df["cluster"] = labels
+df["cluster"].to_csv("strange_results_new/4000dbscan.csv")
 
 """
 # Calcolo eps e min samples migliori
