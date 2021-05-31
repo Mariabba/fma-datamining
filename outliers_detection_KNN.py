@@ -112,8 +112,8 @@ plt.plot(distances.mean(axis=1), color="black")
 plt.axhline(y=1.5, color="r", linestyle="-")
 plt.show()
 
-# visually determine cutoff values > 10
-outlier_index = np.where(distances.mean(axis=1) > 3.8)
+# visually determine cutoff values > 10 3.8
+outlier_index = np.where(distances.mean(axis=1) > 2.5)
 
 # filter outlier values
 # outlier_values = df.iloc[outlier_index]
