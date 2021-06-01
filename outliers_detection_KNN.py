@@ -59,19 +59,20 @@ from sklearn.neighbors import NearestNeighbors
 # DATASET
 df = utils.load_tracks(buckets="continuous", outliers=False)
 
-column2drop = [("track", "language_code"),
-               ("track", "license"),
-               ("artist", "wikipedia_page"),
-               ("track", "composer"),
-               ("track", "information"),
-               ("track", "lyricist"),
-               ("track", "publisher"),
-               ("album", "engineer"),
-               ("album", "information"),
-               ("artist", "bio"),
-               ("album", "producer"),
-               ("artist", "website")
-               ]
+column2drop = [
+    ("track", "language_code"),
+    ("track", "license"),
+    ("artist", "wikipedia_page"),
+    ("track", "composer"),
+    ("track", "information"),
+    ("track", "lyricist"),
+    ("track", "publisher"),
+    ("album", "engineer"),
+    ("album", "information"),
+    ("artist", "bio"),
+    ("album", "producer"),
+    ("artist", "website"),
+]
 
 df.drop(column2drop, axis=1, inplace=True)
 print(df.info())

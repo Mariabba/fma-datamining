@@ -16,14 +16,13 @@ seq = np.array([map_symbols[v] for v in db.ravel()])
 print(seq)
 X_seq = list()
 for x in db:
-    X_seq.append([map_symbols.get(v,-1)for v in x.ravel()])
+    X_seq.append([map_symbols.get(v, -1) for v in x.ravel()])
 
 
-p= pyprefixspan(X_seq)
+p = pyprefixspan(X_seq)
 
-#minsup standard = 2
+# minsup standard = 2
 p.setminsup(5)
 p.setlen(4)
 p.run()
 print(p.out())
-
