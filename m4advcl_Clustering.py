@@ -1,6 +1,5 @@
 import numpy as np
 from matplotlib import pyplot as plt
-from nltk.sem.logic import printtype
 from pyclustering.cluster import xmeans, cluster_visualizer, cluster_visualizer_multidim
 from pyclustering.cluster.center_initializer import kmeans_plusplus_initializer
 from pyclustering.cluster.silhouette import silhouette
@@ -18,6 +17,7 @@ import utils
 df = utils.load_tracks(
     "data/tracks.csv", dummies=True, buckets="continuous", fill=True, outliers=True
 )
+df = df.head(100)
 
 print(df.shape)
 column2drop = [
@@ -106,10 +106,11 @@ print("count centers", centers.count(centers))
 # print("sil making")
 # print("Scores: '%s'" % str(score))
 
-
+"""
 sil = silhouette(X, clusters).process().get_score()
 print(len(sil))
 print(sil.count(sil))
+"""
 # Visual Guidotti
 # print("score", score)
 i = df.columns.values.tolist().index(("album", "listens"))
