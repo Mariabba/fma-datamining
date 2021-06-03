@@ -76,7 +76,7 @@ X = df[numeric_columns].values
 print("dataset:", X.shape)
 print(X)
 
-xm = xmeans.xmeans(X)
+xm = xmeans.xmeans(X, kmax=4)
 xm.process()
 
 clusters = xm.get_clusters()
@@ -86,6 +86,7 @@ centers = xm.get_centers()
 print("Clusters: ", clusters)
 print("Centers: ", centers)
 
+"""
 # Visual Guidotti
 i = df.columns.values.tolist().index(("album", "listens"))
 j = df.columns.values.tolist().index(("track", "favorites"))
@@ -98,3 +99,4 @@ for c in centers:
     plt.scatter(c[i], c[j], s=100, edgecolors="k")
 
 plt.show()
+"""
