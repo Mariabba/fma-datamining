@@ -5,6 +5,7 @@ from pyclustering.cluster import xmeans, cluster_visualizer, cluster_visualizer_
 from pyclustering.cluster.center_initializer import kmeans_plusplus_initializer
 from pyclustering.cluster.silhouette import silhouette
 from pyclustering.utils import read_sample
+from sklearn.metrics import silhouette_score
 from sklearn.preprocessing import LabelEncoder
 from array import array
 from sklearn.decomposition import PCA
@@ -82,44 +83,49 @@ X = df[numeric_columns].values
 print("dataset:", X.shape)
 
 
-"""MAKING ADVANCED CLUSTER X-MEANS"""
+"""MAKING ADVANCED CLUSTER X-MEANS
 amount_initial_centers = 2
 initial_centers = kmeans_plusplus_initializer(X, amount_initial_centers).initialize()
 
-xmeans_instance = xmeans.xmeans(X)
+xmeans_instance = xmeans.xmeans(X, initial_centers)
 xmeans_instance.process()
-
 
 # Extract clustering results: clusters and their centers
 clusters = xmeans_instance.get_clusters()
 centers = xmeans_instance.get_centers()
-
-a_cluster = np.asarray(clusters)
-a_centers = np.asarray(centers, dtype=object)
-print("dopo cluster", type(a_cluster))
-print("dopo centers", type(a_centers))
-# print(a_cluster)
-
+clus2 = xmeans_instance.get_cluster_encoding()
+# a_cluster = np.asarray(clusters)
+# a_centers = np.asarray(centers, dtype=object)
+# print("dopo cluster", type(a_cluster))
+# print("dopo centers", type(a_centers))
+print(clus2)
+print("count cluster", clusters.count(clusters))
+print("count centers", centers.count(centers))
 
 # Calculate Silhouette score
 # print("sil making")
-# score = silhouette(X, clusters).process().get_score()
+# score =
 # print("Scores: '%s'" % str(score))
 
 
-"""# Visual Guidotti
+sil = silhouette(X, clusters).process().get_score()
+print(len(sil))
+print(sil.count(sil))
+# Visual Guidotti
 # print("score", score)
 i = df.columns.values.tolist().index(("album", "listens"))
 j = df.columns.values.tolist().index(("track", "favorites"))
 
+
 sns.set()
 for indexes in clusters:
-    plt.scatter(X, X, alpha=0.4)
+    plt.scatter(X[indexes, i], X[indexes, j], alpha=0.4)
 for c in centers:
-    plt.scatter(c, c, s=50, edgecolors="k")
+    plt.scatter(c[i], c[j], s=100, edgecolors="k")
+
 plt.show()
-"""
-"""EMBALANCE LEARNING"""
+
+
 # ORIGINAL PCA
 
 print(X.shape)
@@ -135,6 +141,24 @@ plt.scatter(
     edgecolor="k",
     alpha=0.5,
 )
-plt.scatter(a_cluster, a_cluster, alpha=0.3)
-plt.title("Standard KNN-PCA")
+plt.title("Clustering PCA")
 plt.show()
+"""
+
+
+print("MI SONO ROTTA FACCIO L'OPTICS")
+i = df.columns.values.tolist().index(("album", "listens"))
+j = df.columns.values.tolist().index(("track", "favorites"))
+optics = OPTICS(min_samples=5, max_eps=np.inf)
+optics.fit(X)
+print(optics.labels_[:10])
+
+for cluster_id in np.unique(optics.labels_)[:20]:
+    indexes = np.where(optics.labels_ == cluster_id)
+    plt.scatter(X[indexes, i], X[indexes, j], alpha=0.4)
+
+
+from sklearn.metrics import silhouette_score
+
+silhouette5 = silhouette_score(X, optics.labels_)
+print(silhouette5)
