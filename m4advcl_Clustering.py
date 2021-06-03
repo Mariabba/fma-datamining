@@ -83,7 +83,7 @@ X = df[numeric_columns].values
 print("dataset:", X.shape)
 
 
-"""MAKING ADVANCED CLUSTER X-MEANS
+"""MAKING ADVANCED CLUSTER X-MEANS"""
 amount_initial_centers = 2
 initial_centers = kmeans_plusplus_initializer(X, amount_initial_centers).initialize()
 
@@ -104,7 +104,6 @@ print("count centers", centers.count(centers))
 
 # Calculate Silhouette score
 # print("sil making")
-# score =
 # print("Scores: '%s'" % str(score))
 
 
@@ -143,12 +142,12 @@ plt.scatter(
 )
 plt.title("Clustering PCA")
 plt.show()
-"""
 
 
 print("MI SONO ROTTA FACCIO L'OPTICS")
 i = df.columns.values.tolist().index(("album", "listens"))
 j = df.columns.values.tolist().index(("track", "favorites"))
+
 optics = OPTICS(min_samples=5, max_eps=np.inf)
 optics.fit(X)
 print(optics.labels_[:10])
