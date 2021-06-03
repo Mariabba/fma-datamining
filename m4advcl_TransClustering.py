@@ -1,6 +1,7 @@
 from kmodes.kmodes import KModes
 from sklearn.metrics import silhouette_score
 import utils
+from sklearn.metrics import pairwise_distances
 
 df = utils.load_tracks(
     "data/tracks.csv", dummies=True, buckets="discrete", fill=True, outliers=True
@@ -20,9 +21,10 @@ print("centroidi", km.cluster_centroids_)
 
 print("le lables", km.labels_)
 
-
-silhouette = silhouette_score(df, km.labels_)
-print("sil:", silhouette)
+# non funziona
+# silhouette = silhouette_score(df, km.labels_)
+# sil = silhouette_score(df, km.labels_, metric=pairwise_distances(df, km.labels_))
+# print("sil:", sil)
 
 sse = km.cost_
 print("sse:", sse)
