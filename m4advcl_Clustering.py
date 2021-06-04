@@ -1,5 +1,6 @@
 import numpy as np
 from matplotlib import pyplot as plt
+from matplotlib.colors import ListedColormap
 from pyclustering.cluster import xmeans, cluster_visualizer, cluster_visualizer_multidim
 from pyclustering.cluster.center_initializer import kmeans_plusplus_initializer
 from pyclustering.cluster.silhouette import silhouette
@@ -17,66 +18,29 @@ import utils
 df = utils.load_tracks(
     "data/tracks.csv", dummies=True, buckets="continuous", fill=True, outliers=True
 )
-df = df.head(100)
+
 
 print(df.shape)
 column2drop = [
     ("track", "language_code"),
 ]
-
 df.drop(column2drop, axis=1, inplace=True)
-# feature to reshape
-label_encoders = dict()
-column2encode = [
-    ("album", "listens"),
-    ("album", "type"),
-    ("track", "license"),
-    ("album", "comments"),
-    ("album", "date_created"),
-    ("album", "favorites"),
-    ("artist", "comments"),
-    ("artist", "date_created"),
-    ("artist", "favorites"),
-    ("track", "comments"),
-    ("track", "date_created"),
-    ("track", "duration"),
-    ("track", "favorites"),
-    ("track", "interest"),
-    ("track", "listens"),
-]
-for col in column2encode:
-    le = LabelEncoder()
-    df[col] = le.fit_transform(df[col])
-    label_encoders[col] = le
 
-
-print(df.info())
 numeric_columns = [
     ("album", "comments"),
     ("album", "date_created"),
     ("album", "favorites"),
     ("album", "listens"),
-    ("album", "type"),
     ("artist", "comments"),
+    # ("album", "type"),
     ("artist", "date_created"),
     ("artist", "favorites"),
-    ("track", "comments"),
+    # ("track", "comments"),
     ("track", "date_created"),
     ("track", "duration"),
     ("track", "favorites"),
     ("track", "interest"),
     ("track", "listens"),
-    ("artist", "active_year_end"),
-    ("artist", "wikipedia_page"),
-    ("track", "composer"),
-    ("track", "information"),
-    ("track", "lyricist"),
-    ("track", "publisher"),
-    ("album", "engineer"),
-    ("album", "information"),
-    ("artist", "bio"),
-    ("album", "producer"),
-    ("artist", "website"),
 ]
 
 X = df[numeric_columns].values
@@ -106,30 +70,32 @@ print("count centers", centers.count(centers))
 # print("sil making")
 # print("Scores: '%s'" % str(score))
 
-"""
-sil = silhouette(X, clusters).process().get_score()
-print(len(sil))
-print(sil.count(sil))
-"""
-# Visual Guidotti
-# print("score", score)
+print("SSE: ", xmeans.xmeans.get_total_wce(xmeans_instance))
+# score = silhouette(X, clusters).process().get_score()
+# print("Score SIl:", score)
+
+# score = silhouette_score(xmeans_instance, clusters)
+# print(score)
+
 i = df.columns.values.tolist().index(("album", "listens"))
 j = df.columns.values.tolist().index(("track", "favorites"))
 
-
 sns.set()
+colours = ListedColormap(["r", "b", "g"])
 for indexes in clusters:
-    plt.scatter(X[indexes, i], X[indexes, j], alpha=0.4)
+    plt.scatter(X[indexes, i], X[indexes, j], alpha=0.4, cmap=colours)
 for c in centers:
     plt.scatter(c[i], c[j], s=100, edgecolors="k")
-
+plt.xlabel("album,listens")
+plt.ylabel("track,favourites")
+plt.title("Visualizing centeroids and centers")
 plt.show()
 
-
+"""
 # ORIGINAL PCA
 
 print(X.shape)
-pca = PCA(n_components=25)
+pca = PCA(n_components=4)
 pca.fit(X)
 X_pca = pca.transform(X)
 print("pcs shape", X_pca.shape)
@@ -143,22 +109,4 @@ plt.scatter(
 )
 plt.title("Clustering PCA")
 plt.show()
-
-
-print("MI SONO ROTTA FACCIO L'OPTICS")
-i = df.columns.values.tolist().index(("album", "listens"))
-j = df.columns.values.tolist().index(("track", "favorites"))
-
-optics = OPTICS(min_samples=5, max_eps=np.inf)
-optics.fit(X)
-print(optics.labels_[:10])
-
-for cluster_id in np.unique(optics.labels_)[:20]:
-    indexes = np.where(optics.labels_ == cluster_id)
-    plt.scatter(X[indexes, i], X[indexes, j], alpha=0.4)
-
-
-from sklearn.metrics import silhouette_score
-
-silhouette5 = silhouette_score(X, optics.labels_)
-print(silhouette5)
+"""
