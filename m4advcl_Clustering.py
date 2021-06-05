@@ -51,7 +51,7 @@ print("dataset:", X.shape)
 amount_initial_centers = 2
 initial_centers = kmeans_plusplus_initializer(X, amount_initial_centers).initialize()
 
-xmeans_instance = xmeans.xmeans(X, initial_centers)
+xmeans_instance = xmeans.xmeans(X, initial_centers, kmax=5)
 xmeans_instance.process()
 
 # Extract clustering results: clusters and their centers

@@ -32,7 +32,7 @@ print(df.info())
 print(df.shape)
 
 
-km = KModes(n_clusters=4, init="Huang", n_init=5, verbose=1)
+km = KModes(n_clusters=3, init="Huang", n_init=5, verbose=1)
 
 clusters = km.fit_predict(df)
 
