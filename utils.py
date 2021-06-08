@@ -27,25 +27,9 @@ class TracksMetaDB(object):
     @normalized.default
     def _default_normalized(self):
         df = load_tracks(buckets=self.buckets)
-        tokeep = [
-            ("album", "comments"),
-            ("album", "date_created"),
-            ("album", "favorites"),
-            ("album", "listens"),
-            ("artist", "comments"),
-            ("artist", "date_created"),
-            ("artist", "favorites"),
-            ("track", "date_created"),
-            ("track", "duration"),
-            ("track", "favorites"),
-            ("track", "interest"),
-            ("track", "listens"),
-        ]
-        df = df[tokeep]
         scaler = StandardScaler()
         miao = scaler.fit_transform(df)
         scaled_df = pd.DataFrame(miao, index=df.index, columns=df.columns)
-        print(f"Scaled df.info():\n{scaled_df.info()}\n{scaled_df.head(5)}")
         return scaled_df
 
 
