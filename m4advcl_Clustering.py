@@ -13,19 +13,21 @@ from sklearn.preprocessing import StandardScaler
 import seaborn as sns
 
 from sklearn.cluster import OPTICS
-import utils
+from utils import TracksMetaDB
 
-df = utils.load_tracks(
-    "data/tracks.csv", dummies=True, buckets="continuous", fill=True, outliers=True
-)
+df = TracksMetaDB(buckets="continuous").normalized
 
 
-print(df.shape)
-column2drop = [
-    ("track", "language_code"),
-]
-df.drop(column2drop, axis=1, inplace=True)
+# df = utils.load_tracks(
+#    "data/tracks.csv", dummies=True, buckets="continuous", fill=True, outliers=True
+# )
 
+
+# column2drop = [
+#    ("track", "language_code"),
+# ]
+# df.drop(column2drop, axis=1, inplace=True)
+"""
 numeric_columns = [
     ("album", "comments"),
     ("album", "date_created"),
@@ -42,10 +44,9 @@ numeric_columns = [
     ("track", "interest"),
     ("track", "listens"),
 ]
-
-X = df[numeric_columns].values
+"""
+X = df.values
 print("dataset:", X.shape)
-
 
 """MAKING ADVANCED CLUSTER X-MEANS"""
 amount_initial_centers = 2
@@ -76,20 +77,72 @@ print("SSE: ", xmeans.xmeans.get_total_wce(xmeans_instance))
 
 # score = silhouette_score(xmeans_instance, clusters)
 # print(score)
+"""COMBINAZIONE DEI CLUSTER"""
+print()
 
-i = df.columns.values.tolist().index(("album", "listens"))
+a = df.columns.values.tolist().index(("album", "comments"))
+b = df.columns.values.tolist().index(("album", "date_created"))
+cc = df.columns.values.tolist().index(("album", "favorites"))
+d = df.columns.values.tolist().index(("album", "listens"))
+e = df.columns.values.tolist().index(("artist", "comments"))
+f = df.columns.values.tolist().index(("artist", "date_created"))
+g = df.columns.values.tolist().index(("artist", "favorites"))
+h = df.columns.values.tolist().index(("track", "date_created"))
+i = df.columns.values.tolist().index(("track", "duration"))
 j = df.columns.values.tolist().index(("track", "favorites"))
+k = df.columns.values.tolist().index(("track", "interest"))
+l = df.columns.values.tolist().index(("track", "listens"))
+
+k = 4
+l = 8
+print(
+    "a:",
+    a,
+    "b:",
+    b,
+    "cc:",
+    cc,
+    "d:",
+    d,
+    "e:",
+    e,
+    "f:",
+    f,
+    "g:",
+    g,
+    "h:",
+    h,
+    "i:",
+    i,
+    "j:",
+    j,
+    "k:",
+    k,
+    "l:",
+    l,
+)
 
 sns.set()
-colours = ListedColormap(["r", "b", "g"])
 for indexes in clusters:
-    plt.scatter(X[indexes, i], X[indexes, j], alpha=0.4, cmap=colours)
+    plt.scatter(X[indexes, h], X[indexes, l], alpha=0.4)
 for c in centers:
-    plt.scatter(c[i], c[j], s=100, edgecolors="k")
-plt.xlabel("album,listens")
-plt.ylabel("track,favourites")
-plt.title("Visualizing centeroids and centers")
+    plt.scatter(c[h], c[l], s=100, edgecolors="k")
+plt.xlabel("track,date_created")
+plt.ylabel("track,listens")
+plt.title("Visualizing centroids and centers")
 plt.show()
+
+
+sns.set()
+for indexes in clusters:
+    plt.scatter(X[indexes, g], X[indexes, cc], alpha=0.4)
+for c in centers:
+    plt.scatter(c[g], c[cc], s=100, edgecolors="k")
+plt.ylabel("artist,favorites")
+plt.xlabel("album,favourites")
+plt.title("Visualizing centroids and centers")
+plt.show()
+
 
 """
 # ORIGINAL PCA
