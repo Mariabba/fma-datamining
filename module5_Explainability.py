@@ -1,11 +1,17 @@
+from collections import Counter
+
+from imblearn.over_sampling import SMOTE
 from lime import lime_tabular
 from matplotlib import pyplot as plt
+from sklearn import tree
 from sklearn.metrics import accuracy_score, f1_score
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import LabelEncoder
 from sklearn.svm import LinearSVC
 import lime
 import lime.lime_tabular
+from sklearn.tree import DecisionTreeClassifier
+
 import utils
 import seaborn as sns
 import numpy as np
@@ -14,7 +20,7 @@ import pandas as pd
 from lime.lime_tabular import LimeTabularExplainer
 
 df = utils.load_small_tracks(buckets="discrete")
-df = df.head(100)
+# df = df.head(100)
 # CAMBIO ALBUM TYPE IN BINARIA
 print("prima", df["album", "type"].unique())
 df["album", "type"] = df["album", "type"].replace(
@@ -29,15 +35,14 @@ column2encode = [
     ("track", "duration"),
     ("track", "interest"),
     ("track", "listens"),
-    # ("album", "type"),
+    ("album", "type"),
 ]
 for col in column2encode:
     le = LabelEncoder()
     df[col] = le.fit_transform(df[col])
     label_encoders[col] = le
 df.info()
-
-
+print(df[df["album", "type"] == "NotAlbum"].head())
 class_name = ("album", "type")
 
 attributes = [col for col in df.columns if col != class_name]
@@ -47,10 +52,28 @@ y = df[class_name]
 X_train, X_test, y_train, y_test = train_test_split(
     X, y, test_size=0.2, random_state=42
 )
+
+
 from sklearn.ensemble import RandomForestClassifier
 
-clf = RandomForestClassifier(random_state=42)
+
+clf = RandomForestClassifier(
+    n_estimators=100,
+    criterion="gini",
+    max_depth=17,
+    min_samples_split=3,
+    min_samples_leaf=3,
+    max_features="auto",
+    random_state=10,
+    class_weight="balanced",
+)
+
+
 clf.fit(X_train, y_train)
+
+# text_representation = tree.export_text(clf)
+# print(text_representation)
+
 score = clf.score(X_test, y_test)
 
 
