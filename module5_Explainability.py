@@ -84,6 +84,9 @@ exp.save_to_file("porco.html")
 """
 Indici da tenere
 
-Live Performance : Document id: 16178
-
+Stranamente quasi bilanciata:  Document id: 10993
+Live Performance : Document id: 16178 or 16458
+Album : Document id: 11710
+Single Tracks : Document id: 13726 or 9326 or 10236
+Radio Programm : Document id: 15019
 """
