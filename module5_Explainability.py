@@ -1,6 +1,7 @@
-from collections import Counter
+import lime
+import lime.lime_tabular
+import numpy as np
 
-from imblearn.over_sampling import SMOTE
 from lime import lime_tabular
 from matplotlib import pyplot as plt
 from sklearn import tree
@@ -8,16 +9,9 @@ from sklearn.metrics import accuracy_score, f1_score
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import LabelEncoder
 from sklearn.svm import LinearSVC
-import lime
-import lime.lime_tabular
 from sklearn.tree import DecisionTreeClassifier
 
 import utils
-import seaborn as sns
-import numpy as np
-import pandas as pd
-
-from lime.lime_tabular import LimeTabularExplainer
 
 df = utils.load_small_tracks(buckets="discrete")
 # df = df.head(100)
@@ -56,7 +50,6 @@ X_train, X_test, y_train, y_test = train_test_split(
 
 
 from sklearn.ensemble import RandomForestClassifier
-
 
 clf = RandomForestClassifier(
     n_estimators=100,
@@ -126,6 +119,5 @@ print("")
 
 exp = explainer.explain_instance(data_row=x, predict_fn=clf.predict_proba)
 
-print(exp.show_in_notebook(show_table=True))
 print(exp.local_exp)
-exp.save_to_file("C:/Users/jigok/OneDrive/Desktop/porco.html")
+exp.save_to_file("porco.html")
