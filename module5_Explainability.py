@@ -22,12 +22,12 @@ from lime.lime_tabular import LimeTabularExplainer
 df = utils.load_small_tracks(buckets="discrete")
 # df = df.head(100)
 # CAMBIO ALBUM TYPE IN BINARIA
-print("prima", df["album", "type"].unique())
-df["album", "type"] = df["album", "type"].replace(
-    ["Single Tracks", "Live Performance", "Radio Program"],
-    ["NotAlbum", "NotAlbum", "NotAlbum"],
-)
-print("dopo", df["album", "type"].unique())
+# print("prima", df["album", "type"].unique())
+# df["album", "type"] = df["album", "type"].replace(
+#    ["Single Tracks", "Live Performance", "Radio Program"],
+#    ["NotAlbum", "NotAlbum", "NotAlbum"],
+# )
+# print("dopo", df["album", "type"].unique())
 
 
 label_encoders = dict()
@@ -35,14 +35,15 @@ column2encode = [
     ("track", "duration"),
     ("track", "interest"),
     ("track", "listens"),
-    ("album", "type"),
+    # ("album", "type"),
 ]
 for col in column2encode:
     le = LabelEncoder()
     df[col] = le.fit_transform(df[col])
     label_encoders[col] = le
 df.info()
-print(df[df["album", "type"] == "NotAlbum"].head())
+# print(df[df["album", "type"] == "NotAlbum"].head())
+print(df["album", "type"].unique())
 class_name = ("album", "type")
 
 attributes = [col for col in df.columns if col != class_name]
@@ -112,7 +113,7 @@ from lime import lime_tabular
 explainer = lime_tabular.LimeTabularExplainer(
     training_data=np.array(X_train),
     feature_names=df.columns,
-    class_names=["album", "not album"],
+    class_names=["Album", "Single Tracks", "Live Performance", "Radio Program"],
     mode="classification",
 )
 i2e = 2
