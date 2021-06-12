@@ -37089,25 +37089,34 @@
 /***/ })
 /******/ ]);
 //# sourceMappingURL=bundle.js.map </script></head><body>
-        <div class="lime top_div" id="top_divXGIEE774OPU3MTU"></div>
+        <div class="lime top_div" id="top_divOUIAKNK451ZHXRL"></div>
         
         <script>
-        var top_div = d3.select('#top_divXGIEE774OPU3MTU').classed('lime top_div', true);
+        var top_div = d3.select('#top_divOUIAKNK451ZHXRL').classed('lime top_div', true);
         
             var pp_div = top_div.append('div')
                                 .classed('lime predict_proba', true);
             var pp_svg = pp_div.append('svg').style('width', '100%');
-            var pp = new lime.PredictProba(pp_svg, ["Album", "Single Tracks", "Live Performance", "Radio Program"], [0.9046841975336125, 0.024508986684541868, 0.01682599208375445, 0.05398082369809115]);
+            var pp = new lime.PredictProba(pp_svg, ["Album", "Single Tracks", "Live Performance", "Radio Program"], [0.03379818859459943, 0.3079808902284962, 0.6576023337967197, 0.0006185873801847134]);
             
         
         var exp_div;
             var exp = new lime.Explanation(["Album", "Single Tracks", "Live Performance", "Radio Program"]);
         
                 exp_div = top_div.append('div').classed('lime explanation', true);
-                exp.show([["('album', 'information') <= 0.00", -0.17875179418153134], ["('album', 'engineer') <= 0.00", 0.095522162026271], ["0.00 < ('album', 'producer') <= 1.00", 0.08370907704038898], ["('artist', 'active_year_end') <= 0.00", 0.08224458016393131], ["('track', 'publisher') <= 149.00", -0.0725157402008858], ["('artist', 'website') <= 0.00", 0.05595123789032589], ["('album', 'type') <= 0.00", -0.052180413212511316], ["('track', 'listens') <= 585.00", 0.03698426089769855], ["('track', 'duration') <= 1.00", 0.012022172309100623], ["('artist', 'bio') <= 1.00", 0.0]], 1, exp_div);
+                exp.show([["('album', 'information') > 0.00", 0.2545051878917377], ["('artist', 'website') > 0.00", 0.17806492822303066], ["0.00 < ('album', 'producer') <= 1.00", 0.07651676880113578], ["('track', 'listens') <= 585.00", 0.031147737362272068]], 2, exp_div);
+                
+                exp_div = top_div.append('div').classed('lime explanation', true);
+                exp.show([["('album', 'information') > 0.00", 0.18661561878713312], ["0.00 < ('album', 'producer') <= 1.00", 0.07629829100541315], ["('artist', 'website') > 0.00", -0.05647731158265638], ["0.00 < ('album', 'type') <= 1.00", 0.05243460562672456]], 1, exp_div);
+                
+                exp_div = top_div.append('div').classed('lime explanation', true);
+                exp.show([["('album', 'information') > 0.00", -0.3731597797270225], ["0.00 < ('album', 'producer') <= 1.00", -0.1829787144860488], ["('artist', 'website') > 0.00", -0.15304814794759122], ["0.00 < ('album', 'type') <= 1.00", -0.08753938008719964]], 0, exp_div);
+                
+                exp_div = top_div.append('div').classed('lime explanation', true);
+                exp.show([["('album', 'information') > 0.00", -0.06852652715838345], ["0.00 < ('album', 'type') <= 1.00", 0.04822438448658164], ["('artist', 'website') > 0.00", 0.030707441973023355], ["0.00 < ('album', 'producer') <= 1.00", 0.03064570208817812]], 3, exp_div);
                 
         var raw_div = top_div.append('div');
-            exp.show_raw_tabular([[["album", "information"], "0.00", -0.17875179418153134], [["album", "engineer"], "0.00", 0.095522162026271], [["album", "producer"], "1.00", 0.08370907704038898], [["artist", "active_year_end"], "0.00", 0.08224458016393131], [["track", "publisher"], "81.00", -0.0725157402008858], [["artist", "website"], "0.00", 0.05595123789032589], [["album", "type"], "0.00", -0.052180413212511316], [["track", "listens"], "382.00", 0.03698426089769855], [["track", "duration"], "1.00", 0.012022172309100623], [["artist", "bio"], "0.00", 0.0]], 1, raw_div);
+            exp.show_raw_tabular([[["album", "information"], "1.00", 0.2545051878917377], [["artist", "website"], "1.00", 0.17806492822303066], [["album", "producer"], "1.00", 0.07651676880113578], [["track", "listens"], "313.00", 0.031147737362272068]], 2, raw_div);
         
         </script>
         </body></html>

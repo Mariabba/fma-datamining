@@ -59,7 +59,6 @@ clf = RandomForestClassifier(
     class_weight="balanced",
 )
 
-
 clf.fit(X_train, y_train)
 
 # text_representation = tree.export_text(clf)
@@ -107,16 +106,22 @@ explainer = lime_tabular.LimeTabularExplainer(
 X_test = pd.DataFrame(X_test[:, :-1], columns=df.columns[1:-1], index=X_test[:, -1])
 print(X_test.info())
 
-for one_class in class_names:
-    records = X_test[X_test[("artist", "website")] == 1].tail(5)
-    print(records)
-    for record in records:
-        print(record)
-        i2e = record.index
-        x = record.values
-        exp = explainer.explain_instance(data_row=x, predict_fn=clf.predict_proba)
-        print(exp.local_exp)
-        exp.save_to_file("porco.html")
+single_Tracks = df[df["album", "type"] == "Single Tracks"].head()
+print(single_Tracks)
+records = single_Tracks
+
+prova = X_test.loc[[135, 136, 155, 169, 170], :]
+print(prova)
+# for one_class in class_names:
+# records = X_test[X_test[("artist", "website")] == 1].tail(5)
+
+for record in records:
+    print(record)
+    i2e = record.index
+    x = record.values
+    exp = explainer.explain_instance(data_row=x, predict_fn=clf.predict_proba)
+    print(exp.local_exp)
+    exp.save_to_file("porco.html")
 # bb_outcome = bb_predict(x.reshape(1, -1))[0]
 # bb_outcome_str = df.values[bb_outcome]
 
