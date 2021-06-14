@@ -19,14 +19,14 @@ for x in db:
     X_seq.append([map_symbols.get(v, -1) for v in x.ravel()])
 
 #print(X_seq)
-
+"""
 ps = PrefixSpan(X_seq)
-ps.minlen = 2
-ps.maxlen = 100
+ps.minlen = 4
+ps.maxlen = 50
 
 print("ps.frequent")
-print(ps.frequent(4000))
-
+print(ps.frequent(1000))
+"""
 """
 print("ps.topk")
 print(ps.topk(10))
@@ -38,3 +38,11 @@ p.setlen(4)
 p.run()
 # print(p.out())
 """
+
+musi = MusicDB()
+
+each_genre = []
+for genre in musi.feat["enc_genre"].unique():
+    each_genre.append(musi.sax[musi.feat["enc_genre"] == genre].head(100))
+
+print(each_genre)
