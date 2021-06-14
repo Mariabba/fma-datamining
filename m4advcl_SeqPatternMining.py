@@ -1,13 +1,17 @@
 from prefixspan import PrefixSpan
 from music import MusicDB
 import numpy as np
-
+import pandas as pd
 
 musi = MusicDB()
 
+each_genre = pd.DataFrame()
+for genre in musi.feat["enc_genre"].unique():
+    each_genre = each_genre.append(musi.sax[musi.feat["enc_genre"] == genre].head(100))
 
-print(musi.sax.info())
-db = musi.sax.values
+print(each_genre)
+print(each_genre.info)
+db = each_genre.values
 
 map_symbols = {k: v for v, k in enumerate(np.unique(db.ravel()))}
 print(map_symbols)
@@ -39,10 +43,3 @@ p.run()
 # print(p.out())
 """
 
-musi = MusicDB()
-
-each_genre = []
-for genre in musi.feat["enc_genre"].unique():
-    each_genre.append(musi.sax[musi.feat["enc_genre"] == genre].head(100))
-
-print(each_genre)
