@@ -61,6 +61,7 @@ class MusicDB(object):
         sax = SymbolicAggregateApproximation(n_segments=segments, alphabet_size_avg=20)
         ts_sax = sax.fit_transform(musi_scaled)
         miaoooooo = pd.DataFrame(ts_sax.reshape(self.df.values.shape[0], segments))
+        miaoooooo.index = self.df.index
         return miaoooooo
 
     def _dataframe_pickleload(self):
