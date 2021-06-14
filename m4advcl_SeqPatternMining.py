@@ -1,4 +1,4 @@
-from pyprefixspan import pyprefixspan
+from prefixspan import PrefixSpan
 from music import MusicDB
 import numpy as np
 
@@ -7,7 +7,7 @@ musi = MusicDB()
 
 
 print(musi.sax.info())
-db = musi.sax.values
+db = musi.sax.head(5).values
 
 map_symbols = {k: v for v, k in enumerate(np.unique(db.ravel()))}
 print(map_symbols)
@@ -19,10 +19,16 @@ for x in db:
     X_seq.append([map_symbols.get(v, -1) for v in x.ravel()])
 
 
-p = pyprefixspan(X_seq)
+ps = PrefixSpan(X_seq)
 
+print(ps.frequent(3))
+
+print(ps.topk(10))
+
+"""
 # minsup standard = 2
 p.setminsup(5)
 p.setlen(4)
 p.run()
 # print(p.out())
+"""
