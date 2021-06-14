@@ -61,12 +61,12 @@ from lime import lime_tabular
 
 explainer = lime_tabular.LimeTabularExplainer(
     training_data=np.array(X_train),
-    feature_names=df.columns,
+    feature_names=df[attributes].columns,
     class_names=["Album", "Single Tracks", "Live Performance", "Radio Program"],
     mode="classification",
 )
-
-i2e = np.random.randint(0, X_test.shape[0])
+i2e = 10993
+# i2e = np.random.randint(0, X_test.shape[0])
 x = X_test[i2e]
 
 print("")
@@ -79,14 +79,17 @@ print("Document id: %d" % i2e)
 print("miao")
 
 print(exp.local_exp)
+
 exp.save_to_file("porco.html")
 
 """
 Indici da tenere
 
 Stranamente quasi bilanciata:  Document id: 10993
-Live Performance : Document id: 16178 or 16458
-Album : Document id: 11710
-Single Tracks : Document id: 13726 or 9326 or 10236
+
+Live Performance : Document id: 16178 
 Radio Programm : Document id: 15019
+Album : Document id: 11710
+Single Tracks : Document id: 9326(73%) or 10236(77%)
+
 """
