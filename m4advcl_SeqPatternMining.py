@@ -21,9 +21,13 @@ for x in db:
 
 ps = PrefixSpan(X_seq)
 
-print(ps.frequent(3))
+print("ps.frequent")
+# miao = ps.frequent(3)
 
-print(ps.topk(10))
+# print(miao)
+
+print("ps.topk")
+# print(ps.topk(10))
 
 """
 # minsup standard = 2
