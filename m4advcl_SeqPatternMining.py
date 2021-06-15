@@ -1,20 +1,15 @@
-from prefixspan import PrefixSpan
-from music import MusicDB
 import numpy as np
 import pandas as pd
+from rich import print
+
+from music import MusicDB
 
 musi = MusicDB()
 
-each_genre = pd.DataFrame()
-for genre in musi.feat["enc_genre"].unique():
-    each_genre = each_genre.append(musi.sax[musi.feat["enc_genre"] == genre].head(1))
-
-print(each_genre)
-print(each_genre.info)
+each_genre = musi.sax
 db = each_genre.values
 
 map_symbols = {k: v for v, k in enumerate(np.unique(db.ravel()))}
-print(map_symbols)
 
 seq = np.array([map_symbols[v] for v in db.ravel()])
 
@@ -22,23 +17,33 @@ X_seq = list()
 for x in db:
     X_seq.append([map_symbols.get(v, -1) for v in x.ravel()])
 
-#print(X_seq)
+frequent_patterns = [
+    (7758, [9, 9, 9, 9, 9, 9, 9, 9, 9, 9]),
+    (7757, [10, 9, 10, 10, 10, 9, 9, 9, 9, 9]),
+    (7757, [9, 9, 9, 9, 9, 9, 10, 9, 10, 10]),
+    (7755, [9, 10, 10, 10, 9, 9, 9, 9, 9, 9]),
+    (7755, [9, 9, 10, 9, 9, 9, 9, 9, 9, 9]),
+    (7754, [9, 10, 10, 9, 9, 9, 9, 9, 9, 9]),
+    (7754, [9, 9, 9, 10, 9, 10, 10, 9, 9, 9]),
+    (7754, [9, 9, 9, 9, 9, 10, 9, 10, 10, 10]),
+    (7753, [9, 10, 9, 10, 10, 9, 9, 9, 9, 9]),
+    (7753, [9, 10, 9, 9, 9, 9, 9, 9, 9, 9]),
+    (7753, [9, 9, 10, 10, 10, 9, 9, 9, 9, 9]),
+    (7753, [9, 9, 10, 10, 9, 9, 9, 9, 9, 9]),
+    (7753, [9, 9, 9, 10, 9, 9, 9, 9, 9, 9]),
+    (7753, [9, 9, 9, 9, 9, 9, 9, 10, 10, 10]),
+]
 
-ps = PrefixSpan(X_seq)
-ps.minlen = 2
-ps.maxlen = 2
-
-print("ps.frequent")
-frequent_patterns = ps.frequent(8)
-
-index = []
-for i in range(len(X_seq)):
-    for j in range(len(frequent_patterns)):
-        #if set(frequent_patterns[j][1]).issubset(X_seq[i]):
-        if (all(x in X_seq[i] for x in frequent_patterns[j][1])):
-            print("Il pattern: ", frequent_patterns[j][1]  ," è stato trovato nella ts ", i)
-            index.append(i)
+index = {}
+for j, (support, pattern) in enumerate(frequent_patterns):
+    for i, ts in enumerate(X_seq):
+        if all(x in ts for x in pattern):
+            try:
+                index[j].append(i)
+            except KeyError:
+                index[j] = [i]
 
 print(index)
 
-
+for pat in index:
+    print(len(index[pat]))
