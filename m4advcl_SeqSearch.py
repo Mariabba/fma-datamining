@@ -1,8 +1,8 @@
-from prefixspan import PrefixSpan
-from music import MusicDB
 import numpy as np
-import pandas as pd
+from prefixspan import PrefixSpan
 from rich import print
+
+from music import MusicDB
 
 musi = MusicDB()
 """

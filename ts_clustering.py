@@ -1,16 +1,13 @@
-import multiprocessing
-
 import matplotlib as mpl
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
-import seaborn as sbn
+import seaborn as sns
 from rich import print
-from rich.progress import BarColumn, Progress, TimeRemainingColumn
-from tslearn.clustering import TimeSeriesKMeans, silhouette_score
+from tslearn.clustering import TimeSeriesKMeans
 from tslearn.piecewise import SymbolicAggregateApproximation
 from tslearn.preprocessing import TimeSeriesScalerMeanVariance
-import seaborn as sns
+
 from music import MusicDB
 
 mpl.rcParams["figure.dpi"] = 300

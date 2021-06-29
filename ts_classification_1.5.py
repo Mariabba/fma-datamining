@@ -1,24 +1,23 @@
-"""CLASSIFICAZIONE  SHAPLET RANDOM FOREST DATASET COMPLETO"""
-
-"""libraries"""
 import matplotlib.pyplot as plt
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.metrics import (
     accuracy_score,
-    f1_score,
+    auc,
     classification_report,
+    f1_score,
     plot_confusion_matrix,
+    roc_auc_score,
+    roc_curve,
 )
-from sklearn.metrics import roc_curve, auc, roc_auc_score
-from sklearn.model_selection import (
-    train_test_split,
-)
+from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import LabelBinarizer
 from tslearn.preprocessing import TimeSeriesScalerMeanVariance
-
-# librerie x shaplet
 from tslearn.shapelets import ShapeletModel
+
 from music import MusicDB
+
+"""CLASSIFICAZIONE  SHAPLET RANDOM FOREST DATASET COMPLETO"""
+
 
 # Carico il dataframe
 musi = MusicDB()

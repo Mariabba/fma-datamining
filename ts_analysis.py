@@ -1,21 +1,15 @@
-# pandas libraries
-import librosa
-import pandas as pd
-from pandas import DataFrame
-from pandas.testing import assert_frame_equal
-import IPython.display as ipd
-import missingno as mso
 import matplotlib.pyplot as plt
-import seaborn as sns
 import numpy as np
-from tslearn.clustering import TimeSeriesKMeans, silhouette_score
-from tslearn.generators import random_walks
+import seaborn as sns
+from tslearn.clustering import TimeSeriesKMeans
+from tslearn.piecewise import (
+    OneD_SymbolicAggregateApproximation,
+    PiecewiseAggregateApproximation,
+    SymbolicAggregateApproximation,
+)
 from tslearn.preprocessing import TimeSeriesScalerMeanVariance
 
 from music import MusicDB
-import IPython.display as ipd
-import numpy as np
-import scipy.stats as stats
 
 # Carico musi come dataframe 62 rows
 
@@ -85,13 +79,8 @@ def calculate_features(values):
 features = calculate_features(musi.df)
 print("Features", features)
 """
-from tsfresh.feature_extraction import extract_features
 
 """Time series Approximation"""
-from tslearn.piecewise import PiecewiseAggregateApproximation
-from tslearn.piecewise import SymbolicAggregateApproximation
-from tslearn.piecewise import OneD_SymbolicAggregateApproximation
-
 scaler = TimeSeriesScalerMeanVariance(mu=0.0, std=1.0)  # Rescale time series
 ts = scaler.fit_transform(musi.df.values.reshape(1, -1))
 

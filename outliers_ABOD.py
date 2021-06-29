@@ -3,7 +3,6 @@ import numpy as np
 import pandas as pd
 from pyod.models.abod import ABOD
 from pyod.utils.data import get_outliers_inliers
-
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import LabelEncoder
 

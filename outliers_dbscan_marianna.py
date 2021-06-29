@@ -1,20 +1,5 @@
-from collections import Counter, defaultdict
-from pathlib import Path
-
-import matplotlib.pyplot as plt
-import numpy as np
-import pandas as pd
-import seaborn as sns
-from langdetect import detect
-from scipy.spatial.distance import pdist, squareform
-from sklearn import preprocessing
 from sklearn.cluster import DBSCAN
-from sklearn.decomposition import PCA
-from sklearn.metrics import silhouette_score
-from sklearn.model_selection import train_test_split
-from sklearn.neighbors import NearestNeighbors
-from sklearn.preprocessing import LabelEncoder, MinMaxScaler, StandardScaler
-from statsmodels.compat import pandas
+from sklearn.preprocessing import StandardScaler
 
 import utils
 

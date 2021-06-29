@@ -1,16 +1,10 @@
-import lime
-import lime.lime_tabular
 import numpy as np
+import pandas as pd
 from lime import lime_tabular
-from matplotlib import pyplot as plt
-from sklearn import tree
 from sklearn.ensemble import RandomForestClassifier
-from sklearn.metrics import accuracy_score, f1_score
+from sklearn.metrics import accuracy_score
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import LabelEncoder
-from sklearn.svm import LinearSVC
-from sklearn.tree import DecisionTreeClassifier
-import pandas as pd
 
 import utils
 

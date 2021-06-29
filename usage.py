@@ -1,4 +1,4 @@
-import pandas as pd
+import seaborn as sns
 from matplotlib import pyplot as plt
 from rich import pretty, print
 
@@ -26,7 +26,6 @@ for col in tracks:
 print(low_coverage)
 print(tracks[("track", "duration")].describe())
 
-import seaborn as sns
 
 fig = plt.subplots(figsize=(100, 20))
 fig_dims = (1, 1)

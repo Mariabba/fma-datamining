@@ -1,44 +1,25 @@
-from pathlib import Path
 import os
 
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 
-# import pydotplus
-# from pydotplus import graphviz
-from matplotlib import pyplot
-from scipy.constants import lb
-from sklearn import tree, metrics
+from sklearn import metrics
 from sklearn.metrics import (
-    plot_confusion_matrix,
-    ConfusionMatrixDisplay,
-    roc_curve,
-    auc,
-    roc_auc_score,
-    confusion_matrix,
     accuracy_score,
-    f1_score,
+    auc,
     classification_report,
-    average_precision_score,
+    confusion_matrix,
+    f1_score,
+    plot_confusion_matrix,
     roc_auc_score,
-    precision_score,
-    recall_score,
-    make_scorer,
-    precision_recall_curve,
+    roc_curve,
 )
-
-from sklearn.model_selection import (
-    GridSearchCV,
-    RandomizedSearchCV,
-    StratifiedShuffleSplit,
-    train_test_split,
-)
+from sklearn.model_selection import RandomizedSearchCV, train_test_split
 from sklearn.preprocessing import LabelEncoder
 from sklearn.tree import DecisionTreeClassifier
 
 import utils
-from sklearn.utils import class_weight
 
 os.environ["PATH"] += (
     os.pathsep

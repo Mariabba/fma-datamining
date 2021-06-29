@@ -1,10 +1,8 @@
 from pathlib import Path
 
 import matplotlib.pyplot as plt
-import numpy as np
-import seaborn as sns
 import missingno as mso
-from langdetect import detect
+import seaborn as sns
 
 import utils
 

@@ -1,17 +1,10 @@
-import numpy as np
-from matplotlib import pyplot as plt
+import matplotlib.pyplot as plt
+import seaborn as sns
 from matplotlib.colors import ListedColormap
+from pyclustering.cluster import xmeans
+from sklearn.preprocessing import LabelEncoder
 
 import utils
-from pyclustering.cluster import xmeans
-import numpy as np
-import pandas as pd
-import matplotlib.pyplot as plt
-from sklearn.decomposition import PCA
-
-from collections import defaultdict
-from sklearn.preprocessing import LabelEncoder
-import seaborn as sns
 
 df = utils.load_tracks(
     "data/tracks.csv", dummies=True, buckets="continuous", fill=True, outliers=True
@@ -85,8 +78,6 @@ centers = xm.get_centers()
 print("Clusters: ", clusters)
 print("Centers: ", centers)
 
-"""
-# Visual Guidotti"""
 # Visual Guidotti
 # print("score", score)
 i = df.columns.values.tolist().index(("album", "listens"))

@@ -1,11 +1,9 @@
 import matplotlib.pyplot as plt
-import numpy as np
 import pandas as pd
 import seaborn as sns
 from tslearn.clustering.kmeans import TimeSeriesKMeans
 
 from music import MusicDB
-
 
 sns.set_theme(style="darkgrid")
 

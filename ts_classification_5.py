@@ -1,29 +1,25 @@
-"""CLASSIFICAZIONE CON SAX E SHAPLET KNN DTW"""
-from matplotlib import pyplot as plt
-from sklearn.preprocessing import LabelBinarizer
-
-"""libraries"""
 import numpy as np
 import pandas as pd
+from matplotlib import pyplot as plt
+from pyts.classification import KNeighborsClassifier
 from sklearn.metrics import (
     accuracy_score,
-    f1_score,
+    auc,
     classification_report,
+    f1_score,
     plot_confusion_matrix,
     roc_auc_score,
     roc_curve,
-    auc,
 )
-from sklearn.model_selection import (
-    train_test_split,
-    GridSearchCV,
-)
-from pyts.classification import KNeighborsClassifier
+from sklearn.model_selection import train_test_split
+from sklearn.preprocessing import LabelBinarizer
 from tslearn.piecewise import SymbolicAggregateApproximation
 from tslearn.preprocessing import TimeSeriesScalerMeanVariance
 from tslearn.shapelets import ShapeletModel
 
 from music import MusicDB
+
+"""CLASSIFICAZIONE CON SAX E SHAPLET KNN DTW"""
 
 
 def draw_confusion_matrix(Clf, X, y):

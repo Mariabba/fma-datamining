@@ -1,13 +1,9 @@
-import pandas as pd
-
 import matplotlib.pyplot as plt
+import pandas as pd
 import seaborn as sns
-
-from music import MusicDB
-
 from tslearn.metrics import dtw
 
-from scipy.spatial.distance import euclidean
+from music import MusicDB
 
 musi = MusicDB()
 print(musi.df.info())

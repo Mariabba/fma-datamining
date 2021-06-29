@@ -1,23 +1,16 @@
-from sklearn.ensemble import AdaBoostClassifier
-from sklearn.ensemble import BaggingClassifier
-from sklearn.ensemble import RandomForestClassifier
-import numpy as np
-import pandas as pd
 import matplotlib.pyplot as plt
-from sklearn.inspection import permutation_importance
-
+from sklearn.ensemble import AdaBoostClassifier
 from sklearn.metrics import (
     accuracy_score,
-    f1_score,
-    classification_report,
-    roc_curve,
     auc,
-    roc_auc_score,
+    classification_report,
+    f1_score,
     plot_confusion_matrix,
+    roc_auc_score,
+    roc_curve,
 )
-from sklearn.model_selection import train_test_split, RandomizedSearchCV
-from sklearn.preprocessing import LabelEncoder, LabelBinarizer, StandardScaler
-from sklearn.svm import SVC
+from sklearn.model_selection import train_test_split
+from sklearn.preprocessing import LabelBinarizer, LabelEncoder
 from sklearn.tree import DecisionTreeClassifier
 
 import utils

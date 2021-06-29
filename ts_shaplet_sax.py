@@ -1,26 +1,14 @@
-"""libraries"""
-
-import pandas as pd
-from pandas import DataFrame
-from pandas.testing import assert_frame_equal
-import IPython.display as ipd
 import matplotlib.pyplot as plt
-from matplotlib import cm
-import seaborn as sns
 import numpy as np
-
-from sklearn.metrics import (
-    accuracy_score,
-    f1_score,
-    classification_report,
-    plot_confusion_matrix,
-)
+import pandas as pd
+import seaborn as sns
+from sklearn.metrics import accuracy_score
 from tslearn.piecewise import SymbolicAggregateApproximation
 from tslearn.preprocessing import TimeSeriesScalerMeanVariance
-
+from tslearn.shapelets import ShapeletModel
 from tslearn.utils import ts_size
+
 from music import MusicDB
-from tslearn.shapelets import ShapeletModel, grabocka_params_to_shapelet_size_dict
 
 # Carico il dataframe
 musi = MusicDB()

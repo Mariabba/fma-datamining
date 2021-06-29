@@ -1,11 +1,7 @@
-from matplotlib import pyplot as plt
-import numpy as np
 import matrixprofile as mp
+from matplotlib import pyplot as plt
+
 from music import MusicDB
-from tslearn.piecewise import PiecewiseAggregateApproximation
-from tslearn.piecewise import SymbolicAggregateApproximation
-from tslearn.piecewise import OneD_SymbolicAggregateApproximation
-import pandas as pd
 
 data = MusicDB()
 

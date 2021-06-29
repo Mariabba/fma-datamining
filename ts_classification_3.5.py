@@ -1,30 +1,25 @@
-"""CLASSIFICAZIONE CON SAX E SHAPLET RANDOM FOREST"""
-from matplotlib import pyplot as plt
-from sklearn.preprocessing import LabelBinarizer
-
-"""libraries"""
-from tslearn.shapelets import ShapeletModel
-import pandas as pd
 import numpy as np
+import pandas as pd
+from matplotlib import pyplot as plt
 from sklearn.ensemble import RandomForestClassifier
-from sklearn.model_selection import (
-    train_test_split,
-    RandomizedSearchCV,
-)
 from sklearn.metrics import (
     accuracy_score,
-    f1_score,
+    auc,
     classification_report,
+    f1_score,
     plot_confusion_matrix,
     roc_auc_score,
-    auc,
     roc_curve,
 )
+from sklearn.model_selection import train_test_split
+from sklearn.preprocessing import LabelBinarizer
 from tslearn.piecewise import SymbolicAggregateApproximation
+from tslearn.preprocessing import TimeSeriesScalerMeanVariance
+from tslearn.shapelets import ShapeletModel
 
 from music import MusicDB
 
-from tslearn.preprocessing import TimeSeriesScalerMeanVariance
+"""CLASSIFICAZIONE CON SAX E SHAPLET RANDOM FOREST"""
 
 
 def draw_confusion_matrix(Clf, X, y):

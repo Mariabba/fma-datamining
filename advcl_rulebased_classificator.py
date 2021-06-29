@@ -1,26 +1,16 @@
-import pandas as pd
+import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
-import matplotlib.pyplot as plt
-from sklearn.preprocessing import LabelEncoder, StandardScaler
-from sklearn.metrics import precision_score, recall_score
-from sklearn.model_selection import GridSearchCV
-from sklearn.metrics import confusion_matrix
 from sklearn.metrics import (
     accuracy_score,
-    f1_score,
-    classification_report,
-    roc_curve,
     auc,
-    roc_auc_score,
+    classification_report,
+    confusion_matrix,
+    f1_score,
     plot_confusion_matrix,
+    roc_auc_score,
+    roc_curve,
 )
-from sklearn.metrics import roc_curve, auc, roc_auc_score
-from collections import defaultdict
-import utils
-import wittgenstein as lw
-
-from sklearn.model_selection import train_test_split
 
 
 def draw_confusion_matrix(Clf, X, y):

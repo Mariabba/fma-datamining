@@ -1,60 +1,10 @@
-import os
-import numpy as np
-import pandas as pd
-import matplotlib as mpl
 import matplotlib.pyplot as plt
-from matplotlib.colors import ListedColormap
-
-# sklearn
-from pyod.utils.example import visualize
-from sklearn import metrics
-from sklearn.preprocessing import (
-    MinMaxScaler,
-    MaxAbsScaler,
-    RobustScaler,
-    StandardScaler,
-    LabelEncoder,
-)
-from sklearn.preprocessing import KBinsDiscretizer
-
-from sklearn.metrics import (
-    accuracy_score,
-    f1_score,
-    classification_report,
-    confusion_matrix,
-)
-from sklearn.metrics import multilabel_confusion_matrix, roc_curve, auc
-from sklearn.metrics import (
-    roc_auc_score,
-    precision_score,
-    recall_score,
-    make_scorer,
-    precision_recall_curve,
-)
-from sklearn.metrics import average_precision_score
-from sklearn.metrics import plot_confusion_matrix, ConfusionMatrixDisplay
-
+import numpy as np
 from sklearn.model_selection import train_test_split
-from sklearn.model_selection import (
-    cross_val_score,
-    cross_validate,
-    cross_val_predict,
-    GridSearchCV,
-)
-from sklearn.inspection import permutation_importance
-
-from sklearn.neighbors import KNeighborsClassifier
-
-from pandas import DataFrame
-
-from pandas import DataFrame
-import utils
-from pathlib import Path
-from sklearn.preprocessing import LabelEncoder, StandardScaler
-import seaborn as sns
-from pyod.models.knn import KNN
-from sklearn.decomposition import PCA
 from sklearn.neighbors import NearestNeighbors
+from sklearn.preprocessing import StandardScaler
+
+import utils
 
 # DATASET
 df = utils.load_tracks(buckets="continuous", outliers=False)

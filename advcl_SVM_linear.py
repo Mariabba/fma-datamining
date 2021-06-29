@@ -1,19 +1,15 @@
-import numpy as np
-import pandas as pd
 import matplotlib.pyplot as plt
-
 from sklearn.metrics import (
     accuracy_score,
-    f1_score,
-    classification_report,
-    roc_curve,
     auc,
-    roc_auc_score,
+    classification_report,
+    f1_score,
     plot_confusion_matrix,
+    roc_auc_score,
+    roc_curve,
 )
-from sklearn.model_selection import train_test_split, RandomizedSearchCV
-from sklearn.naive_bayes import GaussianNB, CategoricalNB
-from sklearn.preprocessing import LabelEncoder, LabelBinarizer
+from sklearn.model_selection import train_test_split
+from sklearn.preprocessing import LabelEncoder
 from sklearn.svm import LinearSVC
 
 import utils
@@ -132,7 +128,7 @@ print(classification_report(y_test, y_pred))
 draw_confusion_matrix(clf, X_test, y_test)
 
 """ROC CURVE"""
-from sklearn.metrics import roc_curve, auc, roc_auc_score
+from sklearn.metrics import auc, roc_auc_score, roc_curve
 
 fpr, tpr, _ = roc_curve(y_test, y_pred)
 roc_auc = auc(fpr, tpr)

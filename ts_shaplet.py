@@ -1,25 +1,14 @@
-"""SHAPLET RETRIVE WITH ALL DATASET"""
-"""libraries"""
-
-import pandas as pd
-from pandas import DataFrame
-from pandas.testing import assert_frame_equal
-import IPython.display as ipd
 import matplotlib.pyplot as plt
-from matplotlib import cm
-import seaborn as sns
 import numpy as np
-
-from sklearn.metrics import (
-    accuracy_score,
-    f1_score,
-    classification_report,
-    plot_confusion_matrix,
-)
-
-from tslearn.utils import ts_size
-from music import MusicDB
+import seaborn as sns
+from sklearn.metrics import accuracy_score
 from tslearn.shapelets import ShapeletModel
+from tslearn.utils import ts_size
+
+from music import MusicDB
+
+"""SHAPLET RETRIVE WITH ALL DATASET"""
+
 
 # Carico il dataframe
 musi = MusicDB()

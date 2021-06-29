@@ -1,59 +1,19 @@
-import itertools
-import os
-import numpy as np
-import pandas as pd
-import matplotlib as mpl
 import matplotlib.pyplot as plt
-from matplotlib.colors import ListedColormap
-import missingno as mso
-
-# sklearn
-from sklearn import metrics
-from sklearn.preprocessing import (
-    MinMaxScaler,
-    MaxAbsScaler,
-    RobustScaler,
-    StandardScaler,
-    LabelEncoder,
-    label_binarize,
-    LabelBinarizer,
-)
-from sklearn.preprocessing import KBinsDiscretizer
-
 from sklearn.metrics import (
+    ConfusionMatrixDisplay,
     accuracy_score,
-    f1_score,
+    auc,
     classification_report,
-    confusion_matrix,
-)
-from sklearn.metrics import multilabel_confusion_matrix, roc_curve, auc
-from sklearn.metrics import (
+    f1_score,
+    plot_confusion_matrix,
     roc_auc_score,
-    precision_score,
-    recall_score,
-    make_scorer,
-    precision_recall_curve,
+    roc_curve,
 )
-from sklearn.metrics import average_precision_score
-from sklearn.metrics import plot_confusion_matrix, ConfusionMatrixDisplay
-import seaborn as sns
-from sklearn.model_selection import train_test_split, RandomizedSearchCV
-from sklearn.model_selection import (
-    cross_val_score,
-    cross_validate,
-    cross_val_predict,
-    GridSearchCV,
-)
-from sklearn.inspection import permutation_importance
-
+from sklearn.model_selection import GridSearchCV, train_test_split
 from sklearn.neighbors import KNeighborsClassifier
+from sklearn.preprocessing import LabelBinarizer, LabelEncoder
 
-from pandas import DataFrame
-
-from pandas import DataFrame
 import utils
-from pathlib import Path
-
 
 # FUNCTION
 

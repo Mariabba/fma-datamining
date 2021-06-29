@@ -1,11 +1,7 @@
-from kmodes.kmodes import KModes
-from matplotlib import pyplot as plt
-from sklearn.metrics import silhouette_score
-import utils
-from sklearn.metrics import pairwise_distances
-import seaborn as sns
 import numpy as np
-import pandas as pd
+from kmodes.kmodes import KModes
+
+import utils
 
 df = utils.load_tracks(
     "data/tracks.csv", dummies=True, buckets="discrete", fill=True, outliers=True

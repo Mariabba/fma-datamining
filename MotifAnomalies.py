@@ -1,25 +1,9 @@
-import librosa
-import pandas as pd
-
-from pandas import DataFrame
-from pandas.testing import assert_frame_equal
-import IPython.display as ipd
-import missingno as mso
 import matplotlib.pyplot as plt
-import seaborn as sns
-import numpy as np
-from tslearn.clustering import TimeSeriesKMeans, silhouette_score
-from tslearn.generators import random_walks
+import pandas as pd
+from matrixprofile import *
 from tslearn.preprocessing import TimeSeriesScalerMeanVariance
 
 from music import MusicDB
-import IPython.display as ipd
-import numpy as np
-import scipy.stats as stats
-import numpy as np
-from sklearn.preprocessing import StandardScaler
-
-from matrixprofile import *
 
 musi = MusicDB()
 

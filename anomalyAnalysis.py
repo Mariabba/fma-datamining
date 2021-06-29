@@ -1,27 +1,8 @@
-import librosa
-import pandas as pd
-
-from pandas import DataFrame
-from pandas.testing import assert_frame_equal
-import IPython.display as ipd
-import missingno as mso
 import matplotlib.pyplot as plt
+import numpy as np
+import pandas as pd
 import seaborn as sns
-import numpy as np
-from scipy.signal import argrelextrema
-from tslearn.clustering import TimeSeriesKMeans, silhouette_score
-from tslearn.generators import random_walks
-from tslearn.preprocessing import TimeSeriesScalerMeanVariance
-
-from music import MusicDB
-import IPython.display as ipd
-import numpy as np
-import scipy.stats as stats
-import numpy as np
-from sklearn.preprocessing import StandardScaler
-
 from matrixprofile import *
-import seaborn as sns
 
 sns.set(
     rc={"figure.figsize": (18, 6)},

@@ -1,18 +1,8 @@
-import numpy as np
-from matplotlib import pyplot as plt
-from matplotlib.colors import ListedColormap
-from pyclustering.cluster import xmeans, cluster_visualizer, cluster_visualizer_multidim
-from pyclustering.cluster.center_initializer import kmeans_plusplus_initializer
-from pyclustering.cluster.silhouette import silhouette
-from pyclustering.utils import read_sample
-from sklearn.metrics import silhouette_score
-from sklearn.preprocessing import LabelEncoder
-from array import array
-from sklearn.decomposition import PCA
-from sklearn.preprocessing import StandardScaler
 import seaborn as sns
+from matplotlib import pyplot as plt
+from pyclustering.cluster import xmeans
+from pyclustering.cluster.center_initializer import kmeans_plusplus_initializer
 
-from sklearn.cluster import OPTICS
 from utils import TracksMetaDB
 
 df = TracksMetaDB(buckets="continuous").normalized

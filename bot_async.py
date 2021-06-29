@@ -1,6 +1,5 @@
 import hashlib
 import logging
-import time
 
 from aiogram import Bot, Dispatcher, executor
 from aiogram.types import InlineQuery, InlineQueryResultArticle, InputTextMessageContent

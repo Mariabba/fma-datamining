@@ -1,30 +1,24 @@
-"""CLASSIFCAZIONE CON SAX E RANDOM FOREST"""
-from matplotlib import pyplot as plt
-from sklearn.preprocessing import LabelBinarizer
-
-"""libraries"""
 import numpy as np
 import pandas as pd
+from matplotlib import pyplot as plt
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.metrics import (
     accuracy_score,
-    f1_score,
+    auc,
     classification_report,
+    f1_score,
     plot_confusion_matrix,
     roc_auc_score,
-    auc,
     roc_curve,
 )
-from sklearn.model_selection import (
-    train_test_split,
-    RandomizedSearchCV,
-    GridSearchCV,
-    cross_val_score,
-)
+from sklearn.model_selection import train_test_split
+from sklearn.preprocessing import LabelBinarizer
 from tslearn.piecewise import SymbolicAggregateApproximation
 from tslearn.preprocessing import TimeSeriesScalerMeanVariance
 
 from music import MusicDB
+
+"""CLASSIFCAZIONE CON SAX E RANDOM FOREST"""
 
 """FILE 4  CLASSIFICAZIONE CON SAX RANDOM FOREST"""
 

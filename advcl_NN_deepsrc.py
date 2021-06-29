@@ -1,4 +1,3 @@
-import matplotlib.pyplot as plt
 import pandas as pd
 from rich import pretty, print
 from rich.progress import BarColumn, Progress
